@@ -1,0 +1,41 @@
+#!/bin/bash
+#Скрипт запускается при первом входе пользователя в систему.
+#Целью скрипта является создание закладок, ссылок, отображение окна приветсвия, уточнение данных для установки системы.
+#author: kachnu
+# email: ya.kachnu@yandex.ua
+
+#Создание закладок в Thunar и окне проводника gtk-3
+if [ -f "/home/$USER/.gtk-bookmarks" ]; then
+   sed -i "s/REPLACEME/${USER}/g" /home/$USER/.gtk-bookmarks
+fi
+if [ -f "/home/$USER/.config/gtk-3.0/bookmarks" ]; then
+   sed -i "s/REPLACEME/${USER}/g" /home/$USER/.config/gtk-3.0/bookmarks
+fi
+#Создание ссылок на обои
+if [ ! -f /home/$USER/images/wallpapers/desktop-base ]; then
+   ln -s /usr/share/images/desktop-base /home/$USER/images/wallpapers/desktop-base
+   ln -s /usr/share/backgrounds /home/$USER/images/wallpapers/backgrounds
+fi
+#Добавляем в меню пунк Install
+
+#Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
+#После установки данные строки не будут использоваться.
+if [ -f "/etc/pointlinux-installer/install.conf" ]
+then
+    OLD_WAY=$(cat /etc/pointlinux-installer/install.conf | grep LIVE_MEDIA_SOURCE | sed "s/LIVE_MEDIA_SOURCE = //g")
+    if [ ! -f "$OLD_WAY" ]
+     then 
+      echo "Путь к файлу filesystem.squashfs - $OLD_WAY не верен! Будем искать другой путь к файлу"
+      NEW_WAY=$(find /lib/ -name filesystem.squashfs -type f 2>/dev/null)
+      echo "Найден путь $NEW_WAY, редактируем /etc/pointlinux-installer/install.conf" 
+      sudo sed -i "s|${OLD_WAY}|${NEW_WAY}|g" /etc/pointlinux-installer/install.conf
+     else 
+      echo "Путь к файлу filesystem.squashfs - $OLD_WAY верен. Никаких изменений не требуется"
+    fi
+fi
+#Убираем данный скрипт из автозапуска
+if [ -f "/home/$USER/.config/autostart/firstrun.desktop" ]; then
+   sed -i "s/Hidden=false/Hidden=true/g" /home/$USER/.config/autostart/firstrun.desktop
+fi
+
+exit 0
