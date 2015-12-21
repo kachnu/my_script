@@ -12,13 +12,6 @@ if [ ! -x "`which "$DIALOG"`" ]
   fi
 fi
 
-if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
-then
- echo "Start $0 with root"
- sudo $0 
- exit 0
-fi
-
 case $LANG in
   uk*|ru*|be*) #UA RU BE locales
                MAIN_LABEL="Cкрипт для e4rat"
@@ -29,13 +22,16 @@ case $LANG in
                MENU4="Убрать e4rat из параметров загрузки"
                MENU5="Добавить e4rat в параметры загрузки"
                MENU6="Редактировать файл настроек e4rat"
-               MENU7="Справка"
+               MENUh="Справка"
                HELP_EXIT="Нажмите Enter для перехода в главное меню"
                ATTENTION="ВНИМАНИЕ!"
                CHECK_PO="- не найдено!"
                REBOOT_TEXT="Для продолжения необходимо перезагрузить систему!
                
 Перезагрузить систему сейчас?"
+               STEP1_OVER="Шаг1 - Сбор информации для e4rat. ЗАКОНЧЕН!
+Теперь необходимо выполнить Шаг2 - Преобразование файлов и включение e4rat.
+"
                TIME_TEXT="Введите время (секунд) в течение, которого e4rat будет собирать информацию о запускаемых программах/процессах"
                ERROR_TIME="- не является числом. Повторите ввод!"
                DEL_LABEL="Исключение e4rat из параметров загрузки"
@@ -98,13 +94,16 @@ ___________________________________"
                MENU4="Remove e4rat from boot options"
                MENU5="Add e4rat to boot options"
                MENU6="Edit the configuration file e4rat"
-               MENU7="Help"
+               MENUh="Help"
                HELP_EXIT="Press Enter to go to the main menu"
                ATTENTION="ATTENTION!"
                CHECK_PO="- Not found!"
                REBOOT_TEXT="To continue, you must reboot the system!
                
 Reboot Sistem now?"
+               STEP1_OVER="Step 1 - Gathering information for e4rat. FINISHED!
+Now you need to perform Step 2 - Converting files and inclusion e4rat.
+"
                TIME_TEXT="Enter the time (seconds) during which e4rat will collect information about running programs/processes"
                ERROR_TIME="- Not a number. Re-enter!"
                DEL_LABEL="E4rat exception of boot options"
@@ -159,6 +158,25 @@ Grub settings will be updated.
 Perform an action?"
                ;;
 esac             
+
+if [[ $1 == '' ]]
+then 
+ if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
+  then
+  echo "Start $0 with root"
+  sudo $0 
+  exit 0
+ fi
+fi
+
+if [[ $1 == '2step' ]] #Автозапуск скрипта после первого шага
+ then 
+     TIME=$(grep "timeout  " /etc/e4rat.conf  | sed "s/; timeout  //g" | sed "s/timeout  //g" | sed "s/ //g")
+     sleep $TIME
+     x-terminal-emulator -e $DIALOG --title "$ATTENTION" --msgbox "$STEP1_OVER" 10 60 
+     x-terminal-emulator -e $0 
+     exit 0
+fi
 #########################################################
 Check () #Функция проверки ПО
 {
@@ -179,18 +197,28 @@ echo "$HELP"
 CollectInfo () #Шаг1
 {
 TIME=$(grep "timeout  " /etc/e4rat.conf  | sed "s/; timeout  //g" | sed "s/timeout  //g" | sed "s/ //g")
-whiptail --title "$STEP1_LABEL" --yesno "$STEP1_TEXT1 $TIME $STEP1_TEXT2" 15 70
+$DIALOG --title "$STEP1_LABEL" --yesno "$STEP1_TEXT1 $TIME $STEP1_TEXT2" 15 70
 if [ $? == 0 ]
  then sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\(.*\)/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet init=\/sbin\/e4rat-collect\"/g" /etc/default/grub
       update-grub
+      echo "Add \"$0 2step\" to autostart"
+      echo "[Desktop Entry]
+Type=Application
+Exec=/usr/local/bin/my_e4rat.sh 2step
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_IN]=Autostart script e4rat
+Name=Autostart script e4rat
+Comment[en_IN]=
+Comment=" > /home/$SUDO_USER/.config/autostart/script_e4rat.desktop
  else MainForm
 fi
-
 }
 #########################################################
 DefragByInfo () #Шаг2
 {
-whiptail --title "$STEP2_LABEL" --yesno "$STEP2_TEXT" 18 60
+$DIALOG --title "$STEP2_LABEL" --yesno "$STEP2_TEXT" 18 60
 if [ $? == 0 ]
  then echo -n '#! /bin/sh
 echo "- Start script $0" > /dev/tty1
@@ -201,7 +229,8 @@ echo "- Delete temp files - /etc/rc1.d/S10my_e4rat_realloc and /etc/init.d/my_e4
 rm -r /etc/rc1.d/S10my_e4rat_realloc
 rm -r /etc/init.d/my_e4rat_realloc.sh
 echo "- Start command: e4rat-realloc /var/lib/e4rat/startup.log" > /dev/tty1
-echo "Wait, please. The system restarts automatically" > /dev/tty1
+echo "
+- Wait, please. The system restarts automatically" > /dev/tty1
 e4rat-realloc /var/lib/e4rat/startup.log
 echo "- Reboot system"  > /dev/tty1
 sleep 4s && reboot
@@ -211,6 +240,8 @@ exit 0
             ln /etc/init.d/my_e4rat_realloc.sh /etc/rc1.d/S10my_e4rat_realloc
       sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\(.*\)/GRUB_CMDLINE_LINUX_DEFAULT=\"single\"/g" /etc/default/grub
       update-grub
+      rm /home/$SUDO_USER/.config/autostart/script_e4rat.desktop
+      sed -i '/e4rat/d' /var/lib/e4rat/startup.log
  else MainForm
 fi
 
@@ -218,7 +249,7 @@ fi
 ########################################################
 DefragByInfo2 () #Шаг2 - альтернативный с отображением выполнения e4rat-realloc 
 {
-whiptail --title "$STEP2_LABEL" --yesno "$STEP2_TEXT" 18 60
+$DIALOG --title "$STEP2_LABEL" --yesno "$STEP2_TEXT" 18 60
 if [ $? == 0 ]
  then cp /root/.bashrc /root/.bashrc.backup
  echo -n '#! /bin/sh
@@ -228,7 +259,8 @@ update-grub
 echo "- mv /root/.bashrc.backup  /root/.bashrc"
 mv /root/.bashrc.backup  /root/.bashrc
 echo "- Start command: e4rat-realloc /var/lib/e4rat/startup.log"
-echo "Wait, please."
+echo "
+- Wait, please."
 e4rat-realloc /var/lib/e4rat/startup.log
 echo "- Turn Enter for reboot system"
 read x 
@@ -238,15 +270,15 @@ exit 0
       chmod +x /root/.bashrc     
       sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\(.*\)/GRUB_CMDLINE_LINUX_DEFAULT=\"single\"/g" /etc/default/grub
       update-grub
+      /home/$SUDO_USER/.config/autostart/script_e4rat.desktop
  else MainForm
 fi
-
 }
 
 #########################################################
-Adde4rat () #Добавление e4rat в автозагрузку
+Adde4rat () #Добавление e4rat в автозагрузку системы
 {
-whiptail --title "$ADD_LABEL" --yesno "$ADD_TEXT" 13 60
+$DIALOG --title "$ADD_LABEL" --yesno "$ADD_TEXT" 13 60
 if [ $? == 0 ]
  then sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\(.*\)/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet init=\/sbin\/e4rat-preload\"/g" /etc/default/grub
       update-grub
@@ -256,17 +288,20 @@ fi
 #########################################################
 Dele4rat () #Исключение e4rat из автозагрузки
 {
-whiptail --title "$DEL_LABEL" --yesno "$DEL_TEXT" 13 60
+$DIALOG --title "$DEL_LABEL" --yesno "$DEL_TEXT" 13 60
 if [ $? == 0 ]
  then sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\(.*\)/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet\"/g" /etc/default/grub
       update-grub
+      if [ -f /home/$SUDO_USER/.config/autostart/script_e4rat.desktop ]
+       then rm /home/$SUDO_USER/.config/autostart/script_e4rat.desktop
+      fi
  else MainForm
 fi	
 }
 #########################################################
 RebootSystem () #Перезагрузка
 {
-whiptail --title "$ATTENTION" --yesno "$REBOOT_TEXT" 10 60
+$DIALOG --title "$ATTENTION" --yesno "$REBOOT_TEXT" 10 60
 if [ $? == 0 ]
  then reboot
  else MainForm
@@ -292,21 +327,23 @@ done
 #########################################################
 MainForm () #Главная форма
 {
+TIME=$(grep "timeout  " /etc/e4rat.conf  | sed "s/; timeout  //g" | sed "s/timeout  //g" | sed "s/ //g")
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
-    "$MAIN_TEXT" 13 60\
+    "$MAIN_TEXT" 16 60\
     7\
         1 "$MENU1"\
         2 "$MENU2"\
-        3 "$MENU3"\
+        3 "$MENU3 - $TIME s"\
         4 "$MENU4"\
         5 "$MENU5"\
         6 "$MENU6"\
-        7 "$MENU7" 3>&1 1>&2 2>&3)
+        h "$MENUh" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Exit ; exit 0
 fi
 case $ANSWER in
     1) Check e4rat-collect
+       Check x-terminal-emulator
        CollectInfo
        RebootSystem
        ;;
@@ -329,7 +366,7 @@ case $ANSWER in
        nano /etc/e4rat.conf
        MainForm
        ;; 
-    7) Help
+    h) Help
        echo $HELP_EXIT 
        read x
        MainForm

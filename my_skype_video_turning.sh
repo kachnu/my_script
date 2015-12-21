@@ -22,8 +22,9 @@ case $LANG in
                MENU4="Отображать по горизонтали и по вертикали"
                MENU5="Удалить все проделки данного скрипта над скайпом"
                MENU6="Редактирование файла /usr/bin/skype"
-               MENU7="Справка"
-               HELP_EXIT="Нажмите Enter для перехода в главное меню"
+               MENUh="Справка"
+               HELP_EXIT="
+Нажмите Enter для перехода в главное меню"
                ATTENTION="ВНИМАНИЕ!"
                CHECK_PO="- не найдено!"
                RESTART_TEXT="Запустить (перезапустить) Skype сейчас?"
@@ -44,8 +45,9 @@ ___________________________________"
                MENU4="Show on the horizon and vertically"
                MENU5="Delete all the tricks of the script over skype"
                MENU6="Edit the file /usr/bin/skype"
-               MENU7="Help"
-               HELP_EXIT="Press Enter to go to the main menu"
+               MENUh="Help"
+               HELP_EXIT="
+Press Enter to go to the main menu"
                ATTENTION="ATTENTION!"
                CHECK_PO="- not found!"
                RESTART_TEXT="Start (restart) Skype now?"
@@ -140,7 +142,7 @@ MainForm () #Главная форма
 {
 CheckState
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
-    "$MAIN_TEXT" 13 60\
+    "$MAIN_TEXT" 15 60\
     7\
         1 "$MENU1 $STATE_DEF"\
         2 "$MENU2 $STATE_HOR"\
@@ -148,7 +150,7 @@ ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
         4 "$MENU4 $STATE_HOR_VER"\
         5 "$MENU5"\
         6 "$MENU6"\
-        7 "$MENU7" 3>&1 1>&2 2>&3)
+        h "$MENUh" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Exit ; exit 0
 fi
@@ -185,7 +187,7 @@ case $ANSWER in
        sudo nano /usr/bin/skype
        MainForm
        ;; 
-    7) Help
+    h) Help
        echo $HELP_EXIT 
        read x
        MainForm

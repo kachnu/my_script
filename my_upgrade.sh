@@ -43,7 +43,7 @@ ___________________________________"
                MAIN_TEXT="Select an action:"
                MENU1="Start safe upgrade"
                MENU2="Start full upgrade"
-               MENU3="Edit /etc/apt/sources.list)"
+               MENU3="Edit /etc/apt/sources.list"
                MENU4="Update flashplugin-nonfree"
                MENUh="Help"
                PRELINK_TEXT="To speed up the application launch is recommended to use the utility prelink!
@@ -130,7 +130,7 @@ use_proxy = on" | sudo tee --append /etc/wgetrc
       ;;
   h ) Help;;
  '' ) ;;
-  * ) echo "oops!";;
+  * ) echo "oops! - $ANSWER";;
 esac
 echo "$EXIT_TEXT"
 read input

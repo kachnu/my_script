@@ -19,7 +19,7 @@ case $LANG in
                MENU1="Установка NVIDIA Optimus (non-free)"
                MENU2="Установка NVIDIA Optimus (nouveau)"
                MENU3="Запуск теста NVIDIA Optimus"
-               MENU4="Справка"
+               MENUh="Справка"
                REBOOT_TEXT="Для применения настроек необходимо перезагрузить систему!
                
 Перезагрузить систему сейчас?"
@@ -41,7 +41,7 @@ ___________________________________"
                MENU1="Install NVIDIA Optimus (non-free)"
                MENU2="Install NVIDIA Optimus (nouveau)"
                MENU3="Help"
-               MENU4="Start test NVIDIA Optimus"
+               MENUh="Start test NVIDIA Optimus"
                REBOOT_TEXT="To apply the settings you must reboot the system !
                
 Reboot Sistem now?"
@@ -93,7 +93,7 @@ ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
         1 "$MENU1"\
         2 "$MENU2"\
         3 "$MENU3"\
-        4 "$MENU4" 3>&1 1>&2 2>&3)
+        h "$MENUh" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Exit ; exit 0
 fi
@@ -101,8 +101,8 @@ case $ANSWER in
   1 ) sudo apt-get update; sudo apt-get install bumblebee-nvidia primus && echo "$ALLOK"; RebootSystem ;; 
   2 ) sudo apt-get update; sudo apt-get install bumblebee primus && echo "$ALLOK"; RebootSystem ;; 
   3 ) Check optirun && optirun glxgears -info;;
-  4 ) Help;;
-  * ) echo "oops!";;
+  h ) Help;;
+  * ) echo "oops! - $ANSWER" ;;
 esac
 echo "$EXIT_TEXT"
 read input

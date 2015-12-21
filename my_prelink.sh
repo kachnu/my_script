@@ -19,7 +19,7 @@ case $LANG in
                MAIN_TEXT="Выберите действие:"
                MENU1="Запуск связывания prelink"
                MENU2="Отмена связывания prelink"
-               MENU3="Справка"
+               MENUh="Справка"
                EXIT_TEXT="
 Нажмите Enter для перехода в главное меню"
                ATTENTION="ВНИМАНИЕ!"
@@ -38,7 +38,7 @@ ___________________________________"
                MAIN_TEXT="Select an action:"
                MENU1="Start prelink "
                MENU2="Start un-prelink "
-               MENU3="Help"
+               MENUh="Help"
                EXIT_TEXT="
 Press Enter to go to the main menu"
                ATTENTION="ATTENTION!"
@@ -74,18 +74,18 @@ echo "$HELP"
 MainForm () #Главная форма
 {
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
-    "$MAIN_TEXT" 10 40\
+    "$MAIN_TEXT" 12 50\
     3\
         1 "$MENU1"\
         2 "$MENU2"\
-        3 "$MENU3" 3>&1 1>&2 2>&3)
+        h "$MENUh" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Exit ; exit 0
 fi
 case $ANSWER in
   1 ) sudo prelink -amvRf && echo "$ALLOK";; 
   2 ) sudo prelink -auv && echo "$ALLOK";; 
-  3 ) Help;;
+  h ) Help;;
   * ) echo "oops!";;
 esac
 echo "$EXIT_TEXT"

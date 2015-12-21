@@ -33,6 +33,32 @@ fi
 
 TMPFILE=`mktemp` || exit 1
 
+cd $HOME
+STATE_DIS=''
+STATE_EN=''
+STATE_EN_RBG=''
+STATE_EN_BRG=''
+wine regedit /E HKEY_CURRENT_USER
+MODE=`cat HKEY_CURRENT_USER | grep \"FontSmoothing\" | sed "s/[^0-9]//g"`
+TYPE=`cat HKEY_CURRENT_USER | grep \"FontSmoothingType\" | sed "s/[^0-9]//g" | sed "s/0000000//g"`
+ORIENTATION=`cat HKEY_CURRENT_USER | grep \"FontSmoothingOrientation\" | sed "s/[^0-9]//g" | sed "s/0000000//g"`
+if [ $MODE = 0 ] && [ $TYPE = 0 ] && [ $ORIENTATION = 1 ]
+ then STATE_DIS='- ON'
+fi
+if [ $MODE = '' ] && [ $TYPE = '' ] && [ $ORIENTATION = '' ]
+ then STATE_DIS='- ON'
+fi
+if [ $MODE = 2 ] && [ $TYPE = 1 ] && [ $ORIENTATION = 1 ]
+ then STATE_EN='- ON'
+fi
+if [ $MODE = 2 ] && [ $TYPE = 2 ] && [ $ORIENTATION = 1 ]
+ then STATE_EN_RBG='- ON'
+fi
+if [ $MODE = 2 ] && [ $TYPE = 2 ] && [ $ORIENTATION = 0 ]
+ then STATE_EN_BRG='- ON'
+fi
+rm -f HKEY_CURRENT_USER
+
 case $LANG in
    uk*|ru*|be*) #UA RU BE locales 
                 MENU_TEXT="Выберите режим сглаживания шрифтов в wine:"
@@ -50,14 +76,13 @@ case $LANG in
                 ;;
 esac
 
-
 $DIALOG --menu \
-   "$MENU_TEXT" 13 55\
+   "$MENU_TEXT" 13 65\
     4\
-        1 "$MENU1"\
-        2 "$MENU2"\
-        3 "$MENU3"\
-        4 "$MENU4" 2>$TMPFILE
+        1 "$MENU1 $STATE_DIS"\
+        2 "$MENU2 $STATE_EN"\
+        3 "$MENU3 $STATE_EN_RBG"\
+        4 "$MENU4 $STATE_EN_BRG" 2>$TMPFILE
 
 STATUS=$?
 ANSWER=`cat $TMPFILE`
