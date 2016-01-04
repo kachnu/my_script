@@ -448,6 +448,8 @@ then
         Help
         MainForm
         ;;
+   "")  MainForm 
+        ;; 
     *)  echo "ooops!- $ANSWER"
         exit 1
         ;;

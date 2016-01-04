@@ -113,8 +113,7 @@ case $ANSWER in
         TYPE=2
         ORIENTATION=0
         ;;
-    *)
-        rm -f $TMPFILE
+    *)  rm -f $TMPFILE
         echo "ooops! - $ANSWER"
         exit 1
         ;;

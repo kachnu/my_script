@@ -327,7 +327,9 @@ then
         ;;    
     6)  echo "Open xfce configuration Default"
         OpenSettings default.tar.gz
-        ;;  
+        ;;
+   "")  MainForm 
+        ;;   
     *)  echo oops! - $ANSWER
         exit 1
         ;;

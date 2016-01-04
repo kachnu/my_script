@@ -241,7 +241,9 @@ then
        ;;
     6) Help | zenity --text-info --cancel-label="Back" --title="Help" --width=400 --height=300
        MainForm
-       ;;              
+       ;;  
+  "" ) MainForm 
+       ;;             
     *) echo ooops! - $ANSWER
        exit 1
        ;;
