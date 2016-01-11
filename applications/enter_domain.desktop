@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Enter PC to Domain
+Name[ru]=Ввод ПК в домен
+Comment=Enter PC to Domain
+Exec=x-terminal-emulator -e /usr/local/bin/my_enter_to_domain.sh
+Icon=network-workgroup
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=System;Settings;

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Skype Video Turning
+Name[ru]=Skype поворот видео
+Comment=Video Turning
+Exec=/usr/local/bin/my_skype_video_turning.sh
+Icon=skype.png
+Terminal=true
+Type=Application
+Encoding=UTF-8
+Categories=Network;Application;
+MimeType=x-scheme-handler/skype;
+X-KDE-Protocols=skype

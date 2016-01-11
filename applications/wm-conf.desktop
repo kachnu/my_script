@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Manager WM
+GenericName[ru]=Управление WM Compiz Metacity Xfwm4
+Name=Manager WM
+Name[ru]=Управление WM Compiz Metacity Xfwm4
+Comment=Manager WM
+Comment[ru]=Скрипт управления оконными менеджерами WM. Позволяет запускать Compiz, Metacity, Xfwm4, добавлять их в автозагрузку, вызывать менеджеры настроек WM.
+Exec=/usr/local/bin/my_wm_conf.sh
+Icon=ccsm
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;Utility;Settings;

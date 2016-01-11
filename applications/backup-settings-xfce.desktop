@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Backup settings XFCE
+GenericName[ru]=Backup настроек XFCE
+Name=Backup settings XFCE
+Name[ru]=Backup настроек XFCE
+Comment=Backup settings XFCE
+Comment[ru]=Backup настроек XFCE. Выбор настроек вида Gnome2 Xfce Windows
+Exec=/usr/local/bin/my_backup_settings_xfce.sh
+Icon=preferences-desktop-theme
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;Utility;Settings;

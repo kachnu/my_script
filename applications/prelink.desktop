@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Acceleration Prelink
+GenericName[ru]=Ускорение Prelink
+Name=Acceleration Prelink
+Name[ru]=Ускорение Prelink
+Comment=Script for prelink
+Comment[ru]=Скрипт prelink (связывание динамических библиотек для ускорения запуска программ)
+Exec=x-terminal-emulator -e /usr/local/bin/my_prelink.sh
+Icon=insert-link
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;System;

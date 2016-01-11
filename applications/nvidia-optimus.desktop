@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=NVIDIA optimus drivers
+GenericName[ru]=NVIDIA optimus driversk
+Name=NVIDIA optimus drivers
+Name[ru]=NVIDIA optimus drivers
+Comment=NVIDIA optimus drivers
+Comment[ru]=Скрипт устанавливает драйвера NVIDIA optimus
+Exec=/usr/local/bin/my_nvidia_optimus_drivers.sh
+Icon=nvidia-settings
+Terminal=true
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;System;

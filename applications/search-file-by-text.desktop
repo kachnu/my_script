@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Search file by text
+GenericName[ru]=Поиск файлов по фразе
+Name=Search file by text
+Name[ru]=Поиск файлов по фразе
+Comment=Search file by text
+Comment[ru]=Скрипт выводит список файлов в которых встречается заданная фраза.
+Exec=/usr/local/bin/my_search_file_by_text.sh --gui
+Icon=system-search
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;GNOME;Utility;

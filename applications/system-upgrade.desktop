@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Upgrade system
+GenericName[ru]=Обновление системы
+Name=Upgrade system
+Name[ru]=Обновление системы
+Comment=Upgrade system
+Comment[ru]=Скрипт обновления системы (использование apt-get upgrade, apt-get dist-upgrade).
+Exec=x-terminal-emulator -e /usr/local/bin/my_upgrade.sh
+Icon=system-software-update
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;System;

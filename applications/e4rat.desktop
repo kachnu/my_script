@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Acceleration e4rat
+GenericName[ru]=Ускорение e4rat
+Name=Acceleration e4rat
+Name[ru]=Ускорение e4rat
+Comment=Script for e4rat
+Comment[ru]=Скрипт для облегчения работы e4rat. Инструмент e4rat существенно ускоряет системы при использовании обычных жестких дисков с файловой системой ext4, бесполезен для ssd.
+Exec=x-terminal-emulator -e /usr/local/bin/my_e4rat.sh
+Icon=poi-airport
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;System;

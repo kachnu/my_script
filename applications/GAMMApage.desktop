@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=GAMMApage
+Name[ru]=Настройка гаммы монитора GAMMApage
+Comment=Video gamma
+Exec=/usr/local/bin/GAMMApage
+Icon=desktop-effects
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=System;Settings;

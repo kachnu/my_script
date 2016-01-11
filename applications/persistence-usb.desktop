@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Make persistence live-usb
+GenericName[ru]=Создание live-usb с сохранением
+Name=Make persistence live-usb
+Name[ru]=Создание live-usb с сохранением
+Comment=Make persistence live-usb
+Comment[ru]=Скрипт позволяет создавать live-usb с возможностью cохранить изменения в системе, использует gparted и unetbootin.
+Exec=gksudo /usr/local/bin/my_persistence_usb.sh
+Icon=usb-creator-gtk
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=false
+Categories=GTK;System;

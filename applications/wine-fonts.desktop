@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Wine-config-fonts
+GenericName[ru]=Conky-conf
+Name=Wine-config-fonts
+Name[ru]=Настройка сглаживания шрифтов Wine
+Comment=Wine-config-fonts
+Comment[ru]=Настройка сглаживания шрифтов Wine
+Exec=/usr/local/bin/winefontssmoothing.sh
+Icon=wine-winecfg
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=Wine;
