@@ -1,5 +1,8 @@
 #!/bin/bash
-#http://vasilisc.com/android-app-in-linux
+#Сделано на основании статьи http://vasilisc.com/android-app-in-linux
+#Скрипт для запуска android-приложений *.apk а также подготовленных для запуска файлов ARCon
+#author: kachnu
+# email: ya.kachnu@yandex.ua
 
 #указывается путь к папке с ARCon, скачать можно с ресурса https://github.com/vladikoff/chromeos-apk/blob/master/archon.md
 FOLDER_WITH_ARCHON="$HOME/tmp/vladikoff-archon-2d4c947b3f04"
@@ -8,7 +11,8 @@ FOLDER_WITH_ARCHON="$HOME/tmp/vladikoff-archon-2d4c947b3f04"
 FOLDER_WITH_NODE="$HOME/tmp/node-v5.3.0-linux-x86/bin"
 
 TEMP_FOLDER="$HOME/tmp/"
-MY_TERMINAL="x-terminal-emulator"
+MY_TERMINAL="x-terminal-emulator" #Присваивание терминала 
+DIALOG=zenity #Присваивание типа графического диалогового окна
 FILE_APK="$1"
 
 HELP="НАИМЕНОВАНИЕ
@@ -36,7 +40,8 @@ StartApk ()
 {
 if [ -d "$FILE_APK" ] #обрабатываем папку
  then FOLDER_APK="$FILE_APK"
-      google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_APK"
+      google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_APK" 
+      #$DIALOG --info --title="$ATTENTION" --text="Пожалуйста, закройте google-chrome и повторите попытку"
 fi
 
 if [ -f "$FILE_APK" ] #обрабатываем файл *.apk
@@ -54,7 +59,8 @@ if [ -f "$FILE_APK" ] #обрабатываем файл *.apk
       if [ -d "$FOLDER_APK" ]
        then TEXT_TO_INCLUDE=$(cat "$FOLDER_APK/manifest.json" | grep -m1 name | sed "s/name/message/" | sed "s/,//")
             sed -i "s/\"description\": \"Extension name\"/\"description\": \"Extension name\", ${TEXT_TO_INCLUDE}/g" $FOLDER_APK/_locales/en/messages.json
-            google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_APK" # && rm -R "$FOLDER_APK"
+            google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_APK" #&& rm -R "$FOLDER_APK"
+            #$DIALOG --info --title="$ATTENTION" --text="Пожалуйста, закройте google-chrome и повторите попытку"
       fi
 fi
 }
@@ -72,23 +78,22 @@ if [ ! -d $FOLDER_WITH_NODE ]
 fi
 
 if [ ! -x "`which chromeos-apk`" ] #Проверка наличия chromeos-apk
- then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n * Не установлен chromeos-apk! Пожалуйста выполните в терминале команду $0 --install")
+ then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n * Не установлен chromeos-apk! Пожалуйста, выполните в терминале команду $0 --install")
 fi
 
 if [ ! -x "`which google-chrome`" ] #Проверка наличия google-chrome
- then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n * Не установлен google-chrome! Пожалуйста установите google-chrome")
+ then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n * Не установлен google-chrome! Пожалуйста, установите google-chrome")
 fi
 
 if [ "$ERROR_MASSAGE" != '' ]
  then echo -e "Есть ошибки: $ERROR_MASSAGE"
-      read x
-      exit 1
+      exit 1    
 fi
 }
 
 GuiForm ()
 {
-FILE_APK=`zenity  --file-selection --title="Выбирите файл *.apk "`
+FILE_APK=`$DIALOG --file-selection --title="Выбирите файл *.apk "`
 if [ $? == 0 ]
  then $0 "$FILE_APK"
       exit 0
