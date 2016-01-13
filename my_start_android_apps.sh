@@ -33,6 +33,9 @@ MY_TERMINAL="x-terminal-emulator"
 #Присваивание типа графического диалогового окна
 DIALOG=zenity
 
+#Ссылка на скачивание ChromeAPK
+GET_CHROMEAPK="https://docs.google.com/spreadsheets/d/1iIbxaftAu_ho5rv9fUlXSLTzwU6MbKOldsWXyrYiyo8/htmlview?usp=sharing#"
+
 #Присваивание типа текстового редактора
 TEXT_EDITOR=geany
 ' > "$WORK_FOLDER/start_android_apps.conf"
@@ -40,8 +43,15 @@ fi
 
 source "$WORK_FOLDER/start_android_apps.conf"
 
-FILE_APK="$1"
-
+MAIN_LABEL="Запуск android-приложений"
+MAIN_TEXT="Выберите действие"
+MENU1="Запустить android-приложение *.apk ..."
+MENU2="Запустить ChromeAPK из папки ..."
+MENU3="Установить необходимые для работы скрипта приложения"
+MENU4="Скачать ChromeAPK из Интернет"
+MENU5="Настройки"
+MENU6="Справка"
+ATTENTION="Внимание!"
 HELP="НАИМЕНОВАНИЕ
      Скрипт $0 позволяет запустить файлы *.apk и предварительно подготовленные ARChon файлы (указываются папки) 
 СИНТАКСИС
@@ -49,10 +59,9 @@ HELP="НАИМЕНОВАНИЕ
 КЛЮЧИ
 	-h, --help - выводит данное сообщение
 	--install - устанавливает необходимые пакеты и программы для работы с *.apk
-	--gui - запуск скрипта в графическом диалоговом окне	
 ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ СКРИПТА
 	$0 \"/home/user/Game.apk\" - файл *.apk или предварительно подготовленную ARChon папку
-	$0 --gui - откроет диалоговое окно поиска
+	$0 - запускает gui-форму
 	$0 -h - выводит справку"
 ##########################################
 InstallPackages ()
@@ -92,6 +101,7 @@ if [ "$ERROR_MASSAGE" != '' ]
      esac
     done                    
  else echo "Все установлено, можно работать!"
+      read x
 fi
 }
 ##########################################
@@ -151,7 +161,7 @@ if [ "$ERROR_MASSAGE" != '' ]
  then echo -e "Есть ошибки: $ERROR_MASSAGE"
       $DIALOG --question --title="$ATTENTION" \
         --text="Есть ошибки: $ERROR_MASSAGE 
-Хотите скачать необходимые файлы и установить недостоющие пакеты?" 
+Хотите скачать необходимые файлы и установить недостающие пакеты?" 
       if [ $? == 0 ]
         then $MY_TERMINAL -e $0 --install
         else exit 0
@@ -159,18 +169,61 @@ if [ "$ERROR_MASSAGE" != '' ]
 fi
 }
 ##########################################
-GuiForm ()
+SettingsForm ()
 {
-FILE_APK=`$DIALOG --file-selection --title="Выбирите файл *.apk "`
-if [ $? == 0 ]
- then StartApk
-fi     
+echo settings
 }
 ##########################################
+MainForm ()
+{
+ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="$MAIN_LABEL" \
+      --text="$MAIN_TEXT" \
+      --column="" --column="" \
+        1 "$MENU1"\
+        2 "$MENU2"\
+        3 "$MENU3"\
+        4 "$MENU4"\
+        5 "$MENU5"\
+        6 "$MENU6")
+if [ $? == 0 ]
+then
+ case $ANSWER in
+      1) CheckPO
+         MessageError
+         FILE_APK=`$DIALOG --file-selection --title="Выбирите файл *.apk"`
+         if [ $? == 0 ]
+            then StartApk
+         fi 
+         ;;
+	  2) CheckPO
+         MessageError
+         FILE_APK=`$DIALOG --file-selection --directory --title="Выбирите папку"`
+         if [ $? == 0 ]
+            then StartApk
+         fi
+	     ;;
+	  3) $MY_TERMINAL -e $0 --install
+	     MainForm
+	     ;;
+	  4) x-www-browser "$GET_CHROMEAPK"
+         ;;
+      5) SettingsForm
+         MainForm
+         ;;
+      6) echo -n "$HELP" | $DIALOG --text-info --cancel-label="Back" --title="Help" --width=400 --height=300
+         MainForm
+         ;;
+      *) MainForm
+         ;; 
+ esac 
+fi
+   
+}
+##########################################
+FILE_APK="$1"
+
 case "$FILE_APK" in
-            '') CheckPO
-                MessageError
-                GuiForm
+            '') MainForm
                 ;;
      -h|--help) echo "$HELP"
                 read x
