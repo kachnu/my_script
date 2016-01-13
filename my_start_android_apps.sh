@@ -1,6 +1,6 @@
 #!/bin/bash
 #Сделано на основании статьи http://vasilisc.com/android-app-in-linux
-#Скрипт для запуска android-приложений *.apk, а также подготовленных для запуска файлов ARCon
+#Скрипт для запуска android-приложений *.apk, а также подготовленных для запуска файлов ARCHON
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
@@ -12,20 +12,24 @@ fi
 
 if [ ! -f  "$WORK_FOLDER/start_android_apps.conf" ]
  then echo '
-#ссылка на скачивание ARCon https://github.com/vladikoff/chromeos-apk/blob/master/archon.md
-WGET_ARCON="http://archon.vf.io/ARChon-v1.2-x86_32.zip"
+#ссылка на скачивание ARCHON https://github.com/vladikoff/chromeos-apk/blob/master/archon.md
+WGET_ARCHON="http://archon.vf.io/ARChon-v1.2-x86_32.zip"
+
+WGET_ARCHON_ALTERNATIVE=
 
 #ссылка на скачивание node https://nodejs.org/download/
-WGET_NODE="https://nodejs.org/download/release/latest-v5.x/node-v5.4.0-linux-x86.tar.gz"
+WGET_NODE="https://nodejs.org/download/release/v5.4.1/node-v5.4.1-linux-x86.tar.gz"
+
+WGET_NODE_ALTERNATIVE=
 
 #ссылка на скачивание google-chrome https://dl.google.com/linux/direct/google-chrome-stable_current_i386.deb
 WGET_CHROME="https://dl.google.com/linux/direct/google-chrome-stable_current_i386.deb"
 
-#указывается путь к папке с ARCon
+#указывается путь к папке с ARCHON
 FOLDER_WITH_ARCHON="$WORK_FOLDER/vladikoff-archon-2d4c947b3f04"
 
 #указывается путь к бинарнику node
-FOLDER_WITH_NODE="$WORK_FOLDER/node-v5.4.0-linux-x86/bin"
+FOLDER_WITH_NODE="$WORK_FOLDER/node-v5.4.1-linux-x86/bin"
 
 #Присваивание терминала
 MY_TERMINAL="x-terminal-emulator" 
@@ -72,12 +76,27 @@ if [ "$ERROR_MASSAGE" != '' ]
    for opt in $ERROR_MASSAGE
    do
     case "$opt" in
-    "$FOLDER_WITH_ARCHON") #загрузка и распаковка ARCON
-                           FILE_NAME=$(echo "$WGET_ARCON" | sed "s|\(.*\/\)||")
+    "$FOLDER_WITH_ARCHON") #загрузка и распаковка ARCHON
+                           FILE_NAME=$(echo "$WGET_ARCHON" | sed "s|\(.*\/\)||")
+                           echo $FILE_NAME
                            if [ -f "$FILE_NAME" ]
                               then unzip "$FILE_NAME"
-                              else wget "$WGET_ARCON" && unzip "$FILE_NAME"
+                              else wget "$WGET_ARCHON" && unzip "$FILE_NAME"
                            fi
+                           #if [ $?!=0 ]
+                              #then FILE_NAME=$(echo "$WGET_ARCHON_ALTERNATIVE" | sed "s|\(.*\/\)||")
+                                   #if [ -f "$FILE_NAME" ]
+                                     #then unzip "$FILE_NAME"
+                                     #else wget "$WGET_ARCHON_ALTERNATIVE" && unzip "$FILE_NAME"
+                                   #fi
+                           #fi
+                           #NEW_FOLDER_WITH_ARCHON=$(unzip -l "$FILE_NAME" | grep -A3 "Name" | grep -m1 "0" | awk '{print $4}')
+                           #echo $NEW_FOLDER_WITH_ARCHON
+                           #if [ -d $NEW_FOLDER_WITH_ARCHON ]
+                            #then 
+                             #echo $FOLDER_WITH_ARCHON
+                             #sed -i "FOLDER_WITH_ARCHON=|s|!FOLDER_WITH_ARCHON=|${NEW_FOLDER_WITH_ARCHON}|" start_android_apps.conf && echo iouoiuoiuoiu
+                           #fi
                            ;;	
       "$FOLDER_WITH_NODE") #загрузка и распаковка node
                             FILE_NAME=$(echo "$WGET_NODE" | sed "s|\(.*\/\)||")
@@ -99,7 +118,8 @@ if [ "$ERROR_MASSAGE" != '' ]
                            fi
                            ;;
      esac
-    done                    
+    done  
+    read x
  else echo "Все установлено, можно работать!"
       read x
 fi

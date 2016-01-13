@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Start android apps
+GenericName[ru]=Запуск android приложений
+Name=Start android apps
+Name[ru]=Запуск android приложений
+Comment=Start android apps && google apps
+Comment[ru]=Запуск android && googleapps приложений
+Exec=/usr/local/bin/my_start_android_apps.sh
+Icon=android
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=false
+Categories=GTK;GNOME;Utility;
