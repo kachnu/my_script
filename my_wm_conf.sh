@@ -37,10 +37,6 @@ case $LANG in
                THEME_TEXT="Выберите тему:"
                CHECK_PO="- не найдено!
 Установите пакеты для работы -"
-               CHECK_NAME_TEXT="Были найдены папки (темы) название, которых содержат ПРОБЕЛЫ.
-Наличие пробелов в названии, может повлиять на правильность формирования списка тем.
-
-Вы согласны переименовать папки?"
                HELP="Данный скрипт позволяет управлять оконными менеджерами (WM)
 
 В системе 3 оконных менеджера:
@@ -88,10 +84,6 @@ compiz настраивается с помощью утилиты ccsm, а са
                THEME_TEXT="Select theme:"
                CHECK_PO="- not found!
 Install packages for -"
-               CHECK_NAME_TEXT="Were found folder name that contains spaces.
-The presence of spaces in the title, could affect the correctness of the list.
-
-You agree to rename a folder?"
                HELP="This script allows you to control window managers (WM)
 
 The system 3 window manager :
@@ -161,44 +153,6 @@ if [ ! -x "`which "$1"`" ] #Проверка наличия ПО
 fi
 }
 #####################################################################
-CheckNameThemes () #Функция проверки пробелов в именах тем
-{
-THEME_LIST=$(find /usr/share/themes/ -name metacity-1 | sed "s/\/metacity-1/\//g" | grep ' ')
-THEME_LIST_HOME=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/metacity-1/\//g" | grep ' ')
-if [[ "$THEME_LIST" != '' || "$THEME_LIST_HOME" != '' ]]
- then
- echo Themes metacity problem "$THEME_LIST" "$THEME_LIST_HOME"
- NEW_NAME_LIST=$(echo "$THEME_LIST" | sed "s/ /_/g" )
- NEW_NAME_LIST_HOME=$(echo "$THEME_LIST_HOME" | sed "s/ /_/g" )
- $DIALOG --question --title="$ATTENTION" \
-        --text="$CHECK_NAME_TEXT
-from
-$THEME_LIST $THEME_LIST_HOME
-to
-$NEW_NAME_LIST $NEW_NAME_LIST_HOME
-"
-if [ $? == 0 ]
- then
-  if [[ "$THEME_LIST" != '' ]]
-  then
-   echo "$THEME_LIST" | while read line
-   do
-   gksudo mv "$line" $(echo "$line" | sed "s/ /_/g")
-   done
-  fi
-  if [[ "$THEME_LIST_HOME" != '' ]]
-  then
-   echo "$THEME_LIST_HOME" | while read line
-   do
-   mv "$line" $(echo "$line" | sed "s/ /_/g")
-   done
-  fi
- fi
-else
-  echo Themes metacity - OK
-fi
-}
-#####################################################################
 AddAutostart () #Функция добавления в автозагрузку
 {
 if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
@@ -227,23 +181,22 @@ fi
 if [[ -d ~/.themes && ! -d ~/.local/share/themes ]]
  then ln -s ~/.themes ~/.local/share/themes
 fi
-THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g" )
-#echo Сейчас установлена тема - $THEME_NOW
+THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
+#echo Сейчас установлена тема - "$THEME_NOW"
 THEME_LIST=$(find /usr/share/themes/ -name metacity-1 | sed "s/\/usr\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g")
 if [[ -d ~/.local/share/themes ]]
- then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s| |\\\ |g" | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
+ then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
 fi
 if [[ -d ~/.themes ]]
- then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s| |\\\ |g" | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
+ then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
 fi
-THEME_LIST=$(echo $THEME_LIST; echo $THEME_LIST_HOME1; echo $THEME_LIST_HOME2)
-THEME_LIST=$(echo $THEME_LIST | sed "s/FALSE ${THEME_NOW} /TRUE ${THEME_NOW} /g")
-#echo Общий список тем - $THEME_LIST
-THEME_METACITY=$($DIALOG --width=400 --height=300 --list --cancel-label="Back" --radiolist \
+THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
+THEME_LIST=$(echo "$THEME_LIST" | sed "s/FALSE ${THEME_NOW}$/TRUE ${THEME_NOW}/g")
+echo Общий список тем - "$THEME_LIST"
+THEME_METACITY=$(echo "$THEME_LIST" | sed "s/FALSE /FALSE\n/g" | sed "s/TRUE /TRUE\n/g" | $DIALOG --width=400 --height=300 --list --cancel-label="Back" --radiolist \
        --title="$THEME_LABEL" \
        --text="$THEME_TEXT" \
-       --column="" --column="Name" \
-	   $THEME_LIST )
+       --column="" --column="Name")
 if [ $? == 0 ]
  then
   #echo Выбрана тема - $THEME_METACITY
@@ -420,7 +373,6 @@ then
         echo Settings metacity
         Check dconf-editor
         #Check gconftool-2
-        CheckNameThemes
         SetMetacity
         ;;
     6) # Add to autostart compiz
