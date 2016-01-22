@@ -11,4 +11,4 @@ Terminal=false
 X-MultipleArgs=false
 Type=Application
 StartupNotify=true
-Categories=GTK;Utility;Settings;
+Categories=GTK;Settings;

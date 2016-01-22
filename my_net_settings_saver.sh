@@ -98,11 +98,7 @@ fi
 #####################################################################
 SaveConfig2 ()
 {
-<<<<<<< HEAD
-FILE_LIST=$(ls $WORK_DIR | awk '{print "FALSE\n"$0}' |  sed "s/^/\'/g" | sed "s/$/\'/g")
-=======
 FILE_LIST=$(ls $WORK_DIR | awk '{print "FALSE\n"$0}' |  sed "s/ /\\\ /g")
->>>>>>> e9a991ef48cab7185678366d8aff89052cc68a14
 CHECKED=`echo "$FILE_LIST"|\
          zenity --list --checklist --title="Select network setting-files" \
                 --text="Select network setting-files" --column="" --column="Files" --separator=" "`
@@ -113,11 +109,7 @@ if [ $? == 0 ]
    if [ $? == 0 ]
      then  
      cd "$WORK_DIR"
-<<<<<<< HEAD
-     tar -cvfz "$FILE_SAVE"\.tar.gz "$CHECKED"
-=======
      tar czpvf "$FILE_SAVE"\.tar.gz "$CHECKED"
->>>>>>> e9a991ef48cab7185678366d8aff89052cc68a14
      FILE_LIST=$(tar -tvf $FILE_SAVE\.tar.gz)
      $DIALOG --info --title="$ATTENTION" \
               --text="$OK_SAVE1 :

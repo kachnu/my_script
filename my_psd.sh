@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+#Скрипт является псевдо-графической оболочкой для Profile-sync-daemon
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
@@ -25,8 +25,8 @@ case $LANG in
                MENU1="Старт/cтоп Profile-sync-daemon"
                MENU2="Автозапуск Profile-sync-daemon"
                MENU3="Состояние"
-               MENU4="Редатировать файл настроек"
-               MENU5="Очистить резервные копии профайлов"
+               MENU4="Редактировать файл настроек"
+               MENU5="Очистить резервные копии профилей"
                MENUh="Справка"
                HELP="
 Profile-sync-daemon (psd) — небольшой псевдо-демон, предназначенный для переноса профилей браузеров в tmpfs (ОЗУ) и синхронизации с постоянным хранилищем (HDD/SSD) используя rsync.

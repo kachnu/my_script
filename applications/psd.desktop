@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Profile-sync-daemon
+GenericName[ru]=Ускорение браузеров psd
+Name=Profile-sync-daemon
+Name[ru]=Ускорение браузеров psd
+Comment=Profile-sync-daemon
+Comment[ru]=Скрипт по ускорению работы браузеров Profile-sync-daemon.
+Exec=x-terminal-emulator -e /usr/local/bin/my_psd.sh
+Icon=web-browser
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;Settings;Network;
