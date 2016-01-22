@@ -32,12 +32,12 @@ case $LANG in
                ;;
 esac
 
-if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
-  then
-  echo "Start $0 with root"
-  gksudo $0 
-  exit 0
-fi
+#if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
+  #then
+  #echo "Start $0 with root"
+  #gksudo $0 
+  #exit 0
+#fi
 
 if ! [ -d "$WORK_DIR.backup" ]
  then cp -R $WORK_DIR $WORK_DIR.backup
@@ -63,6 +63,7 @@ echo -n "$HELP" | zenity --text-info --cancel-label="Back" --title="Help" \
  --width=400 --height=300
 }
 #####################################################################
+
 AddConfig ()
 {
 FILE_ADD=`$DIALOG  --file-selection --title="$ADD_TEXT" --save --filename=$HOME_DIR/`
@@ -95,6 +96,30 @@ $OK_SAVE2 $FILE_SAVE\.tar.gz"
 fi
 }
 #####################################################################
+SaveConfig2 ()
+{
+FILE_LIST=$(ls $WORK_DIR | awk '{print "FALSE\n"$0}' |  sed "s/^/\'/g" | sed "s/$/\'/g")
+CHECKED=`echo "$FILE_LIST"|\
+         zenity --list --checklist --title="Select network setting-files" \
+                --text="Select network setting-files" --column="" --column="Files" --separator=" "`
+echo "$CHECKED"
+if [ $? == 0 ]
+   then
+   FILE_SAVE=`$DIALOG  --file-selection --title="$SAVE_TEXT" --save --filename=$HOME_DIR/`
+   if [ $? == 0 ]
+     then  
+     cd "$WORK_DIR"
+     tar -cvfz "$FILE_SAVE"\.tar.gz "$CHECKED"
+     FILE_LIST=$(tar -tvf $FILE_SAVE\.tar.gz)
+     $DIALOG --info --title="$ATTENTION" \
+              --text="$OK_SAVE1 :
+$FILE_LIST 
+$OK_SAVE2 $FILE_SAVE\.tar.gz"
+   fi
+fi
+}
+
+#####################################################################
 OpenConfig ()
 {
 Check $FILEMANAGER
@@ -122,7 +147,7 @@ then
    "$MENU1" ) AddConfig
               MainForm
               ;;
-   "$MENU2" ) SaveConfig
+   "$MENU2" ) SaveConfig2
               MainForm
               ;;
    "$MENU3" ) OpenConfig
