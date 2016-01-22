@@ -171,8 +171,12 @@ fi
 
 if [[ $1 == '2step' ]] #Автозапуск скрипта после первого шага
  then 
-     TIME=$(grep "timeout  " /etc/e4rat.conf  | sed "s/; timeout  //g" | sed "s/timeout  //g" | sed "s/ //g")
-     sleep $TIME
+     TIME_COLLECT=$(grep "timeout  " /etc/e4rat.conf | sed "s/;//g" | awk '{print $2}')
+     TIME_START_SCRIPT=$(cat /proc/uptime | sed "s/\./ /g" | awk '{print $1}')
+     let "TIME=TIME_COLLECT-TIME_START_SCRIPT"
+     if [ $TIME -ge 0  ]
+       then sleep $TIME
+     fi
      x-terminal-emulator -e $DIALOG --title "$ATTENTION" --msgbox "$STEP1_OVER" 10 60 
      x-terminal-emulator -e $0 
      exit 0
@@ -274,7 +278,6 @@ exit 0
  else MainForm
 fi
 }
-
 #########################################################
 Adde4rat () #Добавление e4rat в автозагрузку системы
 {
@@ -282,6 +285,7 @@ $DIALOG --title "$ADD_LABEL" --yesno "$ADD_TEXT" 13 60
 if [ $? == 0 ]
  then sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\(.*\)/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet init=\/sbin\/e4rat-preload\"/g" /etc/default/grub
       update-grub
+      rm /home/$SUDO_USER/.config/autostart/script_e4rat.desktop
  else MainForm
 fi
 }
