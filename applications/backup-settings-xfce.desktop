@@ -1,8 +1,8 @@
 [Desktop Entry]
 GenericName=Backup settings XFCE
-GenericName[ru]=Backup настроек XFCE
+GenericName[ru]=Настройки XFCE
 Name=Backup settings XFCE
-Name[ru]=Backup настроек XFCE
+Name[ru]=Настройки XFCE
 Comment=Backup settings XFCE
 Comment[ru]=Backup настроек XFCE. Выбор настроек вида Gnome2 Xfce Windows
 Exec=/usr/local/bin/my_backup_settings_xfce.sh

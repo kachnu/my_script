@@ -215,10 +215,10 @@ InstallPackages () #Установка пакетов для входа в До�
 DOMAIN_PACKAGES="/var/cache/apt/domain_packages"	
 cd /etc/ && tar czpf pam.d.tar.gz pam.d
 if [ -d "$DOMAIN_PACKAGES" ]
- then dpkg -i $DOMAIN_PACKAGES/*.deb
+ then dpkg -i $DOMAIN_PACKAGES/*.deb || apt-get update && apt-get install -f 
  else
-   apt-get update
-   apt-get install -y krb5-user samba winbind ntp libpam-krb5 libpam-winbind libnss-winbind libpam-ccreds nscd nss-updatedb libnss-db
+      apt-get update
+      apt-get install -y krb5-user samba winbind ntp libpam-krb5 libpam-winbind libnss-winbind libpam-ccreds nscd nss-updatedb libnss-db
 fi
 }
 #############################

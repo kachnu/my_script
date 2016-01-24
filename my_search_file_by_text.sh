@@ -104,7 +104,7 @@ then
        then $DIALOG --info --title="$ATTENTION" --text="$ERROR_WORD"
             GuiForm "$DIRECTORY"
        fi
-       grep -EHnr --color "$SEARCH_WORD" "$DIRECTORY" | zenity --text-info --cancel-label="Back" --title="LIST" \
+       grep -EHnr "$SEARCH_WORD" "$DIRECTORY" | zenity --text-info --cancel-label="Back" --title="LIST" \
  --width=400 --height=300
        GuiForm "$DIRECTORY"
        ;;
@@ -125,16 +125,10 @@ fi
 MainScript ()
 {
 case "$1" in
-           '') case $LANG in
-                uk*|ru*|be*) echo "Выполните скрипт $0 с ключем -h или --help, чтобы узнать как пользоваться скриптом";;
-                          *) echo "Run the script $0 with key -h or --help, to learn how to use the script";;
-               esac                        
-               exit 1
-               ;;
     -h|--help) Help
                exit 0
                ;;
-        --gui) GuiForm "${2}"
+        --gui|'') GuiForm "${2}"
                exit 0
                ;;
             *) SEARCH_WORD="$1"

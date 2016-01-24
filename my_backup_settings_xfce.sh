@@ -238,6 +238,7 @@ do
     3)  echo "Save terminal configuration"
         mkdir -p $FOLDER/tmp_folder/.config/xfce4
         cp -R ~/.config/xfce4/terminal $FOLDER/tmp_folder/.config/xfce4
+        cp -R ~/.config/terminator $FOLDER/tmp_folder/.config
         ;;
     4)  echo "Save panel configuration"
         mkdir -p $FOLDER/tmp_folder/.config/xfce4
