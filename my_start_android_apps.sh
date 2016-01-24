@@ -252,39 +252,6 @@ if pidof chrome > /dev/null
 fi
 }
 ##########################################
-StartApk ()
-{
-if [ -d "$FILE_APK" ] #обрабатываем папку
- then FOLDER_ANDROID="$FILE_APK"
-      google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_ANDROID" 
-fi
-
-if [ -f "$FILE_APK" ] #обрабатываем файл *.apk
- then 
-      if [ -w "$(dirname "$FILE_APK")" ]
-       then WORK_FOLDER=$(dirname "$FILE_APK")
-      fi
-      if [ -w "$SAVE_ANDROID_FOLDER" ]
-       then WORK_FOLDER=$SAVE_ANDROID_FOLDER
-      fi   
-      cd $WORK_FOLDER
-      export PATH=$PATH:$FOLDER_WITH_NODE
-      chromeos-apk "$FILE_APK"
-      NAME_FOLDER_APK=$(chromeos-apk "$FILE_APK" | awk '{print $3}')
-      echo NAME_FOLDER_APK=$NAME_FOLDER_APK
-      FOLDER_ANDROID="$WORK_FOLDER/$NAME_FOLDER_APK"
-      echo FOLDER_ANDROID=$FOLDER_ANDROID
-      if [ -d "$FOLDER_ANDROID" ]
-       then TEXT_TO_INCLUDE=$(cat "$FOLDER_ANDROID/manifest.json" | grep -m1 name | sed "s/name/message/" | sed "s/,//")
-            sed -i "s/\"description\": \"Extension name\"/\"description\": \"Extension name\", ${TEXT_TO_INCLUDE}/g" $FOLDER_ANDROID/_locales/en/messages.json
-            google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_ANDROID" && \
-            if [ $DEL_FOLDER_ANDROID == 'yes' ]
-               then rm -R "$FOLDER_ANDROID"
-            fi
-      fi
-fi
-}
-##########################################
 CheckPO () #проверки необходимых для работы программ
 {
 ERROR_MASSAGE=''
@@ -293,12 +260,15 @@ if [ ! -d $FOLDER_WITH_ARCHON ] || [[ $FOLDER_WITH_ARCHON = '' ]] #Провер�
  then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - ARCHON $FOLDER_WITH_ARCHON - $FOLDER_NOT_FOUND")
 fi
 
-if [ ! -d $FOLDER_WITH_NODE ] || [[ $FOLDER_WITH_NODE = '' ]] #Проверка наличия NODE
- then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - NODE $FOLDER_WITH_NODE - $FOLDER_NOT_FOUND")
-fi
+if [ "$1" = "full" ]
+   then
+        if [ ! -d $FOLDER_WITH_NODE ] || [[ $FOLDER_WITH_NODE = '' ]] #Проверка наличия NODE
+           then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - NODE $FOLDER_WITH_NODE - $FOLDER_NOT_FOUND")
+        fi
 
-if [ ! -x "`which chromeos-apk`" ] #Проверка наличия chromeos-apk
- then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - chromeos-apk - $NOT_INSTALL")
+        if [ ! -x "`which chromeos-apk`" ] #Проверка наличия chromeos-apk
+           then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - chromeos-apk - $NOT_INSTALL")
+        fi
 fi
 
 if [ ! -x "`which google-chrome`" ] #Проверка наличия google-chrome
@@ -313,8 +283,47 @@ if [ "$ERROR_MASSAGE" != '' ]
       $DIALOG --question --title="$ATTENTION" \
         --text="ERROR: $ERROR_MASSAGE \\n \\n $QUESTION_INSTALL" 
       if [ $? == 0 ]
-        then $MY_TERMINAL -e $0 --install
+        then InstallPackages
         else exit 0
+      fi
+fi
+}
+##########################################
+StartApk ()
+{
+if [ -d "$FILE_APK" ] #обрабатываем папку
+ then FOLDER_ANDROID="$FILE_APK"
+      CheckPO
+      MessageError
+      KillChrome
+      google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_ANDROID" 
+fi
+
+if [ -f "$FILE_APK" ] #обрабатываем файл *.apk
+ then 
+      if [ -w "$(dirname "$FILE_APK")" ]
+       then WORK_FOLDER=$(dirname "$FILE_APK")
+      fi
+      if [ -w "$SAVE_ANDROID_FOLDER" ]
+       then WORK_FOLDER=$SAVE_ANDROID_FOLDER
+      fi   
+      cd $WORK_FOLDER
+      CheckPO full
+      MessageError
+      export PATH=$PATH:$FOLDER_WITH_NODE
+      chromeos-apk "$FILE_APK"
+      NAME_FOLDER_APK=$(chromeos-apk "$FILE_APK" | awk '{print $3}')
+      echo NAME_FOLDER_APK=$NAME_FOLDER_APK
+      FOLDER_ANDROID="$WORK_FOLDER/$NAME_FOLDER_APK"
+      echo FOLDER_ANDROID=$FOLDER_ANDROID
+      if [ -d "$FOLDER_ANDROID" ]
+       then TEXT_TO_INCLUDE=$(cat "$FOLDER_ANDROID/manifest.json" | grep -m1 name | sed "s/name/message/" | sed "s/,//")
+            sed -i "s/\"description\": \"Extension name\"/\"description\": \"Extension name\", ${TEXT_TO_INCLUDE}/g" $FOLDER_ANDROID/_locales/en/messages.json
+            KillChrome
+            google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_ANDROID" && \
+            if [ $DEL_FOLDER_ANDROID == 'yes' ]
+               then rm -R "$FOLDER_ANDROID"
+            fi
       fi
 fi
 }
@@ -335,21 +344,15 @@ ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="
 if [ $? == 0 ]
 then
  case $ANSWER in
-      1) CheckPO
-         MessageError
-         FILE_APK=`$DIALOG --file-selection --title="Open *.apk"`
+      1) FILE_APK=`$DIALOG --file-selection --title="Open *.apk"`
          if [ $? == 0 ]
-            then KillChrome
-                 StartApk
+            then StartApk
             else MainForm
          fi 
          ;;
-	  2) CheckPO
-         MessageError
-         FILE_APK=`$DIALOG --file-selection --directory --title="Open folder"`
+	  2) FILE_APK=`$DIALOG --file-selection --directory --title="Open folder"`
          if [ $? == 0 ]
-            then KillChrome
-                 StartApk
+            then StartApk
             else MainForm
          fi
 	     ;;
@@ -385,7 +388,7 @@ case "$FILE_APK" in
                 read x
                 exit 0
                 ;;
-     --install) CheckPO
+     --install) CheckPO full
                 InstallPackages
                 ;;   
              *) CheckPO
