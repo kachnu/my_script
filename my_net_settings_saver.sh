@@ -1,43 +1,45 @@
 #!/bin/bash
 
+if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
+  then
+  echo "Start $0 with root"
+  gksudo $0 
+  exit 0
+fi
+
 DIALOG=zenity #Установка типа графического диалогового окна
 if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
  then eсho "Not Install - $DIALOG!"
 fi
 
 WORK_DIR="/etc/NetworkManager/system-connections"
+TEMP_DIR="/tmp/net_sittings_saver/"
 HOME_DIR="/home/$SUDO_USER"
 FILEMANAGER=thunar
 
 case $LANG in
  uk*|ru*|be*|*) #UA RU BE locales
-               MAIN_LABEL="system connections"
+               MAIN_LABEL="Настройки сети NetworkManager"
                MAIN_TEXT="Выберите действие:"
                MENU1="Добавить файлы конфигураций сети"
                MENU2="Сохранить конфигурации сети"
                MENU3="Открыть папку с конфигурациями сети"
-               MENU4="Проверка соединений"
+               MENU4="Перезапустить NetworkManager"
                MENU5="Справка"
-               ATTENTION="ВНИМАНИЕ!"
+               ATTENTION="Внимание!"
                OK_SAVE1="Конфигурационные файлы"
                OK_SAVE2="сохранены в архив"
                SAVE_TEXT="Сохранение сетевых настроек в архив"
                CHECK_PO="- не найдено!
 Установите пакеты для работы -"
-               CHECK_NAME_TEXT="Были найдены папки (темы) название, которых содержат ПРОБЕЛЫ.
-Наличие пробелов в названии, может повлиять на правильность формирования списка тем.
-
-Вы согласны переименовать папки?"
-               HELP="Данный скрипт позволяет управлять "
+               HELP="Данный скрипт позволяет сохранять настройки сети для NetworkManager"
                ;;
 esac
 
-#if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
-  #then
-  #echo "Start $0 with root"
-  #gksudo $0 
-  #exit 0
-#fi
+if [ ! -d "$TEMP_DIR" ]
+ then mkdir "$TEMP_DIR"
+ else rm -R $TEMP_DIR/*
+fi 
 
 if ! [ -d "$WORK_DIR.backup" ]
  then cp -R $WORK_DIR $WORK_DIR.backup
@@ -63,17 +65,20 @@ echo -n "$HELP" | zenity --text-info --cancel-label="Back" --title="Help" \
  --width=400 --height=300
 }
 #####################################################################
-
 AddConfig ()
 {
 FILE_ADD=`$DIALOG  --file-selection --title="$ADD_TEXT" --save --filename=$HOME_DIR/`
 if [ $? == 0 ]
  then
-   FILE_LIST=$(tar --list -f $FILE_ADD) #Формирование списка файлов в архиве
+   FILE_LIST=$(tar --list -f $FILE_ADD  | awk '{print "FALSE\n"$0}') #Формирование списка файлов в архиве
+   echo "$FILE_LIST"
    if [ $? == 0 ] #Если список файлов архива можно создать то произойдет распаковка в папку, если нет - добавление файла.
-     then  echo -n "$FILE_LIST" | zenity --text-info --title="$ATTENTION $COPY_TEXT" \
---width=400 --height=300 
-     tar xvf $FILE_ADD -C  $WORK_DIR
+     then  CHECKED=`echo "$FILE_LIST"|\
+         zenity --list --checklist --title="Select network setting-files" \
+                --text="Select network setting-files" --column="" --column="Files" --separator="\n"`
+     tar xvf $FILE_ADD -C  $TEMP_DIR
+     cd $TEMP_DIR
+     echo -e "$CHECKED" | while read file_name; do cp "$file_name" "$WORK_DIR"; done
      else cp $FILE_ADD $WORK_DIR
    fi
   chmod -R -r $WORK_DIR/*
@@ -83,52 +88,33 @@ service network-manager restart
 #####################################################################
 SaveConfig ()
 {
-FILE_SAVE=`$DIALOG  --file-selection --title="$SAVE_TEXT" --save --filename=$HOME_DIR/`
-if [ $? == 0 ]
- then  
-   cd $WORK_DIR/
-   tar czpvf $FILE_SAVE\.tar.gz ./
-   FILE_LIST=$(ls $WORK_DIR | sed "s/^/\'/" | sed "s/$/\'/")
-   $DIALOG --info --title="$ATTENTION" \
-              --text="$OK_SAVE1 :
-$FILE_LIST 
-$OK_SAVE2 $FILE_SAVE\.tar.gz"
-fi
-}
-#####################################################################
-SaveConfig2 ()
-{
-FILE_LIST=$(ls $WORK_DIR | awk '{print "FALSE\n"$0}' |  sed "s/ /\\\ /g")
+FILE_LIST=$(ls $WORK_DIR | awk '{print "FALSE\n"$0}')
 CHECKED=`echo "$FILE_LIST"|\
          zenity --list --checklist --title="Select network setting-files" \
-                --text="Select network setting-files" --column="" --column="Files" --separator=" "`
-echo "$CHECKED"
+                --text="Select network setting-files" --column="" --column="Files" --separator="\n"`
+echo -e "$CHECKED"
 if [ $? == 0 ]
    then
-   FILE_SAVE=`$DIALOG  --file-selection --title="$SAVE_TEXT" --save --filename=$HOME_DIR/`
-   if [ $? == 0 ]
+    cd "$WORK_DIR"
+    echo -e "$CHECKED" | while read file_name; do cp "$file_name" "$TEMP_DIR"; done
+    FILE_SAVE=`$DIALOG  --file-selection --title="$SAVE_TEXT" --save --filename=$HOME_DIR/`
+    if [ $? == 0 ]
      then  
-     cd "$WORK_DIR"
-     tar czpvf "$FILE_SAVE"\.tar.gz "$CHECKED"
-     FILE_LIST=$(tar -tvf $FILE_SAVE\.tar.gz)
+     cd "$TEMP_DIR"
+     tar czpvf $FILE_SAVE\.tar.gz *
+     FILE_LIST=$(ls $WORK_DIR | sed "s/^/\'/" | sed "s/$/\'/")
      $DIALOG --info --title="$ATTENTION" \
               --text="$OK_SAVE1 :
-$FILE_LIST 
+$CHECKED
 $OK_SAVE2 $FILE_SAVE\.tar.gz"
-   fi
+    fi
 fi
 }
-
 #####################################################################
 OpenConfig ()
 {
 Check $FILEMANAGER
 `$FILEMANAGER $WORK_DIR`
-}
-#####################################################################
-TestConfig ()
-{
-	echo
 }
 #####################################################################
 MainForm () #Функция главного окна
@@ -147,13 +133,13 @@ then
    "$MENU1" ) AddConfig
               MainForm
               ;;
-   "$MENU2" ) SaveConfig2
+   "$MENU2" ) SaveConfig
               MainForm
               ;;
    "$MENU3" ) OpenConfig
               MainForm
               ;;
-   "$MENU4" ) TestConfig
+   "$MENU4" ) service network-manager restart
               MainForm
               ;;
    "$MENU5" ) Help
@@ -170,4 +156,5 @@ fi
 
 MainForm
 
+rmdir "$TEMP_DIR"
 exit 0

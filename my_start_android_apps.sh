@@ -296,7 +296,7 @@ if [ -d "$FILE_APK" ] #обрабатываем папку
       CheckPO
       MessageError
       KillChrome
-      google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_ANDROID" 
+      google-chrome --enable-webgl --ignore-gpu-blacklist --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_ANDROID" 
 fi
 
 if [ -f "$FILE_APK" ] #обрабатываем файл *.apk
@@ -320,7 +320,7 @@ if [ -f "$FILE_APK" ] #обрабатываем файл *.apk
        then TEXT_TO_INCLUDE=$(cat "$FOLDER_ANDROID/manifest.json" | grep -m1 name | sed "s/name/message/" | sed "s/,//")
             sed -i "s/\"description\": \"Extension name\"/\"description\": \"Extension name\", ${TEXT_TO_INCLUDE}/g" $FOLDER_ANDROID/_locales/en/messages.json
             KillChrome
-            google-chrome --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_ANDROID" && \
+            google-chrome --enable-webgl --ignore-gpu-blacklist --enable-easy-off-store-extension-install --load-extension="$FOLDER_WITH_ARCHON" --load-and-launch-app="$FOLDER_ANDROID" && \
             if [ $DEL_FOLDER_ANDROID == 'yes' ]
                then rm -R "$FOLDER_ANDROID"
             fi
