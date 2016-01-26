@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=System Tar & Restore
+GenericName[ru]=System Tar & Restore
+Name=System Tar & Restore
+Name[ru]=System Tar & Restore
+Comment=system-tar-and-restore-master
+Comment[ru]=system-tar-and-restore-master
+Exec=gksudo /usr/local/bin/system-tar-and-restore-master/star-gui.sh
+Icon=applications-system
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=GTK;System;
