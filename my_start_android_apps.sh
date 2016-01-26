@@ -66,7 +66,7 @@ MENU1="Запустить android-приложение *.apk ..."
 MENU2="Запустить ChromeAPK из папки ..."
 MENU3="Установить необходимые приложения"
 MENU4="Скачать ChromeAPK из Интернет"
-MENU5="Редактирование файла настроек"
+MENU5="Редактировать файл настроек"
 MENU6="Открыть папку с ярлыками Chrome"
 MENU7="Открыть рабочую папку скрипта"
 MENU8="Справка"
@@ -247,6 +247,7 @@ if pidof chrome > /dev/null
         --text="$QUESTION_KILL_CHROME" 
       if [ $? == 0 ]
         then  killall chrome
+              sleep 1
         else exit 0
       fi
 fi
@@ -375,7 +376,8 @@ then
          ;;
       *) MainForm
          ;; 
- esac 
+ esac
+ else exit 0 
 fi   
 }
 ##########################################

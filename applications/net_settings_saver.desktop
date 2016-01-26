@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Save NetworkManager settings
+Name[ru]=Сохранение настроек NetworkManager
+Comment=Save NetworkManager settings
+Exec=/usr/local/bin/my_net_settings_saver.sh
+Icon=network-workgroup
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=System;

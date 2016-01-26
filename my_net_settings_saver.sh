@@ -1,5 +1,7 @@
 #!/bin/bash
-
+#Скрипт позволяет сохранять конфигурационные файлы NetworkManager
+#author: kachnu
+# email: ya.kachnu@yandex.ua
 if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
   then
   echo "Start $0 with root"
@@ -18,10 +20,10 @@ HOME_DIR="/home/$SUDO_USER"
 FILEMANAGER=thunar
 
 case $LANG in
- uk*|ru*|be*|*) #UA RU BE locales
+ uk*|ru*|be*) #UA RU BE locales
                MAIN_LABEL="Настройки сети NetworkManager"
                MAIN_TEXT="Выберите действие:"
-               MENU1="Добавить файлы конфигураций сети"
+               MENU1="Добавить файлы конфигурации сети"
                MENU2="Сохранить конфигурации сети"
                MENU3="Открыть папку с конфигурациями сети"
                MENU4="Перезапустить NetworkManager"
@@ -29,10 +31,40 @@ case $LANG in
                ATTENTION="Внимание!"
                OK_SAVE1="Конфигурационные файлы"
                OK_SAVE2="сохранены в архив"
-               SAVE_TEXT="Сохранение сетевых настроек в архив"
+               SAVE_TEXT="Сохранение сетевых настроек в архив *.tar.gz"
+               ADD_TEXT="Выберите архив или конфигурацию NetworkManager"
                CHECK_PO="- не найдено!
 Установите пакеты для работы -"
+               FIND_POVTORKA="Найдено совпадение"
+               EDIT_NAME="Уже имеется файл с таким названием!
+Измените имя файла:"
+               SELECT_LABEL="Список NetworkManager"
+               SELECT_FILES="Выберите конфигурации"
+               
                HELP="Данный скрипт позволяет сохранять настройки сети для NetworkManager"
+               ;;
+           *)  #All UA RU BE locales
+               MAIN_LABEL="Network Settings NetworkManager"
+               MAIN_TEXT="Select an action:"
+               MENU1="Add network configuration files"
+               MENU2="Save the network configuration"
+               MENU3="Open the folder with the network configuration"
+               MENU4="Restart the NetworkManager"
+               MENU5="Help"
+               ATTENTION="Attention!"
+               OK_SAVE1="Configuration files"
+               OK_SAVE2="stored in the archive"
+               SAVE_TEXT="Save the network settings to the archive *.tar.gz"
+               ADD_TEXT="Select the file or the configuration of NetworkManager"
+               CHECK_PO="-not found!
+Install packages for -"
+               FIND_POVTORKA="Matches found"
+               EDIT_NAME="There is already a file with that name!
+Change the file name:"
+               SELECT_LABEL="List NetworkManager"
+               SELECT_FILES="Выберите конфигурации"
+               
+               HELP="This script allows you to save the network settings for NetworkManager"
                ;;
 esac
 
@@ -61,7 +93,7 @@ fi
 #####################################################################
 Help () #Помощь
 {
-echo -n "$HELP" | zenity --text-info --cancel-label="Back" --title="Help" \
+echo -n "$HELP" | $DIALOG --text-info --cancel-label="Back" --title="Help" \
  --width=400 --height=300
 }
 #####################################################################
@@ -70,16 +102,38 @@ AddConfig ()
 FILE_ADD=`$DIALOG  --file-selection --title="$ADD_TEXT" --save --filename=$HOME_DIR/`
 if [ $? == 0 ]
  then
-   FILE_LIST=$(tar --list -f $FILE_ADD  | awk '{print "FALSE\n"$0}') #Формирование списка файлов в архиве
-   echo "$FILE_LIST"
+   echo $FILE_ADD
+   FILE_LIST=$(tar --list -f $FILE_ADD) #Формирование списка файлов в архиве
    if [ $? == 0 ] #Если список файлов архива можно создать то произойдет распаковка в папку, если нет - добавление файла.
-     then  CHECKED=`echo "$FILE_LIST"|\
-         zenity --list --checklist --title="Select network setting-files" \
-                --text="Select network setting-files" --column="" --column="Files" --separator="\n"`
+     then    
+     FILE_LIST=$(echo "$FILE_LIST" | awk '{print "FALSE\n"$0}')
+     CHECKED=`echo "$FILE_LIST"|\
+         $DIALOG --list --checklist --title="$SELECT_LABEL" \
+                --text="$SELECT_FILES" --column="" --column="Files" --separator="\n"`
+     rm -R $TEMP_DIR/*
      tar xvf $FILE_ADD -C  $TEMP_DIR
      cd $TEMP_DIR
-     echo -e "$CHECKED" | while read file_name; do cp "$file_name" "$WORK_DIR"; done
-     else cp $FILE_ADD $WORK_DIR
+     echo -e "$CHECKED" | while read file_name; do 
+       POVTORKA=$(find "$WORK_DIR" -name "$file_name") 
+       if [ "$POVTORKA" = '' ]
+         then cp "$file_name" "$WORK_DIR"
+         else FILE_NEW=$($DIALOG --entry --title="$FIND_POVTORKA" --text="$EDIT_NAME" \
+          --entry-text="$(basename "$file_name")")
+              if [ $? == 0 ]
+               then cp "$file_name" "$WORK_DIR"/"$FILE_NEW"
+              fi
+       fi
+       done
+     else 
+     POVTORKA=$(find "$WORK_DIR" -name "$(basename "$FILE_ADD")")
+     if [ "$POVTORKA" = '' ]
+       then cp "$FILE_ADD" "$WORK_DIR"
+       else FILE_NEW=$($DIALOG --entry --title="$FIND_POVTORKA" --text="$EDIT_NAME" \
+          --entry-text="$(basename "$FILE_ADD")")
+            if [ $? == 0 ]
+              then cp "$FILE_ADD" "$WORK_DIR"/"$FILE_NEW"
+            fi
+     fi
    fi
   chmod -R -r $WORK_DIR/*
 fi
@@ -90,12 +144,16 @@ SaveConfig ()
 {
 FILE_LIST=$(ls $WORK_DIR | awk '{print "FALSE\n"$0}')
 CHECKED=`echo "$FILE_LIST"|\
-         zenity --list --checklist --title="Select network setting-files" \
-                --text="Select network setting-files" --column="" --column="Files" --separator="\n"`
+         $DIALOG --list --checklist --title="$SELECT_LABEL" \
+                --text="$SELECT_FILES" --column="" --column="Files" --separator="\n"`
 echo -e "$CHECKED"
 if [ $? == 0 ]
    then
+    if [ "$CHECKED" == '' ]
+      then MainForm
+    fi
     cd "$WORK_DIR"
+    rm -R $TEMP_DIR/*
     echo -e "$CHECKED" | while read file_name; do cp "$file_name" "$TEMP_DIR"; done
     FILE_SAVE=`$DIALOG  --file-selection --title="$SAVE_TEXT" --save --filename=$HOME_DIR/`
     if [ $? == 0 ]
@@ -145,12 +203,10 @@ then
    "$MENU5" ) Help
               MainForm
               ;;
-         "" ) MainForm 
+          * ) MainForm 
               ;;  
-           *) echo "ooops!- $ANSWER"
-              exit 1
-              ;;
  esac
+ else exit 0
 fi
 }
 
