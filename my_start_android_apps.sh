@@ -173,6 +173,47 @@ esac
 
 source "$WORK_FOLDER/start_android_apps.conf"
 
+
+##########################################
+CheckPO () #проверки необходимых для работы программ
+{
+ERROR_MASSAGE=''
+
+if [ ! -d $FOLDER_WITH_ARCHON ] || [[ $FOLDER_WITH_ARCHON = '' ]] #Проверка наличия ARCHON
+ then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - ARCHON $FOLDER_WITH_ARCHON - $FOLDER_NOT_FOUND")
+fi
+
+if [ "$1" = "full" ]
+   then
+        if [ ! -d $FOLDER_WITH_NODE ] || [[ $FOLDER_WITH_NODE = '' ]] #Проверка наличия NODE
+           then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - NODE $FOLDER_WITH_NODE - $FOLDER_NOT_FOUND")
+        fi
+
+        if [ ! -x "`which chromeos-apk`" ] #Проверка наличия chromeos-apk
+           then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - chromeos-apk - $NOT_INSTALL")
+        fi
+fi
+
+if [ ! -x "`which google-chrome`" ] #Проверка наличия google-chrome
+ then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - google-chrome - $NOT_INSTALL")
+fi
+}
+##########################################
+MessageError ()
+{
+if [ "$ERROR_MASSAGE" != '' ]
+ then echo -e "ERROR: $ERROR_MASSAGE"
+      $DIALOG --question --title="$ATTENTION" \
+        --text="ERROR: $ERROR_MASSAGE \\n \\n $QUESTION_INSTALL" 
+      if [ $? == 0 ]
+        then if [ "$1" = "full" ]
+               then $MY_TERMINAL -e "$0" --install-full 
+               else $MY_TERMINAL -e "$0" --install
+             fi  
+        else exit 0
+      fi
+fi
+}
 ##########################################
 InstallPackages ()
 {
@@ -186,11 +227,19 @@ if [ "$ERROR_MASSAGE" != '' ]
                            FILE_NAME=$(echo "$WGET_ARCHON" | sed "s|\(.*\/\)||")
                            FILE_NAME_ALTERNATIVE=$(echo "$WGET_ARCHON_ALTERNATIVE" | sed "s|\(.*\/\)||")
                            if [ -f "$FILE_NAME" ] || [ -f "$FILE_NAME_ALTERNATIVE" ]
-                              then unzip "$FILE_NAME" || FILE_NAME="$FILE_NAME_ALTERNATIVE"
-                                   unzip -n "$FILE_NAME"
+                              then unzip "$FILE_NAME"
+                                   if [ $? != 0 ]
+                                     then rm "$FILE_NAME"
+                                          FILE_NAME="$FILE_NAME_ALTERNATIVE"
+                                          unzip "$FILE_NAME" || rm "$FILE_NAME"
+                                   fi
                               else wget "$WGET_ARCHON" || wget "$WGET_ARCHON_ALTERNATIVE"
-                                   unzip "$FILE_NAME" || FILE_NAME="$FILE_NAME_ALTERNATIVE"
-                                   unzip -n "$FILE_NAME"
+                                   unzip "$FILE_NAME"
+                                   if [ $? != 0 ]
+                                     then rm "$FILE_NAME"
+                                          FILE_NAME="$FILE_NAME_ALTERNATIVE"
+                                          unzip "$FILE_NAME" || rm "$FILE_NAME"
+                                   fi
                            fi
                            #Добавление актуальной информации о папке с ARCHON в конфигурационный файл start_android_apps.conf
                            NEW_FOLDER_WITH_ARCHON=$(unzip -l "$FILE_NAME" | grep -A3 "Name" | grep -m1 "0" | awk '{print $4}')
@@ -203,11 +252,19 @@ if [ "$ERROR_MASSAGE" != '' ]
                             FILE_NAME=$(echo "$WGET_NODE" | sed "s|\(.*\/\)||")
                             FILE_NAME_ALTERNATIVE=$(echo "$WGET_NODE_ALTERNATIVE" | sed "s|\(.*\/\)||")
                             if [ -f "$FILE_NAME" ] || [ -f "$FILE_NAME_ALTERNATIVE" ]
-                               then tar -xvf "$FILE_NAME" || FILE_NAME="$FILE_NAME_ALTERNATIVE"
-                                    tar -xvf "$FILE_NAME"
+                               then tar -xvf "$FILE_NAME" 
+                                    if [ $? != 0 ]
+                                      then rm "$FILE_NAME"
+                                           FILE_NAME="$FILE_NAME_ALTERNATIVE"
+                                           tar -xvf "$FILE_NAME" || rm "$FILE_NAME"
+                                    fi      
                                else wget "$WGET_NODE" || wget "$WGET_NODE_ALTERNATIVE"
-                                    tar -xvf "$FILE_NAME" || FILE_NAME="$FILE_NAME_ALTERNATIVE"
                                     tar -xvf "$FILE_NAME"
+                                    if [ $? != 0 ]
+                                      then rm "$FILE_NAME"
+                                           FILE_NAME="$FILE_NAME_ALTERNATIVE"
+                                           tar -xvf "$FILE_NAME" || rm "$FILE_NAME"
+                                    fi  
                             fi
                            #Добавление актуальной информации о папке с node в конфигурационный файл start_android_apps.conf
                            NEW_FOLDER_WITH_NODE=$(tar -tvf "$FILE_NAME" | grep -m1 "0" | awk '{print $6}')
@@ -253,47 +310,11 @@ if pidof chrome > /dev/null
 fi
 }
 ##########################################
-CheckPO () #проверки необходимых для работы программ
-{
-ERROR_MASSAGE=''
-
-if [ ! -d $FOLDER_WITH_ARCHON ] || [[ $FOLDER_WITH_ARCHON = '' ]] #Проверка наличия ARCHON
- then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - ARCHON $FOLDER_WITH_ARCHON - $FOLDER_NOT_FOUND")
-fi
-
-if [ "$1" = "full" ]
-   then
-        if [ ! -d $FOLDER_WITH_NODE ] || [[ $FOLDER_WITH_NODE = '' ]] #Проверка наличия NODE
-           then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - NODE $FOLDER_WITH_NODE - $FOLDER_NOT_FOUND")
-        fi
-
-        if [ ! -x "`which chromeos-apk`" ] #Проверка наличия chromeos-apk
-           then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - chromeos-apk - $NOT_INSTALL")
-        fi
-fi
-
-if [ ! -x "`which google-chrome`" ] #Проверка наличия google-chrome
- then ERROR_MASSAGE=$(echo -e "$ERROR_MASSAGE \\n - google-chrome - $NOT_INSTALL")
-fi
-}
-##########################################
-MessageError ()
-{
-if [ "$ERROR_MASSAGE" != '' ]
- then echo -e "ERROR: $ERROR_MASSAGE"
-      $DIALOG --question --title="$ATTENTION" \
-        --text="ERROR: $ERROR_MASSAGE \\n \\n $QUESTION_INSTALL" 
-      if [ $? == 0 ]
-        then InstallPackages
-        else exit 0
-      fi
-fi
-}
-##########################################
 StartApk ()
 {
 if [ -d "$FILE_APK" ] #обрабатываем папку
  then FOLDER_ANDROID="$FILE_APK"
+      #проверка и установка пакетоы необходимых для запуска ChromeAPK
       CheckPO
       MessageError
       KillChrome
@@ -309,8 +330,9 @@ if [ -f "$FILE_APK" ] #обрабатываем файл *.apk
        then WORK_FOLDER=$SAVE_ANDROID_FOLDER
       fi   
       cd $WORK_FOLDER
+      #проверка и установка всех пакетов
       CheckPO full
-      MessageError
+      MessageError full
       export PATH=$PATH:$FOLDER_WITH_NODE
       chromeos-apk "$FILE_APK"
       NAME_FOLDER_APK=$(chromeos-apk "$FILE_APK" | awk '{print $3}')
@@ -384,20 +406,20 @@ fi
 FILE_APK="$1"
 
 case "$FILE_APK" in
-            '') MainForm
-                ;;
-     -h|--help) echo "$HELP"
-                read x
-                exit 0
-                ;;
-     --install) CheckPO full
-                InstallPackages
-                ;;   
-             *) CheckPO
-                MessageError
-                KillChrome
-                StartApk
-                ;;
+                '') MainForm
+                    ;;
+         -h|--help) echo "$HELP"
+                    read x
+                    exit 0
+                    ;;
+    --install-full) CheckPO full
+                    InstallPackages
+                    ;;
+         --install) CheckPO
+                    InstallPackages        
+                    ;;   
+                 *) StartApk
+                    ;;
 esac   
 
 exit 0
