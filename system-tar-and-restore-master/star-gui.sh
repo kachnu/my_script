@@ -189,7 +189,7 @@ export MAIN_DIALOG='
 			<action condition="command_is_true([ ! -f /tmp/wr_pid ] && echo true)">disable:BTN_CANCEL</action>
                         <action condition="file_is_false(/tmp/wr_proc)">refresh:BR_MODE</action>
 		</timer>
-                <notebook labels="Резервное копирование|Восстановление/Установка|Журнал" space-expand="true" space-fill="true">
+                <notebook labels="Создание снимка|Восстановление/Клонирование|Журнал" space-expand="true" space-fill="true">
                         <vbox scrollable="true" shadow-type="0">
                                 <text height-request="30" use-markup="true" tooltip-text="==>Убедитесь, что у вас есть достаточно свободного места.
 
@@ -284,14 +284,14 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                                 </hbox>
 
                                 <text xalign="0"><label>Дополнительные опции:</label></text>
-                                <comboboxentry tooltip-text="Установите дополнительные параметры tar. См tar --help для получения более подробной информации. Если вы хотите пробелы в именах замените их //">
+                                <comboboxentry tooltip-text="Установите дополнительные параметры tar. Выполните tar --help для получения более подробной информации. Пробелы в названии замените на //">
                                         <variable>BR_USER_OPTS</variable>
                                        '"`set_default_opts`"'
                                         <item>--acls --xattrs</item>
                                 </comboboxentry>
 
-                                <text xalign="0"><label>Исключать:</label></text>
-                                <entry tooltip-text="Исключить файлы и каталоги. Если вы хотите пробелы в именах замените их //">
+                                <text xalign="0"><label>Исключить:</label></text>
+                                <entry tooltip-text="Исключить файлы и каталоги. Пробелы в названии замените на //">
                                         <variable>BR_EXC</variable>
                                 </entry>
 
@@ -307,7 +307,7 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                                         <default>'"$ENTRY5"'</default>
                                 </checkbox>
 
-                                <checkbox tooltip-text="Создание файла конфигурации в случае успешного резервного копирования">
+                                <checkbox tooltip-text="Создать файл конфигурации в случае успешного резервного копирования">
                                         <label>Создать backup.conf</label>
                                         <variable>ENTRY7</variable>
                                 </checkbox>
@@ -332,9 +332,9 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                         </vbox>
 
                         <vbox scrollable="true" shadow-type="0">
-                                <text wrap="false" height-request="30" use-markup="true" tooltip-text="В первом случае, вы должны запустить его с LiveCD желаемого (резервное копирование) дистрибутива.
+                                <text wrap="false" height-request="30" use-markup="true" tooltip-text="Для восстановление системы, вы должны запустить программу с LiveCD.
 
-==>Убедитесь, что вы создали одну цель root (/) раздел.
+==>Убедитесь, что вы указали один root (/) раздел.
        При желании вы можете создать или использовать 
        любой другой раздел (/boot /home /var etc).
 
@@ -344,8 +344,8 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
 
 ==>Если вы планируете перенести в lvm/mdadm/dm-crypt, 
        убедитесь, что эта система способна 
-       загружаться с этих конфигураций."><label>"<span color='"'brown'"'>Восстановление резервной копии или копирование (установка)
-        этой системы в определенный пользователем раздел.</span>"</label></text>
+       загружаться с этих конфигураций."><label>"<span color='"'brown'"'>Восстановление системы из резерного снимка или
+Клонирование этой системы в заданный пользователем раздел.</span>"</label></text>
 
                                 <vbox>
                                         <frame Разделы назначения:>
@@ -357,7 +357,7 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
 	                                                        <input>echo "$BR_PARTS" | bash -c hide_used_parts</input>
                                                                 <action>refresh:BR_BOOT</action><action>refresh:BR_HOME</action><action>refresh:BR_SWAP</action><action>refresh:BR_ESP</action>
 			                                </comboboxtext>
-                                                        <entry tooltip-text="Список опций монтирования для корневого раздела, разделенных запятыми">
+                                                        <entry tooltip-text="Список опций монтирования, разделенных запятыми, для корневого раздела">
                                                                 <variable>BR_MN_OPTS</variable>
                                                                 <input>echo "defaults,noatime"</input>
                                                         </entry>
@@ -412,23 +412,23 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                                                                 </hbox>
                                                                 <hbox>
                                                                         <text width-request="56" space-expand="false"><label>Other:</label></text>
-                                                                        <entry tooltip-text="Set other partitions (mountpoint=device e.g /var=/dev/sda3). If you want spaces in mountpoints replace them with //">
+                                                                        <entry tooltip-text="Установите другие разделы (mountpoint=device например: /var=/dev/sda3). Пробелы в названии замените на //">
                                                                                 <variable>BR_OTHER_PARTS</variable>
                                                                         </entry>
                                                                 </hbox>
                                                         </vbox>
                                                 </expander>
-                                                <expander label="Btrfs subvolumes">
+                                                <expander label="Btrfs подраздел">
                                                         <vbox>
                                                                 <hbox>
                                                                         <text width-request="40" space-expand="false"><label>Root:</label></text>
-                                                                        <entry tooltip-text="Set subvolume name for /">
+                                                                        <entry tooltip-text="Установите имя подраздела для /">
                                                                                 <variable>BR_ROOT_SUBVOL</variable>
                                                                         </entry>
                                                                 </hbox>
                                                                 <hbox>
                                                                         <text width-request="40" space-expand="false"><label>Other:</label></text>
-                                                                        <entry tooltip-text="Set other subvolumes (subvolume path e.g /home /var /usr ...)">
+                                                                        <entry tooltip-text="Установите другие подразделы (например: /home /var /usr ...)">
                                                                                 <variable>BR_OTHER_SUBVOLS</variable>
                                                                         </entry>
                                                                 </hbox>
@@ -438,9 +438,9 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                                 </vbox>
 
                                 <vbox>
-                                        <frame Bootloader:>
+                                        <frame Загрузчик:>
                                                 <hbox>
-                                                        <comboboxtext space-expand="true" space-fill="true" tooltip-text="Select bootloader">
+                                                        <comboboxtext space-expand="true" space-fill="true" tooltip-text="Выберите загрузчик">
                                                                 <variable>ENTRY12</variable>
                                                                 <item>none</item>
 	                                                        <item>Grub</item>
@@ -456,11 +456,11 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                                                                 <action condition="command_is_true([ $ENTRY12 = Systemd/bootctl ] && echo true)">disable:BR_DISK</action>
                                                                 <action condition="command_is_true([ $ENTRY12 = Grub-efi ] && echo true)">disable:BR_DISK</action>
                                                         </comboboxtext>
-                                                        <comboboxtext space-expand="true" space-fill="true" tooltip-text="Select target disk for bootloader" sensitive="false">
+                                                        <comboboxtext space-expand="true" space-fill="true" tooltip-text="Выберите диск для установки загрузчика" sensitive="false">
 	                                                        <variable>BR_DISK</variable>
 	                                                        <input>bash -c scan_disks</input>
 	                                                </comboboxtext>
-                                                        <entry tooltip-text="Set additional kernel options" sensitive="false">
+                                                        <entry tooltip-text="Установка дополнительных параметров ядра" sensitive="false">
                                                                 <variable>BR_KL_OPTS</variable>
                                                         </entry>
                                                 </hbox>
@@ -468,35 +468,35 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                                 </vbox>
 
                                 <vbox>
-                                        <frame Restore Mode:>
-                                                <hbox tooltip-text="Choose a local archive or enter URL">
-                                                        <entry fs-action="file" fs-title="Select a backup archive">
+                                        <frame Режим восстановления:>
+                                                <hbox tooltip-text="Выберите локальный архив или введите URL-адрес">
+                                                        <entry fs-action="file" fs-title="Выберите резервный архив (снимок)">
                                                                 <variable>BR_FILE</variable>
                                                                 <action condition="command_is_true([[ $BR_FILE == /* ]] && echo true)">disable:BR_USERNAME</action>
                                                                 <action condition="command_is_true([[ $BR_FILE == /* ]] && echo true)">disable:BR_PASSWORD</action>
                                                                 <action condition="command_is_true([[ ! $BR_FILE == /* ]] && echo true)">enable:BR_USERNAME</action>
                                                                 <action condition="command_is_true([[ ! $BR_FILE == /* ]] && echo true)">enable:BR_PASSWORD</action>
                                                         </entry>
-                                                        <button tooltip-text="Select archive">
+                                                        <button tooltip-text="Выберите архив">
                                                                 <input file stock="gtk-open"></input>
                                                                 <action>fileselect:BR_FILE</action>
                                                         </button>
                                                 </hbox>
-                                                <expander label="Authentication">
+                                                <expander label="Аутентификация">
                                                         <vbox>
-                                                                <hbox><text width-request="86" space-expand="false"><label>Username:</label></text>
-                                                                        <entry tooltip-text="Set ftp/http username">
+                                                                <hbox><text width-request="86" space-expand="false"><label>User name:</label></text>
+                                                                        <entry tooltip-text="Установите FTP/HTTP имя пользователя">
                                                                                 <variable>BR_USERNAME</variable>
                                                                         </entry>
                                                                 </hbox>
-                                                                <hbox><text width-request="86" space-expand="false"><label>Password:</label></text>
-                                                                        <entry tooltip-text="Set ftp/http password">
+                                                                <hbox><text width-request="86" space-expand="false"><label>Пароль:</label></text>
+                                                                        <entry tooltip-text="Установите FTP/HTTP пароль">
                                                                                 <variable>BR_PASSWORD</variable>
                                                                         </entry>
                                                                 </hbox>
                                                                 <hbox>
-                                                                        <text width-request="86" space-expand="false"><label>Passphrase:</label></text>
-                                                                        <entry tooltip-text="Set passphrase for decryption">
+                                                                        <text width-request="86" space-expand="false"><label>Ключевая фраза:</label></text>
+                                                                        <entry tooltip-text="Установите ключевую фразу (пароль) для расшифровки">
                                                                                 <variable>BR_PASSPHRASE</variable>
                                                                         </entry>
                                                                 </hbox>
@@ -507,9 +507,9 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                                 </vbox>
 
                                 <vbox>
-                                        <frame Transfer Mode:>
-                                                <checkbox tooltip-text="Activate Tranfer Mode">
-                                                        <label>Activate</label>
+                                        <frame Режим клонирования запущенной системы:>
+                                                <checkbox tooltip-text="Активировать режим Клонирования">
+                                                        <label>Активировать</label>
                                                         <variable>ENTRY13</variable>
                                                         <action>if true disable:FRM</action>
                                                         <action>if false enable:FRM</action>
@@ -518,34 +518,34 @@ efibootmgr dosfstools systemd"><label>"<span color='"'brown'"'>Создание 
                                                         <action>if false disable:ENTRY14</action>
                                                         <action>if false disable:ENTRY21</action>
                                                 </checkbox>
-                                                <checkbox sensitive="false" tooltip-text="Transfer only hidden files and folders from /home">
-                                                        <label>"Only hidden files and folders from /home"</label>
+                                                <checkbox sensitive="false" tooltip-text="Копировать только скрытые файлы и папки из /home">
+                                                        <label>"Только скрытые файлы и папки из /home"</label>
                                                         <variable>ENTRY14</variable>
                                                 </checkbox>
-                                                <checkbox sensitive="false" tooltip-text="Override the default rsync options with user options">
-                                                        <label>Override</label>
+                                                <checkbox sensitive="false" tooltip-text="Заменить опции rsync по умолчанию - опциями пользователя">
+                                                        <label>Переопределить</label>
                                                         <variable>ENTRY21</variable>
                                                 </checkbox>
                                         </frame>
                                 </vbox>
 
-                                <text xalign="0"><label>Additional options:</label></text>
-                                <comboboxentry tooltip-text="Set extra tar/rsync options. See tar --help  or rsync --help for more info. If you want spaces in names replace them with //">
+                                <text xalign="0"><label>Дополнительные опции:</label></text>
+                                <comboboxentry tooltip-text="Установка дополнилельных параметров tar/rsync. Выполните tar --help или rsync --help для получения дополнительной информации. Пробелы в названиях замените на //">
                                         <variable>BR_TR_OPTIONS</variable>
                                         <item>--acls --xattrs</item>
                                 </comboboxentry>
 
-                                <checkbox tooltip-text="Disable genkernel check and initramfs building in gentoo">
-                                        <label>Disable genkernel</label>
+                                <checkbox tooltip-text="Отключить проверку genkernel и initramfs в gentoo">
+                                        <label>Отключить genkernel</label>
                                         <variable>ENTRY18</variable>
                                 </checkbox>
 
-                                <checkbox tooltip-text="Dont check if root partition is empty (dangerous)">
-                                        <label>Dont check root</label>
+                                <checkbox tooltip-text="Не проверять свободное место в корневом разделе (опасно!)">
+                                        <label>Не проверять корневой раздел</label>
                                         <variable>ENTRY19</variable>
                                 </checkbox>
 
-                                <checkbox tooltip-text="Ignore UEFI environment">
+                                <checkbox tooltip-text="Игнорировать UEFI среду">
                                         <label>Bios</label>
                                         <variable>ENTRY20</variable>
                                 </checkbox>
