@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Name=Photorec
+Exec=x-terminal-emulator --command="sudo /opt/testdisk-7.1-WIP/photorec_static && exit"
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=System;
+Icon=drive-harddisk

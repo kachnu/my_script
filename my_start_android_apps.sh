@@ -82,7 +82,7 @@ HELP="НАИМЕНОВАНИЕ
 	$0 [КЛЮЧ] [Файл или Папка]
 КЛЮЧИ
 	-h, --help - выводит данное сообщение
-	--install - устанавливает необходимые пакеты и программы для работы с *.apk
+	--install-full - устанавливает необходимые пакеты и программы для работы с *.apk
 ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ СКРИПТА
 	$0 \"/home/user/Game.apk\" - файл *.apk или предварительно подготовленную ARChon папку
 	$0 - запускает gui-форму
@@ -161,7 +161,7 @@ SYNTAX
 	$0 [ KEY ] [ File or Folder]
 KEYS
 	-h, --help - displays this message
-	--install - installs the required packages and programs to work with * .apk
+	--install-full - installs the required packages and programs to work with * .apk
 EXAMPLES OF SCRIPT
 	$0 \"/home/user/Game.apk\" - *.apk file or folder previously prepared ARChon
 	$0 - launches the gui- shape

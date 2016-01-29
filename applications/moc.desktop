@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Player MOC
+GenericName[ru]=Терминальный музыкальный плеер MOC
+Name=Player MOC
+Name[ru]=Терминальный музыкальный плеер MOC
+Comment=Terminal player MOC.
+Comment[ru]=Терминальный музыкальный плеер MOC. Очень быстрый и экономящий ресурсы Вашего ПК.
+Exec=mocp
+Icon=multimedia-player
+Terminal=true
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=AudioVideo;Audio;Player;GTK;
