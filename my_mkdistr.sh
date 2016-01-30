@@ -11,6 +11,7 @@ if [ ! -x "`which "$DIALOG"`" ]
   then DIALOG=dialog
   fi
 fi
+WORK_DIR="$HOME"
 
 # Дополнительные свойства для текта:
 BOLD='\033[1m'         #  ${BOLD}        # жирный шрифт (интенсивный цвет)
@@ -57,10 +58,11 @@ Help ()
 Пояснения по пунктам меню:
   1 Распаковать iso и создать временные файлы - создаются временная/рабочая папка mydistr, монтируется iso, производится копирование содержимого iso в папку mydistr_iso и распаковка filesystem.squashfs в папку mydistr_root. 
   2 Инструкции по изменению дистрибутива - описаны действия по изменению дистрибутива, установка программ и т.д.
-  3 Собрать  iso - создается filesystem.squashfs из содержимого папки mydistr_root, копируются актуальное ядро и инит, обновляются списки установленных пакетов, производится подсчет контрольной суммы по MD5, генерируется iso-образ
-  4 Удалить временные файлы и папки - удаление временных файлов и папок
-  5 Выполнить всё: распаковка-инструкция-упаковка-очистка - выполняются поочередно пп 1-4 
-  6 Справка - то что вы сейчас читаете
+  3 Подготовить iso (filesystem.squashfs и т.д.) - создается filesystem.squashfs из содержимого папки mydistr_root, копируются актуальное ядро и инит, обновляются списки установленных пакетов, производится подсчет контрольной суммы по MD5.
+  4 Собрать  iso - генерируется iso-образ
+  5 Удалить временные файлы и папки - удаление временных файлов и папок
+  6 Выполнить всё: распаковка-инструкция-упаковка-очистка - выполняются поочередно пп 1-4 
+  7 Справка - то что вы сейчас читаете
 ${NORMAL}
 "
 }
@@ -68,8 +70,8 @@ ${NORMAL}
 UnpackIsoSquashfs ()
 {
 echo "- Создание рабочей папки mydistr в домашней папке пользователя"
-mkdir ~/mydistr
-cd ~/mydistr
+mkdir $WORK_DIR/mydistr
+cd $WORK_DIR/mydistr
 
 echo "- Создание папок mnt и mydistr_iso под iso-образ"
 mkdir mnt
@@ -140,7 +142,7 @@ ManEditDirtrib ()
 echo -en "${UNDERLINE}
 Следующая последовательность команд написана в качестве мануала и нужна для установки ПО в новой сборке.
 ${NORMAL} ${BLUE} 
-cd ~/mydistr
+cd $WORK_DIR/mydistr
 sudo -s
 
 cp /etc/hosts mydistr_root/etc/
@@ -171,11 +173,11 @@ ${NORMAL}____________
 beep
 }
 ##################################
-MakeSquashfsIso ()
+MakeSquashfs ()
 {
-if [ -d ~/mydistr/ ];
- then echo "- Переход в рабочую папку ~/mydistr/"; cd ~/mydistr/ ;
- else $DIALOG --title "ВНИМАНИЕ!" --msgbox "Рабочая папка ~/mydistr/ отсутсвует!!! Начните работу с первого пункта " 10 60 ; MainForm;
+if [ -d $WORK_DIR/mydistr/ ];
+ then echo "- Переход в рабочую папку $WORK_DIR/mydistr/"; cd $WORK_DIR/mydistr/ ;
+ else $DIALOG --title "ВНИМАНИЕ!" --msgbox "Рабочая папка $WORK_DIR/mydistr/ отсутсвует!!! Начните работу с первого пункта " 10 60 ; MainForm;
 fi
 
 # Определяем с каким дистрибутивом имеем дело
@@ -262,7 +264,10 @@ cd mydistr_iso
 sudo rm md5sum.txt
 find -type f -print0 | sudo xargs -0 md5sum | grep -v isolinux/boot.cat | sudo tee md5sum.txt
 beep
-
+}
+##################################
+MakeIso ()
+{
 echo "- Ввод пути для сохранения iso-образа"
 while true; do
  WAY=$($DIALOG --title "Путь для сохранения ISO" --inputbox "Введите путь и имя для сохранения iso-образа CD/DVD (можно воспользоваться ф-цией Copy way-контекстного меню Thunar)" 10 60 $WAY 3>&1 1>&2 2>&3)
@@ -287,15 +292,15 @@ while true; do
 			        echo "Can't create isohybrid.  File: isohdpfx.bin not found. The resulting image will be a standard iso file."
                  fi
                 sudo xorriso -as mkisofs -r -J -joliet-long -l ${isohybrid_opt} -partition_offset 16 -V "$DISTRIBUTIV-custom"  -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
-    -boot-load-size 4 -boot-info-table -o "$WAY" ~/mydistr/mydistr_iso | tee >($DIALOG --title="Creating CD/DVD image file..." --progress --pulsate --auto-close --width 300) 
+    -boot-load-size 4 -boot-info-table -o "$WAY" $WORK_DIR/mydistr/mydistr_iso | tee >($DIALOG --title="Creating CD/DVD image file..." --progress --pulsate --auto-close --width 300) 
                 break
            fi 
            if [[ -x "`which genisoimage`" ]]
-            then sudo genisoimage -D -r -V "$DISTRIBUTIV-custom" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $WAY ~/mydistr/mydistr_iso 
+            then sudo genisoimage -D -r -V "$DISTRIBUTIV-custom" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $WAY $WORK_DIR/mydistr/mydistr_iso 
                  break
            fi
            if [[ -x "`which mkisofs`" ]]
-            then sudo mkisofs -D -r -V "$DISTRIBUTIV-custom" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $WAY ~/mydistr/mydistr_iso 
+            then sudo mkisofs -D -r -V "$DISTRIBUTIV-custom" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $WAY $WORK_DIR/mydistr/mydistr_iso 
                  break
            fi
            ;; 
@@ -316,17 +321,17 @@ ANSWER=$($DIALOG  --title "Удаление временных файлов" --m
     "Выберите действие" 13 55\
     6\
         1 "Оставить временные файлы"\
-        2 "Удалить все временные папки и файлы ~/mydistr/"\
-        3 "Удалить только ~/mydistr/mydistr_iso"\
-        4 "Удалить только ~/mydistr/mydistr_root" 3>&1 1>&2 2>&3)
+        2 "Удалить все временные папки и файлы $WORK_DIR/mydistr/"\
+        3 "Удалить только $WORK_DIR/mydistr/mydistr_iso"\
+        4 "Удалить только $WORK_DIR/mydistr/mydistr_root" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Нажали отмену; MainForm
 fi	
 case $ANSWER in
  1 ) MainForm ;;
- 2 ) sudo rm -r ~/mydistr ;; 
- 3 ) sudo rm -r ~/mydistr/mydistr_iso ;; 
- 4 ) sudo rm -r ~/mydistr/mydistr_root ;; 
+ 2 ) sudo rm -r $WORK_DIR/mydistr ;; 
+ 3 ) sudo rm -r $WORK_DIR/mydistr/mydistr_iso ;; 
+ 4 ) sudo rm -r $WORK_DIR/mydistr/mydistr_root ;; 
  * ) Неожиданный ответ: $ANSWER ; exit 1 ;;
 esac
 echo "Все действия выполнены"
@@ -335,14 +340,15 @@ echo "Все действия выполнены"
 MainForm ()
 {
 ANSWER=$($DIALOG  --cancel-button "Выход" --title "Собираем дистрибутивчик $DISTRIBUTIV" --menu \
-    "Выберите действие" 13 60\
-    6\
+    "Выберите действие" 16 70\
+    8\
         1 "Распаковать iso и создать временные файлы"\
         2 "Инструкции по изменению дистрибутива"\
-        3 "Собрать  iso"\
-        4 "Удалить временные файлы и папки"\
-        5 "Выполнить всё: распакова-инструкция-упаковка-очистка"\
-        6 "Справка" 3>&1 1>&2 2>&3)
+        3 "Подготовить iso (filesystem.squashfs и т.д.)"\
+        4 "Собрать iso"\
+        5 "Удалить временные файлы и папки"\
+        6 "Выполнить всё: распакова-инструкция-упаковка-очистка"\
+        7 "Справка" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Нажали Выход - выходим с нулем ; exit 0
 fi
@@ -357,15 +363,19 @@ case $ANSWER in
        read x
        MainForm
        ;;
-    3) MakeSquashfsIso
+    3) MakeSquashfs
        echo "Нажмите Enter для перехода в главное меню" 
        read x
        MainForm ;;
-    4) RmWorkFiles 
+    4) MakeIso
        echo "Нажмите Enter для перехода в главное меню" 
        read x
        MainForm;;
-    5) UnpackIsoSquashfs
+    5) RmWorkFiles 
+       echo "Нажмите Enter для перехода в главное меню" 
+       read x
+       MainForm;;   
+    6) UnpackIsoSquashfs
        echo "- После проведения изменений, наберите next и нажмите Enter, для перехода к этапу формирования iso-образа" 
        while true; do
         read NEXT
@@ -375,13 +385,14 @@ case $ANSWER in
         esac
        done
        ManEditDirtrib
-       MakeSquashfsIso
+       MakeSquashfs
+       MakeIso
        RmWorkFiles
        echo "Нажмите Enter для перехода в главное меню" 
        read x
        MainForm
        ;;       
-    6) Help  
+    7) Help  
        echo "Нажмите Enter для перехода в главное меню" 
        read x
        MainForm
