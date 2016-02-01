@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Temporary files to RAM
+Name[ru]=Временные файлы в ОЗУ
+Comment=Temporary files /tmp to RAM
+Exec=x-terminal-emulator -e /usr/local/bin/my_tmp_to_ram.sh
+Icon=jockey
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=System;
