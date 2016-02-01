@@ -14,11 +14,14 @@ if [ ! -x "`which "$DIALOG"`" ]
   fi
 fi
 
+EDITOR=nano
+
 case $LANG in
   uk*|ru*|be*) #UA RU BE locales
                MAIN_LABEL="Cкрипт /tmp в ОЗУ"
                MAIN_TEXT="Выберите действие:"
                MENU1="Временные файлы /tmp в ОЗУ"
+               MENU2="Редактирование /etc/fstab"
                MENUh="Справка"
                HELP_EXIT="
 Нажмите Enter для перехода в главное меню"
@@ -41,6 +44,7 @@ ___________________________________"
                MAIN_LABEL="/tmp to RAM"
                MAIN_TEXT="Select an action:"
                MENU1="Temporary files /tmp to RAM"
+               MENU2="Edit /etc/fstab"
                MENUh="Help"
                HELP_EXIT="
 Press Enter to go to the main menu"
@@ -90,6 +94,7 @@ ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
     "$MAIN_TEXT" 10 60\
     3\
        "$MENU1 (automount-$STATE_AUTOMOUNT, status-$STATE_STATUS)" ""\
+       "$MENU2" ""\
        "$MENUh" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Exit ; exit 0
@@ -100,6 +105,9 @@ case $ANSWER in
                else sudo sed -i '/\/tmp tmpfs/d' /etc/fstab
               fi
               RestartPC
+              ;;
+    "$MENU2") sudo $EDITOR /etc/fstab
+              MainForm
               ;;
    "$MENUh" ) echo "$HELP"
               echo "$HELP_EXIT"
