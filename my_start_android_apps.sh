@@ -17,14 +17,8 @@ if [ ! -f  "$WORK_FOLDER/start_android_apps.conf" ]
 #ссылка на скачивание ARCHON https://github.com/vladikoff/chromeos-apk/blob/master/archon.md
 WGET_ARCHON="http://archon.vf.io/ARChon-v1.2-x86_32.zip"
 
-#альтернативная ссылка на ARCHON, загрузка произойдет если главная ссылка будет нерабочей
-WGET_ARCHON_ALTERNATIVE="http://www.ex.ua/load/219729766"
-
 #ссылка на скачивание node https://nodejs.org/download/
 WGET_NODE="https://nodejs.org/download/release/v5.4.1/node-v5.4.1-linux-x86.tar.gz"
-
-#альтернативная ссылка на node, загрузка произойдет если главная ссылка будет нерабочей
-WGET_NODE_ALTERNATIVE="http://www.ex.ua/load/219729841"
 
 #ссылка на скачивание google-chrome https://dl.google.com/linux/direct/google-chrome-stable_current_i386.deb
 WGET_CHROME="https://dl.google.com/linux/direct/google-chrome-stable_current_i386.deb"
@@ -96,14 +90,8 @@ if [ ! -f  "$WORK_FOLDER/start_android_apps.conf" ]
 #download link ARCHON https://github.com/vladikoff/chromeos-apk/blob/master/archon.md
 WGET_ARCHON="http://archon.vf.io/ARChon-v1.2-x86_32.zip"
 
-#Alternative link to ARCHON, loading will happen if the main link is broken
-WGET_ARCHON_ALTERNATIVE="http://www.ex.ua/load/219729766"
-
 #download link node https://nodejs.org/download/
 WGET_NODE="https://nodejs.org/download/release/v5.4.1/node-v5.4.1-linux-x86.tar.gz"
-
-#Alternative link to the node, the download will happen if the main link is broken
-WGET_NODE_ALTERNATIVE="http://www.ex.ua/load/219729841"
 
 #download link google-chrome https://dl.google.com/linux/direct/google-chrome-stable_current_i386.deb
 WGET_CHROME="https://dl.google.com/linux/direct/google-chrome-stable_current_i386.deb"
@@ -208,7 +196,9 @@ if [ "$ERROR_MASSAGE" != '' ]
       if [ $? == 0 ]
         then if [ "$1" = "full" ]
                then $MY_TERMINAL -e "$0" --install-full 
+                    killall wget
                else $MY_TERMINAL -e "$0" --install
+                    killall wget
              fi  
         else exit 0
       fi
@@ -225,21 +215,14 @@ if [ "$ERROR_MASSAGE" != '' ]
     case "$opt" in
                    ARCHON) #загрузка и распаковка ARCHON
                            FILE_NAME=$(echo "$WGET_ARCHON" | sed "s|\(.*\/\)||")
-                           FILE_NAME_ALTERNATIVE=$(echo "$WGET_ARCHON_ALTERNATIVE" | sed "s|\(.*\/\)||")
-                           if [ -f "$FILE_NAME" ] || [ -f "$FILE_NAME_ALTERNATIVE" ]
+                           if [ -f "$FILE_NAME" ] 
                               then unzip "$FILE_NAME"
                                    if [ $? != 0 ]
-                                     then rm "$FILE_NAME"
-                                          FILE_NAME="$FILE_NAME_ALTERNATIVE"
-                                          unzip "$FILE_NAME" || rm "$FILE_NAME"
+                                     then wget -c "$WGET_ARCHON"
+                                          unzip "$FILE_NAME"
                                    fi
-                              else wget "$WGET_ARCHON" || wget "$WGET_ARCHON_ALTERNATIVE"
+                              else wget -c "$WGET_ARCHON"
                                    unzip "$FILE_NAME"
-                                   if [ $? != 0 ]
-                                     then rm "$FILE_NAME"
-                                          FILE_NAME="$FILE_NAME_ALTERNATIVE"
-                                          unzip "$FILE_NAME" || rm "$FILE_NAME"
-                                   fi
                            fi
                            #Добавление актуальной информации о папке с ARCHON в конфигурационный файл start_android_apps.conf
                            NEW_FOLDER_WITH_ARCHON=$(unzip -l "$FILE_NAME" | grep -A3 "Name" | grep -m1 "0" | awk '{print $4}')
@@ -250,21 +233,14 @@ if [ "$ERROR_MASSAGE" != '' ]
                            ;;	
                       NODE) #загрузка и распаковка node
                             FILE_NAME=$(echo "$WGET_NODE" | sed "s|\(.*\/\)||")
-                            FILE_NAME_ALTERNATIVE=$(echo "$WGET_NODE_ALTERNATIVE" | sed "s|\(.*\/\)||")
-                            if [ -f "$FILE_NAME" ] || [ -f "$FILE_NAME_ALTERNATIVE" ]
+                            if [ -f "$FILE_NAME" ]
                                then tar -xvf "$FILE_NAME" 
                                     if [ $? != 0 ]
-                                      then rm "$FILE_NAME"
-                                           FILE_NAME="$FILE_NAME_ALTERNATIVE"
-                                           tar -xvf "$FILE_NAME" || rm "$FILE_NAME"
+                                      then wget -c "$WGET_NODE"
+                                           tar -xvf "$FILE_NAME"
                                     fi      
-                               else wget "$WGET_NODE" || wget "$WGET_NODE_ALTERNATIVE"
+                               else wget "$WGET_NODE"
                                     tar -xvf "$FILE_NAME"
-                                    if [ $? != 0 ]
-                                      then rm "$FILE_NAME"
-                                           FILE_NAME="$FILE_NAME_ALTERNATIVE"
-                                           tar -xvf "$FILE_NAME" || rm "$FILE_NAME"
-                                    fi  
                             fi
                            #Добавление актуальной информации о папке с node в конфигурационный файл start_android_apps.conf
                            NEW_FOLDER_WITH_NODE=$(tar -tvf "$FILE_NAME" | grep -m1 "0" | awk '{print $6}')
@@ -335,7 +311,7 @@ if [ -f "$FILE_APK" ] #обрабатываем файл *.apk
       MessageError full
       export PATH=$PATH:$FOLDER_WITH_NODE
       chromeos-apk "$FILE_APK"
-      NAME_FOLDER_APK=$(chromeos-apk "$FILE_APK" | awk '{print $3}')
+      NAME_FOLDER_APK=$(chromeos-apk "$FILE_APK" --tablet | awk '{print $3}')
       echo NAME_FOLDER_APK=$NAME_FOLDER_APK
       FOLDER_ANDROID="$WORK_FOLDER/$NAME_FOLDER_APK"
       echo FOLDER_ANDROID=$FOLDER_ANDROID
