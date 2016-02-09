@@ -188,11 +188,11 @@ if [[ -d ~/.local/share/themes ]]
  then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
 fi
 if [[ -d ~/.themes ]]
- then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
+ then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.themes\//FALSE /g" | sed "s/\/metacity-1//g")
 fi
 THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
 THEME_LIST=$(echo "$THEME_LIST" | sort)
-THEME_LIST=$(echo "$THEME_LIST" | sed "s/FALSE ${THEME_NOW}$/TRUE ${THEME_NOW}/g")
+THEME_LIST=$(echo "$THEME_LIST" | sed "/^$/d" | sed "s/FALSE ${THEME_NOW}$/TRUE ${THEME_NOW}/g")
 #echo -e "Общий список тем - $THEME_LIST"
 THEME_METACITY=$(echo "$THEME_LIST" | sed "s/FALSE /FALSE\n/g" | sed "s/TRUE /TRUE\n/g" | $DIALOG --width=400 --height=300 --list --cancel-label="Back" --radiolist \
        --title="$THEME_LABEL" \
