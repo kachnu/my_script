@@ -11,12 +11,12 @@ fi
 if [ -f "/home/$USER/.config/gtk-3.0/bookmarks" ]; then
    sed -i "s/REPLACEME/${USER}/g" /home/$USER/.config/gtk-3.0/bookmarks
 fi
+
 #Создание ссылок на обои
 if [ ! -f /home/$USER/images/wallpapers/desktop-base ]; then
    ln -s /usr/share/images/desktop-base /home/$USER/images/wallpapers/desktop-base
    ln -s /usr/share/backgrounds /home/$USER/images/wallpapers/backgrounds
 fi
-#Добавляем в меню пунк Install
 
 #Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
 #После установки данные строки не будут использоваться.
@@ -33,6 +33,30 @@ then
       echo "Путь к файлу filesystem.squashfs - $OLD_WAY верен. Никаких изменений не требуется"
     fi
 fi
+
+#Преднастройка WPS-office (русский - при славянских локалях, бланк вместо инет шаблонов)
+if [ ! -f "/home/$USER/.config/Kingsoft/Office.conf" ] && [ -x "`which wps`" ] ; then
+  mkdir -p /home/$USER/.config/Kingsoft/
+  case $LANG in
+  uk*|ru*|be*) #UA RU BE locales
+               echo "[General]
+languages=ru_RU
+
+[6.0]
+common\wpshomeoptions\default=
+common\wpshomeoptions\StartWithHome=0
+common\wpshomeoptions\StartWithBlank=1" > /home/$USER/.config/Kingsoft/Office.conf
+               ;;
+            *) #All locales
+			echo "
+[6.0]
+common\wpshomeoptions\default=
+common\wpshomeoptions\StartWithHome=0
+common\wpshomeoptions\StartWithBlank=1" > /home/$USER/.config/Kingsoft/Office.conf
+               ;;
+  esac 
+fi
+
 #Убираем данный скрипт из автозапуска
 if [ -f "/home/$USER/.config/autostart/firstrun.desktop" ]; then
    sed -i "s/Hidden=false/Hidden=true/g" /home/$USER/.config/autostart/firstrun.desktop
