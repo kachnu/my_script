@@ -293,17 +293,29 @@ STATE_XFWM4=''
 AUTO_COMPIZ=''
 AUTO_METACITY=''
 AUTO_XFWM4=''
+NUMBER_WORKSPACE=''
 
 if pidof compiz > /dev/null
  then STATE_COMPIZ="- ON"
+      s0_hsize=2
+      s0_vsize=1
+      export $(cat $HOME/.config/compiz/compizconfig/config | sed "s/ //g") 2>/dev/null
+      if [[ $profile = '' ]]
+         then profile='Default'
+      fi
+      export $(cat $HOME/.config/compiz/compizconfig/$profile.ini | sed "s/ //g") 2>/dev/null
+      echo $s0_hsize $s0_vsize
+      let NUMBER_WORKSPACE=$s0_hsize*$s0_vsize
 fi
 
 if pidof metacity > /dev/null
  then STATE_METACITY="- ON"
+      NUMBER_WORKSPACE=`dconf read /org/gnome/desktop/wm/preferences/num-workspaces`
 fi
 
 if pidof xfwm4 > /dev/null
  then STATE_XFWM4="- ON"
+      NUMBER_WORKSPACE=`xfconf-query -c xfwm4 -p /general/workspace_count`
 fi	
 
 if [[ $(cat "$CONFIG_FILE" | grep compiz) != '' ]]
@@ -341,8 +353,16 @@ then
         WM=compiz
         echo Run $WM
         Check $WM
+        CheckState
+        export $(cat $HOME/.config/compiz/compizconfig/config | sed "s/ //g") 2>/dev/null
+        if [[ $profile = '' ]]
+         then profile='Default'
+        fi
+        sed -i "/^s0_hsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
+        sed -i "/^s0_vsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
+        sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz/compizconfig/$profile.ini   
         $WM --replace &
-        xfce4-panel -r
+        xfce4-panel -r                   
         sleep 1
         MainForm
         ;;
@@ -350,24 +370,28 @@ then
         WM=metacity
         echo Run $WM
         Check $WM
+        CheckState
         $WM --replace &
         xfce4-panel -r
+        dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE        
         sleep 1
         MainForm
         ;;
     3) # Run xfwm4
         WM=xfwm4
         echo Run $WM
-        Check $WM                        
+        Check $WM 
+        CheckState                       
         $WM --replace &
         xfce4-panel -r
+        xfconf-query -c xfwm4 -p /general/workspace_count -s $NUMBER_WORKSPACE
         sleep 1
         MainForm
         ;;
     4) # Settings compiz
         echo Settings compiz
         Check ccsm
-        ccsm
+        ccsm 1>/dev/null
         MainForm
         ;;
     5) # Settings metacity
