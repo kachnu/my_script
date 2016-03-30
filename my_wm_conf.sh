@@ -107,7 +107,6 @@ One of the conditions for the proper formation of the list is the lack of spaces
                ;;
 esac
 
-
 CONFIG_FILE=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml
 if [ -f $CONFIG_FILE ] #проверяем существование файла xfce4-session.xml, если не существует - создаем новый
  then sed -i 's/<property name="Client0_Command" type="empty"\/>/<property name="Client0_Command" type="array"> <value type="string" value="xfwm4"\/> <\/property>/g' $CONFIG_FILE
@@ -307,25 +306,20 @@ if pidof compiz > /dev/null
       echo $s0_hsize $s0_vsize
       let NUMBER_WORKSPACE=$s0_hsize*$s0_vsize
 fi
-
 if pidof metacity > /dev/null
  then STATE_METACITY="- ON"
       NUMBER_WORKSPACE=`dconf read /org/gnome/desktop/wm/preferences/num-workspaces`
 fi
-
 if pidof xfwm4 > /dev/null
  then STATE_XFWM4="- ON"
       NUMBER_WORKSPACE=`xfconf-query -c xfwm4 -p /general/workspace_count`
 fi	
-
 if [[ $(cat "$CONFIG_FILE" | grep compiz) != '' ]]
  then AUTO_COMPIZ="- ON"
 fi
-
 if [[ $(cat "$CONFIG_FILE" | grep metacity) != '' ]]
  then AUTO_METACITY="- ON"
 fi
-
 if [[ $(cat "$CONFIG_FILE" | grep xfwm4) != '' ]]
  then AUTO_XFWM4="- ON"
 fi

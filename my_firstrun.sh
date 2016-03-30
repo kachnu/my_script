@@ -34,7 +34,8 @@ then
     fi
 fi
 
-#Преднастройка WPS-office (русский - при славянских локалях, бланк вместо инет шаблонов)
+#Преднастройка ПО 
+#WPS-office (русский - при славянских локалях, бланк вместо инет шаблонов)
 if [ ! -f "/home/$USER/.config/Kingsoft/Office.conf" ] && [ -x "`which wps`" ] ; then
   mkdir -p /home/$USER/.config/Kingsoft/
   case $LANG in
@@ -54,6 +55,33 @@ common\wpshomeoptions\default=
 common\wpshomeoptions\StartWithHome=0
 common\wpshomeoptions\StartWithBlank=1" > /home/$USER/.config/Kingsoft/Office.conf
                ;;
+  esac 
+fi
+#SMplayer (русский - при славянских локалях, монохромные ярлыки)
+if [ ! -f "/home/$USER/.config/smplayer/smplayer.ini" ] && [ -x "`which smplayer`" ] ; then
+  mkdir -p /home/$USER/.config/smplayer/
+  case $LANG in
+  uk*|ru*|be*) #UA RU BE locales
+               echo "[gui]
+language=ru_RU
+iconset=Monochrome" > /home/$USER/.config/smplayer/smplayer.ini
+               ;;
+            *) #All locales
+			echo "[gui]
+iconset=Monochrome" > /home/$USER/.config/smplayer/smplayer.ini
+               ;;
+  esac 
+fi
+#ocenaudio (русский - при славянских локалях)
+if [ ! -f "/home/$USER/.local/share/data/OcenAudio/ocenaudio.cfg" ] && [ -x "`which ocenaudio`" ] ; then
+  mkdir -p /home/$USER/.local/share/data/OcenAudio/
+  case $LANG in
+  uk*|ru*|be*) #UA RU BE locales
+               echo "[ocenapp]
+language=ru_RU" > /home/$USER/.local/share/data/OcenAudio/ocenaudio.cfg
+               ;;
+            *) #All locales
+			   ;;
   esac 
 fi
 
