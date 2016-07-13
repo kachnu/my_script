@@ -85,6 +85,20 @@ language=ru_RU" > /home/$USER/.local/share/data/OcenAudio/ocenaudio.cfg
   esac 
 fi
 
+#masterpdfeditor3  (русский - при славянских локалях)
+if [ ! -f "/home/$USER/.config/Code Industry/Master PDF Editor.conf" ] && [ -x "`which masterpdfeditor3 `" ] ; then
+  mkdir -p "/home/$USER/.config/Code Industry/"
+  case $LANG in
+  uk*|ru*|be*) #UA RU BE locales
+               echo "[General]
+lang=ru_ru" > "/home/$USER/.config/Code Industry/Master PDF Editor.conf"
+               ;;
+            *) #All locales
+			   ;;
+  esac 
+fi
+
+
 #Убираем данный скрипт из автозапуска
 if [ -f "/home/$USER/.config/autostart/firstrun.desktop" ]; then
    sed -i "s/Hidden=false/Hidden=true/g" /home/$USER/.config/autostart/firstrun.desktop
