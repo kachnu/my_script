@@ -19,8 +19,20 @@ case $LANG in
                MENU1="Запуск обновления"
                MENU2="Запуск полного обновления"
                MENU3="Редактирование /etc/apt/sources.list"
-               MENU4="Обновление flashplugin-nonfree"
+               MENU4="Очистить кэш пакетов"
+               MENU5="Автоматическое обновление"
+               MENU6="Обновление flashplugin-nonfree"
                MENUh="Справка"
+               MENU1_2="Вкл/выкл автообновление (ON или OFF)"
+               MENU2_2="Час (0-23)"
+               MENU3_2="Минута (0-59)"
+               MENU4_2="День недели (1-7)"
+               MENU5_2="День месяца (1-31)"
+               MENU6_2="Месяц (1-12)"              
+               MENU7_2="Применить настройки"
+               MENU8_2="Редактировать настройки вручную"
+               
+               
                PRELINK_TEXT="Для ускорения запуска приложений рекомендуется воспользоваться утилитой prelink!
                
 Запустить prelink сейчас?"
@@ -44,7 +56,9 @@ ___________________________________"
                MENU1="Start safe upgrade"
                MENU2="Start full upgrade"
                MENU3="Edit /etc/apt/sources.list"
-               MENU4="Update flashplugin-nonfree"
+               MENU4="Clear"
+               MENU5="Auto-upgrade"
+               MENU6="Update flashplugin-nonfree"
                MENUh="Help"
                PRELINK_TEXT="To speed up the application launch is recommended to use the utility prelink!
                
@@ -93,49 +107,171 @@ if [ -x "`which "/usr/sbin/prelink"`" ]
 fi
 }
 #########################################################
+Autoupgrade () #Автоматическое обновление
+{
+
+ANSWER=$($DIALOG  --cancel-button "Back" --title "$MAIN_LABEL" --menu \
+    "$MAIN_TEXT" 13 50\
+    7\
+        1 "$MENU1_2: $autoupgrade"\
+        2 "$MENU2_2: $HOUR"\
+        3 "$MENU3_2: $MINUTE"\
+        4 "$MENU4_2: $DAY_WEEK"\
+        5 "$MENU5_2: $DAY_MONTH"\
+        6 "$MENU6_2: $MONTH"\
+        7 "$MENU7_2" 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+ then echo Exit to main form ; MainForm
+fi
+case $ANSWER in
+	  1 ) if [ -f "/etc/cron.d/autoupgrade" ]
+            then sudo cp /etc/cron.d/autoupgrade /etc/cron.d/autoupgrade.backup
+                 sudo mv -f /etc/cron.d/autoupgrade.backup '/etc/cron.d/!autoupgrade'
+                 autoupgrade="OFF"
+          fi
+          if [ -f "/etc/cron.d/!autoupgrade" ]
+            then sudo mv -f '/etc/cron.d/!autoupgrade' /etc/cron.d/autoupgrade
+                 autoupgrade="ON"
+          fi         
+	      Autoupgrade;;
+	  2 ) HOUR=$($DIALOG --title "$MENU2_2" --inputbox "" 10 60 $HOUR 3>&1 1>&2 2>&3 | sed "s/[^0-9,*/]//g")
+          if [ $? != 0 ]
+            then HOUR=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $2}'`
+                 HOUR=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $2}'`
+          fi 
+          Autoupgrade;;
+	  3 ) MINUTE=$($DIALOG --title "$MENU3_2" --inputbox "" 10 60 $MINUTE 3>&1 1>&2 2>&3 | sed "s/[^0-9,*/]//g")
+          if [ $? != 0 ]
+            then MINUTE=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $1}'`
+                 MINUTE=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $1}'`
+          fi 
+          Autoupgrade;;
+	  4 ) DAY_WEEK=$($DIALOG --title "$MENU4_2" --inputbox "" 10 60 $DAY_WEEK 3>&1 1>&2 2>&3 | sed "s/[^0-9,*/]//g")
+          if [ $? != 0 ]
+            then DAY_WEEK=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $3}'`
+                 DAY_WEEK=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $3}'`
+          fi 
+          Autoupgrade;;
+	  5 ) DAY_MONTH=$($DIALOG --title "$MENU5_2" --inputbox "" 10 60 $DAY_MONTH 3>&1 1>&2 2>&3 | sed "s/[^0-9,*/]//g")
+          if [ $? != 0 ]
+            then DAY_MONTH=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $4}'`
+                 DAY_MONTH=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $4}'`
+          fi 
+          Autoupgrade;;
+	  6 ) MONTH=$($DIALOG --title "$MENU6_2" --inputbox "" 10 60 $MONTH 3>&1 1>&2 2>&3 | sed "s/[^0-9,*/]//g")
+          if [ $? != 0 ]
+            then MONTH=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $5}'`
+                 MONTH=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $5}'`
+          fi 
+          Autoupgrade;;
+	  7 ) echo -n "# /etc/cron.d/autoupgrade: crontab entries for autoupgrade
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+$MINUTE $HOUR $DAY_WEEK $DAY_MONTH $MONTH   root  export DISPLAY=:0 && beep
+" | sudo tee /etc/cron.d/autoupgrade > /dev/null
+          if [ -f /etc/cron.d/!autoupgrade ]
+             then sudo mv /etc/cron.d/autoupgrade /etc/cron.d/!autoupgrade
+          fi
+          ;;
+       8 ) if [ -f /etc/cron.d/!autoupgrade ]
+             then sudo nano /etc/cron.d/!autoupgrade
+           fi
+           if [ -f /etc/cron.d/autoupgrade ]
+             then sudo nano /etc/cron.d/autoupgrade
+           fi
+esac
+echo "$EXIT_TEXT"
+read input
+MainForm	
+
+}
+
+#########################################################
 MainForm () #Главная форма
 {
-flash="4"
+flash="6"
 if ! [ -f /usr/lib/flashplugin-nonfree/libflashplayer.so ]
  then flash=''
-  MENU4=''
+  MENU6=''
+fi
+
+if [ -f /etc/cron.d/autoupgrade ]
+   then
+		HOUR=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $2}'`
+		MINUTE=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $1}'`
+		DAY_WEEK=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $3}'`
+		DAY_MONTH=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $4}'`
+		MONTH=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $5}'`
+		autoupgrade="ON"
+else
+    if [ -f /etc/cron.d/!autoupgrade ]
+      then
+		HOUR=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $2}'`
+		MINUTE=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $1}'`
+		DAY_WEEK=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $3}'`
+		DAY_MONTH=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $4}'`
+		MONTH=`cat /etc/cron.d/!autoupgrade | grep beep | awk '{print $5}'`
+		autoupgrade="OFF"
+	 else
+		HOUR="22"
+		MINUTE="01"
+		DAY_WEEK="6"
+		DAY_MONTH="*"
+		MONTH="*"
+
+   fi
 fi
 
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
     "$MAIN_TEXT" 13 50\
-    5\
+    7\
         1 "$MENU1"\
         2 "$MENU2"\
         3 "$MENU3"\
-        "$flash" "$MENU4"\
+        4 "$MENU4"\
+        5 "$MENU5 $autoupgrade"\
+        "$flash" "$MENU6"\
         h "$MENUh" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Exit ; exit 0
 fi
 case $ANSWER in
-  1 ) sudo apt-get update; sudo apt-get upgrade && echo "$MENU1 - $ALLOK"; PrelinkSystem ;; 
-  2 ) sudo apt-get update; sudo apt-get dist-upgrade && echo "$MENU2 - $ALLOK"; PrelinkSystem ;;
-  3 ) Check nano; sudo nano /etc/apt/sources.list ;;
-  4 ) Check sudo update-flashplugin-nonfree; 
-      sudo cp /etc/wgetrc /etc/wgetrc.bak
-      if [ "$ftp_proxy" != '' ] || [ "$http_proxy" != '' ] || [ "$https_proxy" != '' ]
-        then echo "ftp_proxy = $ftp_proxy
+	  1 ) sudo apt-get update; sudo apt-get upgrade && echo "$MENU1 - $ALLOK"; PrelinkSystem ;; 
+	  2 ) sudo apt-get update; sudo apt-get dist-upgrade && echo "$MENU2 - $ALLOK"; PrelinkSystem ;;
+	  3 ) Check nano; sudo nano /etc/apt/sources.list ;;
+	  4 ) sudo rm -r /var/cache/apt/archives && echo "remove /var/cache/apt/archive"
+		  sudo rm -r /var/cache/apt-xapian-index && echo "remove /var/cache/apt-xapian-index";;
+	  5 ) Autoupgrade ;;
+	  $flash ) Check sudo update-flashplugin-nonfree; 
+		  sudo cp /etc/wgetrc /etc/wgetrc.bak
+		  if [ "$ftp_proxy" != '' ] || [ "$http_proxy" != '' ] || [ "$https_proxy" != '' ]
+			then echo "ftp_proxy = $ftp_proxy
 http_proxy = $http_proxy
 https_proxy = $https_proxy
-use_proxy = on" | sudo tee --append /etc/wgetrc
-      fi
-      sudo update-flashplugin-nonfree --install
-      sudo update-flashplugin-nonfree --status
-      sudo mv /etc/wgetrc.bak /etc/wgetrc
-      ;;
-  h ) Help;;
- '' ) ;;
-  * ) echo "oops! - $ANSWER";;
+use_proxy = on" | sudo tee --append /etc/wgetrc > /dev/null
+		  fi
+		  sudo update-flashplugin-nonfree --install
+		  sudo update-flashplugin-nonfree --status
+		  sudo mv /etc/wgetrc.bak /etc/wgetrc
+		  ;;
+	  h ) Help;;
+	 '' ) ;;
+	  * ) echo "oops! - $ANSWER";;
 esac
 echo "$EXIT_TEXT"
 read input
 MainForm
 }
 
-MainForm
+
+case $1 in
+     "-u"  ) sudo apt-get update; sudo apt-get -y dist-upgrade;;
+     "-uv" ) sudo apt-get update; sudo apt-get dist-upgrade && echo "$MENU2 - $ALLOK"
+             echo "$EXIT_TEXT"
+             read input;;
+        *  ) MainForm ;;
+esac
+
 exit 0
