@@ -25,26 +25,33 @@ case $LANG in
   uk*|ru*|be*) #UA RU BE locales
                MAIN_LABEL="Настройка параметров работы с дисками и памятью"
                MAIN_TEXT="Выберите действие:"
+               
                MENU1="Параметры монтирования"
-               MENU2="Настройки Swap & Sysctl"
+               MENU2="Настройки Swap и Sysctl"
                MENU3="Временные файлы /tmp в ОЗУ"
                MENU4="Логи /var/* в ОЗУ"
                MENU5="Автонастройка для SSD"
                MENU6="Редактирование /etc/fstab"
                MENU7="Редактирование /etc/sysctl.conf"
                MENUh="Справка"
+               
                MENU1_SWAP="Подкачка swap"
+               
                MENU2_SWAP="Настроить порог swappiness"
                MENU2_SWAP_SWAPPINESS="Введите значение в % (от 0 до 100) свободной ОЗУ, при котором начнется задействование подкачки swap.
 Для ОЗУ 2 GB = 30, 4 GB = 10, 6 GB or more = 0."
+               
                MENU3_SWAP="Настроить vfs_cache_pressurecat"
                MENU3_SWAP_VFS_CACHE_PRESSURECAT="Введите значение (от 0 до 1000), чтобы определить отношение ядра к освободившимся страницам памяти. 
 Чем ниже значение, тем дольше информация хранится в ОЗУ и меньше кэшируется, значение выше 100 способствует агрессивному кэшированию.
 Для SSD рекомендуют 50, для HDD - 1000."
+               
                MENU4_SWAP="Режим laptop и активация отложенной записи"
+               
                MENU5_SWAP="Отложенная запись dirty_writeback_centisecs"
                MENU5_SWAP_DIRTY_WRITEBACK_CENTISECS="Введите значение (от 0 до 60000), чтобы установить время задержки записи (запуска pdflush) на жесткий диск (100 ед. = 1 секунда).
 Для SSD - 6000 (1 минута)"
+               
                MENU6_SWAP="Настроить dirty_ratio"
                MENU6_SWAP_DIRTY_RATIO="Введите значение в % (от 0 до 100) - доля свободной системной памяти в процентах, по достижении которой процесс, ведущий запись на диск, инициирует запись \"грязных\" данных.
 Для SSD - 60"
@@ -52,6 +59,13 @@ case $LANG in
                MENU7_SWAP_DIRTY_BACKGROUND_RATIO="Введите значение в % (от 0 до 100) - доля свободной памяти в процентах от общей памяти всей системы, по достижении которой демон pdflush начинает сбрасывать данные их дискового кэша на сам диск.
 Для SSD - 5"
                MENU8_SWAP="Сброс настроек sysctl по умолчанию"
+               
+               MAIN_PART="Выберите раздел:"
+               MENU1_PART="TRIM через discard"
+               MENU2_PART="TRIM по расписанию fstrim"
+               MENU3_PART="TRIM для LVM"
+               MENU4_PART="Снять barrier"
+               MENU5_PART="Задержка сброса commit=600"
                
                HELP_EXIT="
 Нажмите Enter для перехода в главное меню"
@@ -151,13 +165,11 @@ if [ "$STATE_AUTOMOUNT_SWAP" != '' ]
  then STATE_AUTOMOUNT_SWAP="ON"
  else STATE_AUTOMOUNT_SWAP="OFF"
 fi
-
 STATE_STATUS_SWAP=$(cat /proc/swaps | sed -e '1d')
 if [ "$STATE_STATUS_SWAP" != '' ]
  then STATE_STATUS_SWAP="ON"
  else STATE_STATUS_SWAP="OFF"
 fi
-
 VALUE_SWAP=$(cat /proc/swaps | sed -e '1d' | awk '{print $3}')
 if [ "$VALUE_SWAP" != '' ]
  then VALUE_SWAP=", size="$VALUE_SWAP
@@ -183,8 +195,8 @@ DIRTY_BACKGROUND_RATIO=$(cat /proc/sys/vm/dirty_background_ratio)
 SwapSysctlForm () #Форма для настройки Swap & Sysctl
 {
 CheckStateSwapSysctl
-ANSWER=$($DIALOG  --cancel-button "Back" --title "Swap & Sysctl settings" --menu \
-    "$MAIN_TEXT" 16 62\
+ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU2" --menu \
+    "$MAIN_TEXT" 16 64\
     8\
        "$MENU1_SWAP (automount-$STATE_AUTOMOUNT_SWAP, status-$STATE_STATUS_SWAP$VALUE_SWAP)" ""\
        "$MENU2_SWAP ($SWAPPINESS% free RAM)" ""\
@@ -304,6 +316,81 @@ sudo sysctl -p
 SwapSysctlForm
 }
 #########################################################
+CheckStatePartition ()
+{
+MOUNT_DISCARD=$(cat /etc/fstab | grep $PARTITION | grep discard)
+if [ "$MOUNT_DISCARD" != "" ]
+    then MOUNT_DISCARD="ON"
+    else MOUNT_DISCARD="OFF"
+fi
+STATE_DISCARD=$(mount | grep $PARTITION | grep discard)
+if [ "$STATE_DISCARD" != '' ]
+ then STATE_DISCARD="ON"
+ else STATE_DISCARD="OFF"
+fi
+
+
+MOUNT_BARRIER=$(cat /etc/fstab | grep $PARTITION | grep barrier)
+if [ "$MOUNT_BARRIER" != "" ]
+    then MOUNT_BARRIER="ON"
+    else MOUNT_BARRIER="OFF"
+fi
+STATE_BARRIER=$(mount | grep $PARTITION | grep barrier)
+if [ "$STATE_BARRIER" != '' ]
+ then STATE_BARRIER="ON"
+ else STATE_BARRIER="OFF"
+fi
+
+MOUNT_COMMIT=$(cat /etc/fstab | grep $PARTITION | grep commit)
+if [ "$MOUNT_COMMIT" != "" ]
+    then MOUNT_COMMIT="ON"
+    else MOUNT_COMMIT="OFF"
+fi
+STATE_COMMIT=$(mount | grep $PARTITION | grep commit)
+if [ "$STATE_COMMIT" != '' ]
+ then STATE_COMMIT="ON"
+ else STATE_COMMIT="OFF"
+fi
+}
+#########################################################
+PartitionForm ()
+{
+CheckStatePartition
+ANSWER=$($DIALOG  --cancel-button "Back" --title "$PARTITION" --menu \
+    "$MAIN_TEXT" 16 60\
+    8\
+       "$MENU1_PART (mount-$MOUNT_DISCARD, state-$STATE_DISCARD) " ""\
+       "$MENU2_PART" ""\
+       "$MENU3_PART" ""\
+       "$MENU4_PART (mount-$MOUNT_BARRIER, state-$STATE_BARRIER)" ""\
+       "$MENU5_PART (mount-$MOUNT_COMMIT, state-$STATE_COMMIT)" "" 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+ then echo "to MainForm"; MainForm
+fi
+
+case $ANSWER in
+   "$MENU1" ) MountForm
+   ;;
+
+esac
+
+PartitionForm
+}
+#########################################################
+MountForm () #Список разделов автомантирования
+{
+MOUNT_PARTITIONS=`cat /etc/fstab | grep ^UUID | awk '{print $1" "$2 }'`
+MOUNT_PARTITIONS=$MOUNT_PARTITIONS" "`cat /etc/fstab | grep ^/dev | awk '{print $1" "$2 }'`
+
+PARTITION=$($DIALOG  --cancel-button "Back" --title "$MENU1" --menu \
+    "$MAIN_PART" 16 60 8 $MOUNT_PARTITIONS  3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+ then echo "to MainForm"; MainForm
+fi
+
+PartitionForm
+}
+#########################################################
 MainForm () #Главная форма
 {
 CheckStateTmpfs
@@ -322,6 +409,8 @@ if [ $? != 0 ]
  then echo Exit ; exit 0
 fi
 case $ANSWER in
+   "$MENU1" ) MountForm
+              ;;
    "$MENU2" ) SwapSysctlForm
               ;;
   "$MENU3"* ) if [ "$STATE_AUTOMOUNT_TMP" = "OFF" ]  
@@ -350,7 +439,7 @@ vm.dirty_background_ratio=5" | sudo tee -a /etc/sysctl.conf
               sudo sync
               sudo sysctl -p
               
-              #setup logs and tmp to RAM
+              #logs and tmp to RAM
               echo -e "#Mount /tmp to RAM ( /tmp tmpfs) \ntmpfs /tmp tmpfs rw,nosuid,nodev 0 0" | sudo tee -a /etc/fstab
               echo -e "#Mount /var/* to RAM 
 tmpfs /var/tmp tmpfs defaults 0 0
