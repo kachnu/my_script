@@ -183,7 +183,7 @@ DIRTY_BACKGROUND_RATIO=$(cat /proc/sys/vm/dirty_background_ratio)
 SwapSysctlForm () #Форма для настройки Swap & Sysctl
 {
 CheckStateSwapSysctl
-ANSWER=$($DIALOG  --cancel-button "Exit" --title "Swap & Sysctl settings" --menu \
+ANSWER=$($DIALOG  --cancel-button "Back" --title "Swap & Sysctl settings" --menu \
     "$MAIN_TEXT" 16 62\
     8\
        "$MENU1_SWAP (automount-$STATE_AUTOMOUNT_SWAP, status-$STATE_STATUS_SWAP$VALUE_SWAP)" ""\
@@ -296,7 +296,6 @@ case $ANSWER in
                   sudo sed -i '/vm.dirty_background_ratio/d' /etc/sysctl.conf
                   RestartPC
                   ;;                                   
-                  
 esac
 
 sudo sync
@@ -335,6 +334,7 @@ case $ANSWER in
                then echo -e "#Mount /var/* to RAM 
 tmpfs /var/tmp tmpfs defaults 0 0
 tmpfs /var/lock tmpfs defaults 0 0
+tmpfs /var/log tmpfs defaults,size=20M 0 0
 tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
                else sudo sed -i '/\/var\//d' /etc/fstab
               fi
@@ -355,6 +355,7 @@ vm.dirty_background_ratio=5" | sudo tee -a /etc/sysctl.conf
               echo -e "#Mount /var/* to RAM 
 tmpfs /var/tmp tmpfs defaults 0 0
 tmpfs /var/lock tmpfs defaults 0 0
+tmpfs /var/log tmpfs defaults,size=20M 0 0
 tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
               RestartPC
               ;;
