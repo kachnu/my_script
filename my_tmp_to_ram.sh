@@ -21,16 +21,18 @@ fi
 
 EDITOR=nano
 
+
 case $LANG in
   uk*|ru*|be*|*) #UA RU BE locales
                MAIN_LABEL="Настройка параметров работы с дисками и памятью"
                MAIN_TEXT="Выберите действие:"
                
-               MENU_PARTITION_FORM="Параметры монтирования"
+               MENU_PARTITION_FORM="Настройки монтирования"
                MENU_SWAP_SYSCTL_FORM="Настройки Swap и Sysctl"
                MENU_TMP_TO_RAM="Временные файлы /tmp в ОЗУ"
                MENU_LOG_TO_RAM="Логи /var/* в ОЗУ"
                MENU_AUTOSETTINGS_SSD="Автонастройка для SSD"
+               MENU_BACKUP="Backup настроек"
                MENU_EDIT_FSTAB="Редактирование /etc/fstab"
                MENU_EDIT_SYSCTLCONF="Редактирование /etc/sysctl.conf"
                MENU_HELP="Справка"
@@ -58,7 +60,6 @@ case $LANG in
                MENU_DIRTY_BACKGROUND_RATIO="Настроить dirty_background_ratio"
                MENU_INFO_DIRTY_BACKGROUND_RATIO="Введите значение в % (от 0 до 100) - доля свободной памяти в процентах от общей памяти всей системы, по достижении которой демон pdflush начинает сбрасывать данные их дискового кэша на сам диск.
 Для SSD - 5"
-               MENU_RESET_SYSCTL="Сброс настроек sysctl по умолчанию"
                
                MAIN_PART="Выберите раздел:"
                MENU_DISCARD="TRIM через discard"
@@ -66,7 +67,7 @@ case $LANG in
                MENU_LVM="TRIM для LVM"
                MENU_BARRIER="Снять барьер barrier=0"
                MENU_COMMIT="Задержка сброса commit=600"
-               MENU_NOATIME="Не отслеживать оступ noatime"
+               MENU_NOATIME="Не отслеживать доступ noatime"
                
 
                HELP_EXIT="
@@ -112,6 +113,12 @@ fi
 #########################################################
 CheckStateTmpfs () #Проверка состояния
 {
+if [ -f /etc/fstab.backup ]
+   then TIME_BACKUP=`date +%F_%T -r /etc/fstab.backup`
+        TIME_BACKUP="(recovery-"$TIME_BACKUP")"
+   else TIME_BACKUP="(make backup)"
+fi
+
 STATE_AUTOMOUNT_TMP=$(cat /etc/fstab | grep "^tmpfs /tmp tmpfs")
 if [ "$STATE_AUTOMOUNT_TMP" != '' ]
    then STATE_AUTOMOUNT_TMP="ON"
@@ -182,8 +189,7 @@ ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SWAP_SYSCTL_FORM" --menu
        "$MENU_LAPTOPMODE (status-$LAPTOP_MODE)" ""\
        "$MENU_DIRTY_WRITEBACK_CENTISECS ($DIRTY_WRITEBACK_CENTISECS centisecs)" ""\
        "$MENU_DIRTY_RATIO ($DIRTY_RATIO% RAM)" ""\
-       "$MENU_DIRTY_BACKGROUND_RATIO ($DIRTY_BACKGROUND_RATIO% RAM)" ""\
-       "$MENU_RESET_SYSCTL" "" 3>&1 1>&2 2>&3)
+       "$MENU_DIRTY_BACKGROUND_RATIO ($DIRTY_BACKGROUND_RATIO% RAM)" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then MainForm
 fi
@@ -234,7 +240,7 @@ case $ANSWER in
                          sudo sed -i '/vm.laptop_mode/d' /etc/sysctl.conf
                          echo -e "vm.laptop_mode=0" | sudo tee -a /etc/sysctl.conf
                   fi
-                  ;;                 
+                  ;;
      
    "$MENU_DIRTY_WRITEBACK_CENTISECS"* ) while true; do
                      DIRTY_WRITEBACK_CENTISECS=$($DIALOG --title "$MENU_DIRTY_WRITEBACK_CENTISECS" --inputbox "$MENU_INFO_DIRTY_WRITEBACK_CENTISECS" 14 60 $DIRTY_WRITEBACK_CENTISECS 3>&1 1>&2 2>&3)
@@ -278,14 +284,7 @@ case $ANSWER in
                   sudo sed -i '/vm.dirty_background_ratio/d' /etc/sysctl.conf
                   echo -e "vm.dirty_background_ratio=$DIRTY_BACKGROUND_RATIO" | sudo tee -a /etc/sysctl.conf
                   ;; 
-   "$MENU_RESET_SYSCTL" )  sudo sed -i '/vm.swappiness/d' /etc/sysctl.conf
-                  sudo sed -i '/vm.vfs_cache_pressure/d' /etc/sysctl.conf
-                  sudo sed -i '/vm.laptop_mode/d' /etc/sysctl.conf
-                  sudo sed -i '/vm.dirty_writeback_centisecs/d' /etc/sysctl.conf
-                  sudo sed -i '/vm.dirty_ratio/d' /etc/sysctl.conf
-                  sudo sed -i '/vm.dirty_background_ratio/d' /etc/sysctl.conf
-                  RestartPC
-                  ;;                                   
+
 esac
 
 sudo sync
@@ -345,18 +344,18 @@ fi
 #########################################################
 AddParmToFstab ()
 {
-PARM=$1
+PARM=$1","
 DATA=`cat /etc/fstab | grep $PARTITION`
 NEW_DATA=`echo $DATA | awk -v v1=$PARM '{print $1" "$2" "$3" "v1$4" "$5" "$6}' | sed "s/ /\t/g"`
-sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/fstab	
+sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/fstab
 }
 #########################################################
 RmParmFromFstab ()
 {
-PARM=$1
+PARM=$1","
 DATA=`cat /etc/fstab | grep $PARTITION`
 NEW_DATA=`echo $DATA | sed "s/${PARM}//g" | sed "s/ /\t/g"`
-sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/fstab	
+sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/fstab
 }
 #########################################################
 PartitionForm ()
@@ -376,10 +375,11 @@ if [ $? != 0 ]
 fi
 
 case $ANSWER in
-   "$MENU_DISCARD"* ) 
+   "$MENU_DISCARD"* )
+                    OPTION="discard"
                     if [ "$MOUNT_DISCARD" = "OFF" ] 
-                        then AddParmToFstab "discard,"
-                        else RmParmFromFstab "discard,"
+                        then AddParmToFstab $OPTION
+                        else RmParmFromFstab $OPTION
                     fi
                     sudo mount -o remount $MOUNT_POINT
                     ;;
@@ -387,21 +387,24 @@ case $ANSWER in
                     ;;
    "$MENU_LVM"* ) echo MENU_TMP_TO_RAM
                     ;;
-   "$MENU_BARRIER"* ) if [ "$MOUNT_BARRIER" = "OFF" ] 
-                        then AddParmToFstab "barrier=0,"
-                        else RmParmFromFstab "barrier=0,"
+   "$MENU_BARRIER"* ) OPTION="barrier=0"
+                    if [ "$MOUNT_BARRIER" = "OFF" ] 
+                        then AddParmToFstab $OPTION
+                        else RmParmFromFstab $OPTION
                     fi
                     sudo mount -o remount $MOUNT_POINT
                     ;;
-   "$MENU_COMMIT"* ) if [ "$MOUNT_COMMIT" = "OFF" ] 
-                        then AddParmToFstab "commit=600,"
-                        else RmParmFromFstab "commit=600,"
+   "$MENU_COMMIT"* ) OPTION="commit=600"
+                    if [ "$MOUNT_COMMIT" = "OFF" ] 
+                        then AddParmToFstab $OPTION
+                        else RmParmFromFstab $OPTION
                     fi
                     sudo mount -o remount $MOUNT_POINT
                     ;;
-   "$MENU_NOATIME"* ) if [ "$MOUNT_NOATIME" = "OFF" ] 
-                        then AddParmToFstab "noatime,"
-                        else RmParmFromFstab "noatime,"
+   "$MENU_NOATIME"* ) OPTION="noatime"
+                    if [ "$MOUNT_NOATIME" = "OFF" ] 
+                        then AddParmToFstab $OPTION
+                        else RmParmFromFstab $OPTION
                     fi
                     sudo mount -o remount $MOUNT_POINT
                     ;;
@@ -428,13 +431,14 @@ MainForm () #Главная форма
 {
 CheckStateTmpfs
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
-    "$MAIN_TEXT" 16 60\
-    8\
+    "$MAIN_TEXT" 18 60\
+    10\
        "$MENU_PARTITION_FORM" ""\
        "$MENU_SWAP_SYSCTL_FORM" ""\
        "$MENU_TMP_TO_RAM (automount-$STATE_AUTOMOUNT_TMP, status-$STATE_STATUS_TMP)" ""\
        "$MENU_LOG_TO_RAM (automount-$STATE_AUTOMOUNT_LOG, status-$STATE_STATUS_LOG)" ""\
        "$MENU_AUTOSETTINGS_SSD" ""\
+       "$MENU_BACKUP $TIME_BACKUP" ""\
        "$MENU_EDIT_FSTAB" ""\
        "$MENU_EDIT_SYSCTLCONF" ""\
        "$MENU_HELP" "" 3>&1 1>&2 2>&3)
@@ -481,6 +485,17 @@ tmpfs /var/log tmpfs defaults,size=20M 0 0
 tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
               RestartPC
               ;;
+   "$MENU_BACKUP"* )  
+              if [ "$TIME_BACKUP" == "(make backup)" ]
+                 then 
+                      sudo cp /etc/fstab  /etc/fstab.backup
+                      sudo cp /etc/sysctl.conf /etc/sysctl.conf.backup
+                 else 
+                      sudo mv /etc/fstab.backup /etc/fstab
+                      sudo mv /etc/sysctl.conf.backup /etc/sysctl.conf
+                      RestartPC
+              fi
+              ;;              
    "$MENU_EDIT_FSTAB" ) sudo $EDITOR /etc/fstab
               ;;
    "$MENU_EDIT_SYSCTLCONF" ) sudo $EDITOR /etc/sysctl.conf
