@@ -28,7 +28,9 @@ case $LANG in
                MAIN_TEXT="Выберите действие:"
                
                MENU_PARTITION_FORM="Настройки монтирования"
-               MENU_SWAP_SYSCTL_FORM="Настройки Swap и Sysctl"
+               MENU_SYSCTL_FORM="Настройки Sysctl"
+               MENU_SWAP_FORM="Настройки Swap"
+               MENU_OTHER_FORM="Дополнительные настройки"
                MENU_TMP_TO_RAM="Временные файлы /tmp в ОЗУ"
                MENU_LOG_TO_RAM="Логи /var/* в ОЗУ"
                MENU_AUTOSETTINGS_SSD="Автонастройка для SSD"
@@ -37,39 +39,34 @@ case $LANG in
                MENU_EDIT_SYSCTLCONF="Редактирование /etc/sysctl.conf"
                MENU_HELP="Справка"
                
-               MENU_SWAP="Подкачка swap"
-               
-               MENU_SWAPPINESS="Настроить порог swappiness"
-               MENU_INFO_SWAPPINESS="Введите значение в % (от 0 до 100) свободной ОЗУ, при котором начнется задействование подкачки swap.
-Для ОЗУ 2 GB = 30, 4 GB = 10, 6 GB or more = 0."
-               
-               MENU_VFS_CACHE_PRESSURECAT="Настроить vfs_cache_pressurecat"
-               MENU_INFO_VFS_CACHE_PRESSURECAT="Введите значение (от 0 до 1000), чтобы определить отношение ядра к освободившимся страницам памяти. 
-Чем ниже значение, тем дольше информация хранится в ОЗУ и меньше кэшируется, значение выше 100 способствует агрессивному кэшированию.
-Для SSD рекомендуют 50, для HDD - 1000."
-               
-               MENU_LAPTOPMODE="Режим laptop и активация отложенной записи"
-               
-               MENU_DIRTY_WRITEBACK_CENTISECS="Отложенная запись dirty_writeback_centisecs"
-               MENU_INFO_DIRTY_WRITEBACK_CENTISECS="Введите значение (от 0 до 60000), чтобы установить время задержки записи (запуска pdflush) на жесткий диск (100 ед. = 1 секунда).
-Для SSD - 6000 (1 минута)"
-               
-               MENU_DIRTY_RATIO="Настроить dirty_ratio"
-               MENU_INFO_DIRTY_RATIO="Введите значение в % (от 0 до 100) - доля свободной системной памяти в процентах, по достижении которой процесс, ведущий запись на диск, инициирует запись \"грязных\" данных.
-Для SSD - 60"
-               MENU_DIRTY_BACKGROUND_RATIO="Настроить dirty_background_ratio"
-               MENU_INFO_DIRTY_BACKGROUND_RATIO="Введите значение в % (от 0 до 100) - доля свободной памяти в процентах от общей памяти всей системы, по достижении которой демон pdflush начинает сбрасывать данные их дискового кэша на сам диск.
-Для SSD - 5"
-               
                MAIN_PART="Выберите раздел:"
                MENU_DISCARD="TRIM через discard"
                MENU_FSTRIM="TRIM по расписанию fstrim"
                MENU_LVM="TRIM для LVM"
                MENU_BARRIER="Снять барьер barrier=0"
                MENU_COMMIT="Задержка сброса commit=600"
-               MENU_NOATIME="Не отслеживать доступ noatime"
+               MENU_NOATIME="Не отслеживать доступ noatime"              
                
-
+               MENU_SWAPPINESS="Настроить порог swappiness"
+               MENU_INFO_SWAPPINESS="Введите значение в % (от 0 до 100) свободной ОЗУ, при котором начнется задействование подкачки swap.
+Для ОЗУ 2 GB = 30, 4 GB = 10, 6 GB or more = 0."
+               MENU_VFS_CACHE_PRESSURECAT="Настроить vfs_cache_pressurecat"
+               MENU_INFO_VFS_CACHE_PRESSURECAT="Введите значение (от 0 до 1000), чтобы определить отношение ядра к освободившимся страницам памяти. 
+Чем ниже значение, тем дольше информация хранится в ОЗУ и меньше кэшируется, значение выше 100 способствует агрессивному кэшированию.
+Для SSD рекомендуют 50, для HDD - 1000."
+               MENU_LAPTOPMODE="Режим laptop и активация отложенной записи"
+               MENU_DIRTY_WRITEBACK_CENTISECS="Отложенная запись dirty_writeback_centisecs"
+               MENU_INFO_DIRTY_WRITEBACK_CENTISECS="Введите значение (от 0 до 60000), чтобы установить время задержки записи (запуска pdflush) на жесткий диск (100 ед. = 1 секунда).
+Для SSD - 6000 (1 минута)"
+               MENU_DIRTY_RATIO="Настроить dirty_ratio"
+               MENU_INFO_DIRTY_RATIO="Введите значение в % (от 0 до 100) - доля свободной системной памяти в процентах, по достижении которой процесс, ведущий запись на диск, инициирует запись \"грязных\" данных.
+Для SSD - 60"
+               MENU_DIRTY_BACKGROUND_RATIO="Настроить dirty_background_ratio"
+               MENU_INFO_DIRTY_BACKGROUND_RATIO="Введите значение в % (от 0 до 100) - доля свободной памяти в процентах от общей памяти всей системы, по достижении которой демон pdflush начинает сбрасывать данные их дискового кэша на сам диск.
+Для SSD - 5"               
+               
+               MENU_SWAP="Подкачка swap"
+ 
                HELP_EXIT="
 Нажмите Enter для перехода в главное меню"
                ATTENTION="ВНИМАНИЕ!"
@@ -84,7 +81,7 @@ $0 - скрипт предназначен для настроки таких п
 __
 * $MENU_PARTITION_FORM
 __
-* $MENU_SWAP_SYSCTL_FORM
+* $MENU_SYSCTL_FORM
 Позволяет настроить способ подкачки.
 __
 * $MENU_TMP_TO_RAM
@@ -111,7 +108,7 @@ if [ $? == 0 ]
 fi
 }
 #########################################################
-CheckStateTmpfs () #Проверка состояния
+CheckStateMain () #Проверка состояния
 {
 if [ -f /etc/fstab.backup ]
    then TIME_BACKUP=`date +%F_%T -r /etc/fstab.backup`
@@ -143,7 +140,7 @@ if [ "$STATE_STATUS_LOG" != '' ]
 fi
 }
 #########################################################
-CheckStateSwapSysctl ()
+CheckStateSwap ()
 {
 STATE_AUTOMOUNT_SWAP=$(cat /etc/fstab | grep "swap" | sed -e '/\#/d')
 if [ "$STATE_AUTOMOUNT_SWAP" != '' ]
@@ -157,9 +154,13 @@ if [ "$STATE_STATUS_SWAP" != '' ]
 fi
 VALUE_SWAP=$(cat /proc/swaps | sed -e '1d' | awk '{print $3}')
 if [ "$VALUE_SWAP" != '' ]
-   then VALUE_SWAP=", size="$VALUE_SWAP
+   then VALUE_SWAP=", size-"$VALUE_SWAP
 fi
 
+}
+#########################################################
+CheckStateSysctl ()
+{
 SWAPPINESS=$(cat /proc/sys/vm/swappiness)
 
 VFS_CACHE_PRESSURECAT=$(cat /proc/sys/vm/vfs_cache_pressure)
@@ -177,13 +178,12 @@ DIRTY_RATIO=$(cat /proc/sys/vm/dirty_ratio)
 DIRTY_BACKGROUND_RATIO=$(cat /proc/sys/vm/dirty_background_ratio)
 }
 #########################################################
-SwapSysctlForm () #Форма для настройки Swap & Sysctl
+SysctlForm () #Форма для настройки Sysctl
 {
-CheckStateSwapSysctl
-ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SWAP_SYSCTL_FORM" --menu \
+CheckStateSysctl
+ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SYSCTL_FORM" --menu \
     "$MAIN_TEXT" 16 64\
     8\
-       "$MENU_SWAP (automount-$STATE_AUTOMOUNT_SWAP, status-$STATE_STATUS_SWAP$VALUE_SWAP)" ""\
        "$MENU_SWAPPINESS ($SWAPPINESS% free RAM)" ""\
        "$MENU_VFS_CACHE_PRESSURECAT ($VFS_CACHE_PRESSURECAT filesystem caches)" ""\
        "$MENU_LAPTOPMODE (status-$LAPTOP_MODE)" ""\
@@ -194,20 +194,10 @@ if [ $? != 0 ]
    then MainForm
 fi
 case $ANSWER in
-   "$MENU_SWAP"* ) if [ "$STATE_AUTOMOUNT_SWAP" = "OFF" ]  
-                      then sudo sed -i '/swap/s/\#//g' /etc/fstab
-                      else sudo sed -i '/swap/s/^/\#/g' /etc/fstab
-                   fi
-                  
-                   if [ "$STATE_STATUS_SWAP" = "OFF" ]  
-                      then sudo swapon -a
-                      else sudo swapoff -a
-                   fi
-                  ;;
    "$MENU_SWAPPINESS"* ) while true; do
                      SWAPPINESS=$($DIALOG --title "$MENU_SWAPPINESS" --inputbox "$MENU_INFO_SWAPPINESS" 14 60 $SWAPPINESS 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
-                        then SwapSysctlForm ; break
+                        then SysctlForm ; break
                      fi
                      
                      if [[ "$SWAPPINESS" -ge 0 ]] && [[ "$SWAPPINESS" -le 100 ]]
@@ -221,7 +211,7 @@ case $ANSWER in
    "$MENU_VFS_CACHE_PRESSURECAT"* ) while true; do
                      VFS_CACHE_PRESSURECAT=$($DIALOG --title "$MENU_VFS_CACHE_PRESSURECAT" --inputbox "$MENU_INFO_VFS_CACHE_PRESSURECAT" 14 60 $VFS_CACHE_PRESSURECAT 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
-                        then SwapSysctlForm ; break
+                        then SysctlForm ; break
                      fi
                      
                      if [[ "$VFS_CACHE_PRESSURECAT" -ge 0 ]] && [[ "$VFS_CACHE_PRESSURECAT" -le 1000 ]]
@@ -245,7 +235,7 @@ case $ANSWER in
    "$MENU_DIRTY_WRITEBACK_CENTISECS"* ) while true; do
                      DIRTY_WRITEBACK_CENTISECS=$($DIALOG --title "$MENU_DIRTY_WRITEBACK_CENTISECS" --inputbox "$MENU_INFO_DIRTY_WRITEBACK_CENTISECS" 14 60 $DIRTY_WRITEBACK_CENTISECS 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
-                        then SwapSysctlForm ; break
+                        then SysctlForm ; break
                      fi
                      
                      if [[ "$DIRTY_WRITEBACK_CENTISECS" -ge 0 ]] && [[ "$DIRTY_WRITEBACK_CENTISECS" -le 60000 ]]
@@ -259,7 +249,7 @@ case $ANSWER in
    "$MENU_DIRTY_RATIO"* ) while true; do
                      DIRTY_RATIO=$($DIALOG --title "$MENU_DIRTY_RATIO" --inputbox "$MENU_INFO_DIRTY_RATIO" 14 60 $DIRTY_RATIO 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
-                        then SwapSysctlForm ; break
+                        then SysctlForm ; break
                      fi
                      
                      if [[ "$DIRTY_RATIO" -ge 0 ]] && [[ "$DIRTY_RATIO" -le 100 ]]
@@ -273,7 +263,7 @@ case $ANSWER in
    "$MENU_DIRTY_BACKGROUND_RATIO"* ) while true; do
                      DIRTY_BACKGROUND_RATIO=$($DIALOG --title "$MENU_DIRTY_BACKGROUND_RATIO" --inputbox "$MENU_INFO_DIRTY_BACKGROUND_RATIO" 14 60 $DIRTY_BACKGROUND_RATIO 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
-                        then SwapSysctlForm ; break
+                        then SysctlForm ; break
                      fi
                      
                      if [[ "$DIRTY_BACKGROUND_RATIO" -ge 0 ]] && [[ "$DIRTY_BACKGROUND_RATIO" -le 100 ]]
@@ -290,12 +280,47 @@ esac
 sudo sync
 sudo sysctl -p
 
-SwapSysctlForm
+SysctlForm
+}
+#########################################################
+SwapForm () #Форма для настройки Sysctl
+{
+CheckStateSwap
+ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SWAP_FORM" --menu \
+    "$MAIN_TEXT" 16 64\
+    8\
+       "$MENU_SWAP (automount-$STATE_AUTOMOUNT_SWAP, status-$STATE_STATUS_SWAP$VALUE_SWAP)" "" 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+   then MainForm
+fi
+case $ANSWER in
+   "$MENU_SWAP"* ) if [ "$STATE_AUTOMOUNT_SWAP" = "OFF" ]  
+                      then sudo sed -i '/swap/s/\#//g' /etc/fstab
+                      else sudo sed -i '/swap/s/^/\#/g' /etc/fstab
+                   fi
+                  
+                   if [ "$STATE_STATUS_SWAP" = "OFF" ]  
+                      then sudo swapon -a
+                      else sudo swapoff -a
+                   fi
+                  ;;
+
+esac
+
+SwapForm
 }
 #########################################################
 CheckStatePartition ()
 {
-MOUNT_POINT=$(cat /etc/fstab | grep $PARTITION | awk '{print $2" "}')
+MOUNT_POINT=$(cat /etc/fstab | grep "$PARTITION" | awk '{print $2" "}')
+
+if [[ `echo $PARTITION | grep "^UUID"` ]]
+   then
+        UUID=`echo "$PARTITION" | sed s/UUID=//g`
+        DISK="/dev/"`ls -l /dev/disk/by-uuid | grep $UUID | awk '{print $NF }' | sed s/[./0-9]//g`
+   else
+        DISK=`echo "$PARTITION" | sed s/[0-9]//g`
+fi
 
 MOUNT_DISCARD=$(cat /etc/fstab | grep $PARTITION | grep discard)
 if [ "$MOUNT_DISCARD" != "" ]
@@ -376,14 +401,20 @@ fi
 
 case $ANSWER in
    "$MENU_DISCARD"* )
+                    SUPPORTED_TRIM=`sudo hdparm -I $DISK | grep "TRIM supported"`
+                    if [[ $SUPPORTED_TRIM == '' ]]
+                       then echo "TRIM is NOT supported by hard disk - $DISK !"
+                       else echo "TRIM is supported by hard disk - $DISK"
+                    fi
+                                        
                     OPTION="discard"
-                    if [ "$MOUNT_DISCARD" = "OFF" ] 
+                    if [ "$MOUNT_DISCARD" = "OFF" ] && [[ $SUPPORTED_TRIM != '' ]]
                         then AddParmToFstab $OPTION
                         else RmParmFromFstab $OPTION
                     fi
                     sudo mount -o remount $MOUNT_POINT
                     ;;
-   "$MENU_FSTRIM"* ) echo MENU_SWAP_SYSCTL_FORM
+   "$MENU_FSTRIM"* ) echo MENU_SYSCTL_FORM
                     ;;
    "$MENU_LVM"* ) echo MENU_TMP_TO_RAM
                     ;;
@@ -429,12 +460,14 @@ PartitionForm
 #########################################################
 MainForm () #Главная форма
 {
-CheckStateTmpfs
+CheckStateMain
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
-    "$MAIN_TEXT" 18 60\
-    10\
+    "$MAIN_TEXT" 20 60\
+    12\
        "$MENU_PARTITION_FORM" ""\
-       "$MENU_SWAP_SYSCTL_FORM" ""\
+       "$MENU_SYSCTL_FORM" ""\
+       "$MENU_SWAP_FORM" ""\
+       "$MENU_OTHER_FORM" ""\
        "$MENU_TMP_TO_RAM (automount-$STATE_AUTOMOUNT_TMP, status-$STATE_STATUS_TMP)" ""\
        "$MENU_LOG_TO_RAM (automount-$STATE_AUTOMOUNT_LOG, status-$STATE_STATUS_LOG)" ""\
        "$MENU_AUTOSETTINGS_SSD" ""\
@@ -448,7 +481,9 @@ fi
 case $ANSWER in
    "$MENU_PARTITION_FORM" ) MountForm
               ;;
-   "$MENU_SWAP_SYSCTL_FORM" ) SwapSysctlForm
+   "$MENU_SYSCTL_FORM" ) SysctlForm
+              ;;
+   "$MENU_SWAP_FORM" ) SwapForm
               ;;
    "$MENU_TMP_TO_RAM"* ) if [ "$STATE_AUTOMOUNT_TMP" = "OFF" ]  
                then echo -e "#Mount /tmp to RAM ( /tmp tmpfs) \ntmpfs /tmp tmpfs rw,nosuid,nodev 0 0" | sudo tee -a /etc/fstab
