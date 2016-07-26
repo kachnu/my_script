@@ -44,8 +44,8 @@ def save(projects, path):
 
 
 def main():
-    # main_url = 'http://rutracker.org/forum/viewforum.php?f=1379'
-    main_url = 'http://rutracker.org/forum/viewforum.php?f=101'
+    main_url = 'http://rutracker.org/forum/viewforum.php?f=1379'
+    # main_url = 'http://rutracker.org/forum/viewforum.php?f=101'
     page_count = get_page_count(get_html(main_url))
     print('Всего страниц -', page_count)
 

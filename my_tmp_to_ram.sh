@@ -21,7 +21,6 @@ fi
 
 EDITOR=nano
 
-
 case $LANG in
   uk*|ru*|be*|*) #UA RU BE locales
                MAIN_LABEL="Настройка параметров работы с дисками и памятью"
@@ -42,7 +41,7 @@ case $LANG in
                MAIN_PART="Выберите раздел:"
                MENU_DISCARD="TRIM через discard"
                MENU_FSTRIM="TRIM по расписанию fstrim"
-               MENU_LVM="TRIM для LVM"
+
                MENU_BARRIER="Снять барьер barrier=0"
                MENU_COMMIT="Задержка сброса commit=600"
                MENU_NOATIME="Не отслеживать доступ noatime"              
@@ -66,7 +65,9 @@ case $LANG in
 Для SSD - 5"               
                
                MENU_SWAP="Подкачка swap"
- 
+               
+               MENU_LVM="TRIM для LVM"
+               
                HELP_EXIT="
 Нажмите Enter для перехода в главное меню"
                ATTENTION="ВНИМАНИЕ!"
@@ -98,7 +99,7 @@ __
 ___________________________________"
              
                ;;
-esac    
+esac
 #########################################################
 RestartPC () #Перезагрузка
 {
@@ -178,7 +179,7 @@ DIRTY_RATIO=$(cat /proc/sys/vm/dirty_ratio)
 DIRTY_BACKGROUND_RATIO=$(cat /proc/sys/vm/dirty_background_ratio)
 }
 #########################################################
-SysctlForm () #Форма для настройки Sysctl
+SysctlForm ()
 {
 CheckStateSysctl
 ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SYSCTL_FORM" --menu \
@@ -274,7 +275,6 @@ case $ANSWER in
                   sudo sed -i '/vm.dirty_background_ratio/d' /etc/sysctl.conf
                   echo -e "vm.dirty_background_ratio=$DIRTY_BACKGROUND_RATIO" | sudo tee -a /etc/sysctl.conf
                   ;; 
-
 esac
 
 sudo sync
@@ -283,7 +283,7 @@ sudo sysctl -p
 SysctlForm
 }
 #########################################################
-SwapForm () #Форма для настройки Sysctl
+SwapForm ()
 {
 CheckStateSwap
 ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SWAP_FORM" --menu \
@@ -304,10 +304,26 @@ case $ANSWER in
                       else sudo swapoff -a
                    fi
                   ;;
-
 esac
 
 SwapForm
+}
+########################################################
+OtherForm ()
+{
+ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_OTHER_FORM" --menu \
+    "$MAIN_TEXT" 16 64\
+    8\
+       "$MENU_LVM" "" 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+   then MainForm
+fi
+case $ANSWER in
+   "$MENU_LVM"* ) echo lvm
+                  ;;
+esac
+
+OtherForm
 }
 #########################################################
 CheckStatePartition ()
@@ -391,7 +407,6 @@ ANSWER=$($DIALOG  --cancel-button "Back" --title "$PARTITION" --menu \
     8\
        "$MENU_DISCARD (mount-$MOUNT_DISCARD, state-$STATE_DISCARD) " ""\
        "$MENU_FSTRIM" ""\
-       "$MENU_LVM" ""\
        "$MENU_BARRIER (mount-$MOUNT_BARRIER, state-$STATE_BARRIER)" ""\
        "$MENU_COMMIT (mount-$MOUNT_COMMIT, state-$STATE_COMMIT)" ""\
        "$MENU_NOATIME (mount-$MOUNT_NOATIME, state-$STATE_NOATIME)" "" 3>&1 1>&2 2>&3)
@@ -415,8 +430,6 @@ case $ANSWER in
                     sudo mount -o remount $MOUNT_POINT
                     ;;
    "$MENU_FSTRIM"* ) echo MENU_SYSCTL_FORM
-                    ;;
-   "$MENU_LVM"* ) echo MENU_TMP_TO_RAM
                     ;;
    "$MENU_BARRIER"* ) OPTION="barrier=0"
                     if [ "$MOUNT_BARRIER" = "OFF" ] 
@@ -444,7 +457,7 @@ esac
 PartitionForm
 }
 #########################################################
-MountForm () #Список разделов автомантирования
+MountForm ()
 {
 MOUNT_PARTITIONS=`cat /etc/fstab | grep ^UUID | awk '{print $1" "$2 }'`
 MOUNT_PARTITIONS=$MOUNT_PARTITIONS" "`cat /etc/fstab | grep ^/dev | awk '{print $1" "$2 }'`
@@ -458,7 +471,7 @@ fi
 PartitionForm
 }
 #########################################################
-MainForm () #Главная форма
+MainForm ()
 {
 CheckStateMain
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
@@ -484,6 +497,8 @@ case $ANSWER in
    "$MENU_SYSCTL_FORM" ) SysctlForm
               ;;
    "$MENU_SWAP_FORM" ) SwapForm
+              ;;
+   "$MENU_OTHER_FORM" ) OtherForm
               ;;
    "$MENU_TMP_TO_RAM"* ) if [ "$STATE_AUTOMOUNT_TMP" = "OFF" ]  
                then echo -e "#Mount /tmp to RAM ( /tmp tmpfs) \ntmpfs /tmp tmpfs rw,nosuid,nodev 0 0" | sudo tee -a /etc/fstab
