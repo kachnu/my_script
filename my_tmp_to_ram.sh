@@ -41,6 +41,10 @@ case $LANG in
                MAIN_PART="Выберите раздел:"
                MENU_DISCARD="TRIM через discard"
                MENU_FSTRIM="TRIM по расписанию fstrim"
+               MENU_INFO_FSTRIM="n - выключить fstrim
+d - включать fstrim каждый день
+w - включать fstrim каждую неделю
+m - включать fstrim каждый месяц"
 
                MENU_BARRIER="Снять барьер barrier=0"
                MENU_COMMIT="Задержка сброса commit=600"
@@ -66,7 +70,17 @@ case $LANG in
                
                MENU_SWAP="Подкачка swap"
                
-               MENU_LVM="TRIM для LVM"
+               MENU_LVM="TRIM для LVM - пока не доступна"
+               MENU_PRELOAD="Сортировка в Preload"
+               MENU_INFO_PRELOAD="0 - No I/O sorting.
+Useful on Flash memory for example.
+1 - Sort based on file path only.
+Useful for network filesystems.
+2 -	Sort based on inode number.
+Does less house-keeping I/O than the next option.
+3 - Sort I/O based on disk block.  Most sophisticated.
+And useful for most Linux filesystems.
+"
                
                HELP_EXIT="
 Нажмите Enter для перехода в главное меню"
@@ -101,7 +115,7 @@ ___________________________________"
                ;;
 esac
 #########################################################
-RestartPC () #Перезагрузка
+RestartPC ()
 {
 $DIALOG --title "$ATTENTION" --yesno "$RESTART_TEXT" 10 60
 if [ $? == 0 ]
@@ -109,7 +123,7 @@ if [ $? == 0 ]
 fi
 }
 #########################################################
-CheckStateMain () #Проверка состояния
+CheckStateMain ()
 {
 if [ -f /etc/fstab.backup ]
    then TIME_BACKUP=`date +%F_%T -r /etc/fstab.backup`
@@ -157,7 +171,6 @@ VALUE_SWAP=$(cat /proc/swaps | sed -e '1d' | awk '{print $3}')
 if [ "$VALUE_SWAP" != '' ]
    then VALUE_SWAP=", size-"$VALUE_SWAP
 fi
-
 }
 #########################################################
 CheckStateSysctl ()
@@ -309,18 +322,42 @@ esac
 SwapForm
 }
 ########################################################
+CheckStateOther ()
+{
+SETTING_PRELOAD_SORTSTRATEGY=`cat /etc/preload.conf | grep ^sortstrategy | awk '{print $NF }'|sed "s/=//g"`
+
+
+}
+########################################################
 OtherForm ()
 {
+CheckStateOther
 ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_OTHER_FORM" --menu \
     "$MAIN_TEXT" 16 64\
     8\
-       "$MENU_LVM" "" 3>&1 1>&2 2>&3)
+       "$MENU_LVM" ""\
+       "$MENU_PRELOAD (setting-$SETTING_PRELOAD_SORTSTRATEGY)" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then MainForm
 fi
 case $ANSWER in
    "$MENU_LVM"* ) echo lvm
                   ;;
+   "$MENU_PRELOAD"* ) while true; do
+                     SETTING_PRELOAD_SORTSTRATEGY=$($DIALOG --title "$MENU_PRELOAD" --inputbox "$MENU_INFO_PRELOAD" 14 60 $SETTING_PRELOAD_SORTSTRATEGY 3>&1 1>&2 2>&3)
+                     if [ $? != 0 ]
+                        then OtherForm ; break
+                     fi
+                     
+                     if [[ "$SETTING_PRELOAD_SORTSTRATEGY" -ge 0 ]] && [[ "$SETTING_PRELOAD_SORTSTRATEGY" -le 3 ]]
+                        then break
+                     fi
+                  done
+                  sudo sed -i '/^sortstrategy/d' /etc/preload.conf
+                  echo -e "sortstrategy = $SETTING_PRELOAD_SORTSTRATEGY" | sudo tee -a /etc/preload.conf
+                  sudo /etc/init.d/preload restart
+                  ;;
+            
 esac
 
 OtherForm
@@ -347,6 +384,24 @@ STATE_DISCARD=$(mount | grep $MOUNT_POINT | grep discard)
 if [ "$STATE_DISCARD" != '' ]
    then STATE_DISCARD="ON"
    else STATE_DISCARD="OFF"
+fi
+
+CRON_TRIM="n"
+STATE_CRON_TRIM="OFF"
+
+if [[ `cat /etc/cron.daily/trim | grep " $MOUNT_POINT"` ]]
+   then CRON_TRIM="d"
+        STATE_CRON_TRIM="ON"
+fi
+
+if [[ `cat /etc/cron.weekly/trim | grep " $MOUNT_POINT"` ]]
+   then CRON_TRIM="w"
+        STATE_CRON_TRIM="ON"
+fi          
+
+if [[ `cat /etc/cron.monthly/trim | grep " $MOUNT_POINT"` ]]
+   then CRON_TRIM="m"
+        STATE_CRON_TRIM="ON"
 fi
 
 MOUNT_BARRIER=$(cat /etc/fstab | grep $PARTITION | grep barrier)
@@ -406,7 +461,7 @@ ANSWER=$($DIALOG  --cancel-button "Back" --title "$PARTITION" --menu \
     "$MAIN_TEXT" 16 60\
     8\
        "$MENU_DISCARD (mount-$MOUNT_DISCARD, state-$STATE_DISCARD) " ""\
-       "$MENU_FSTRIM" ""\
+       "$MENU_FSTRIM (state-$STATE_CRON_TRIM, cron-$CRON_TRIM)" ""\
        "$MENU_BARRIER (mount-$MOUNT_BARRIER, state-$STATE_BARRIER)" ""\
        "$MENU_COMMIT (mount-$MOUNT_COMMIT, state-$STATE_COMMIT)" ""\
        "$MENU_NOATIME (mount-$MOUNT_NOATIME, state-$STATE_NOATIME)" "" 3>&1 1>&2 2>&3)
@@ -429,7 +484,45 @@ case $ANSWER in
                     fi
                     sudo mount -o remount $MOUNT_POINT
                     ;;
-   "$MENU_FSTRIM"* ) echo MENU_SYSCTL_FORM
+   "$MENU_FSTRIM"* )                     
+                    while true; do
+                      CRON_TRIM=$($DIALOG --title "$MENU_FSTRIM" --inputbox "$MENU_INFO_FSTRIM" 14 60 $CRON_TRIM 3>&1 1>&2 2>&3)
+                      if [ $? != 0 ]
+                         then PartitionForm ; break
+                      fi
+                      MOUNT_POINT_RESP=`echo $MOUNT_POINT | sed 's|/|\\\/|g'`
+                      case $CRON_TRIM in
+                          "n" ) sudo sed -i "/ ${MOUNT_POINT_RESP}/d" /etc/cron.daily/trim
+                                sudo sed -i "/ ${MOUNT_POINT_RESP}/d" /etc/cron.weekly/trim
+                                sudo sed -i "/ ${MOUNT_POINT_RESP}/d" /etc/cron.monthly/trim
+                                break
+                                ;;
+                          "d" ) if [ ! -f /etc/cron.daily/trim ]
+                                   then echo -e "#\x21/bin/sh\\nfstrim -v $MOUNT_POINT" | sudo tee /etc/cron.daily/trim
+                                        sudo chmod +x /etc/cron.daily/trim
+                                   else sudo sed -i "/ ${MOUNT_POINT_RESP}/d" /etc/cron.daily/trim
+                                        echo -e "fstrim -v $MOUNT_POINT" | sudo tee -a /etc/cron.daily/trim
+                                fi
+                                break
+                                ;;
+                          "w" ) if [ ! -f /etc/cron.weekly/trim ]
+                                   then echo -e "#\x21/bin/sh\\nfstrim -v $MOUNT_POINT" | sudo tee /etc/cron.weekly/trim
+                                        sudo chmod +x /etc/cron.weekly/trim
+                                   else sudo sed -i "/ ${MOUNT_POINT_RESP}/d" /etc/cron.weekly/trim
+                                        echo -e "fstrim -v $MOUNT_POINT" | sudo tee -a /etc/cron.weekly/trim
+                                fi
+                                break
+                                ;;
+                          "m" ) if [ ! -f /etc/cron.monthly/trim ]
+                                   then echo -e "#\x21/bin/sh\\nfstrim -v $MOUNT_POINT" | sudo tee /etc/cron.monthly/trim
+                                        sudo chmod +x /etc/cron.monthly/trim
+                                   else sudo sed -i "/ ${MOUNT_POINT_RESP}/d" /etc/cron.monthly/trim
+                                        echo -e "fstrim -v $MOUNT_POINT" | sudo tee -a /etc/cron.monthly/trim
+                                fi
+                                break
+                                ;;
+                      esac
+                    done
                     ;;
    "$MENU_BARRIER"* ) OPTION="barrier=0"
                     if [ "$MOUNT_BARRIER" = "OFF" ] 
@@ -516,7 +609,13 @@ tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
               fi
               RestartPC
               ;;
-   "$MENU_AUTOSETTINGS_SSD" ) #setup sysctl
+   "$MENU_AUTOSETTINGS_SSD" ) 
+                            
+              # setup mount /
+              
+              
+              # setup sysctl
+              sudo sed -i '/vm./d' /etc/sysctl.conf 
               echo -e "vm.swappiness=0
 vm.vfs_cache_pressure=50
 vm.laptop_mode=5
@@ -526,13 +625,25 @@ vm.dirty_background_ratio=5" | sudo tee -a /etc/sysctl.conf
               sudo sync
               sudo sysctl -p
               
-              #logs and tmp to RAM
+              # logs and tmp to RAM
+              sudo sed -i '/ \/tmp tmpfs/d' /etc/fstab
+              sudo sed -i '/\/var\//d' /etc/fstab
               echo -e "#Mount /tmp to RAM ( /tmp tmpfs) \ntmpfs /tmp tmpfs rw,nosuid,nodev 0 0" | sudo tee -a /etc/fstab
               echo -e "#Mount /var/* to RAM 
 tmpfs /var/tmp tmpfs defaults 0 0
 tmpfs /var/lock tmpfs defaults 0 0
 tmpfs /var/log tmpfs defaults,size=20M 0 0
 tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
+              
+              # setup preload sortstrategy
+              sudo sed -i '/^sortstrategy/d' /etc/preload.conf
+              echo -e "sortstrategy = 0" | sudo tee -a /etc/preload.conf
+              sudo /etc/init.d/preload restart
+              
+              #setup auto fstrim
+              echo -e "#\x21/bin/sh\\nfstrim -v / " | sudo tee /etc/cron.daily/trim
+              sudo chmod +x /etc/cron.daily/trim
+
               RestartPC
               ;;
    "$MENU_BACKUP"* )  
@@ -543,6 +654,11 @@ tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
                  else 
                       sudo mv /etc/fstab.backup /etc/fstab
                       sudo mv /etc/sysctl.conf.backup /etc/sysctl.conf
+                      
+                      sudo rm /etc/cron.daily/trim
+                      sudo rm /etc/cron.weekly/trim
+                      sudo rm /etc/cron.monthly/trim
+                      
                       RestartPC
               fi
               ;;              
