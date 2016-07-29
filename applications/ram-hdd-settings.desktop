@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Settings RAM and HDD
+Name[ru]=Настройки памяти и дисков
+Comment=settings ram, hdd, mount, tmp, sysctl
+Exec=x-terminal-emulator -e /usr/local/bin/my_ram_hdd_settings.sh
+Icon=jockey
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=System;

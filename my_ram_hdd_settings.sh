@@ -72,14 +72,14 @@ m - включать fstrim каждый месяц"
                
                MENU_LVM="TRIM для LVM - пока не доступна"
                MENU_PRELOAD="Сортировка в Preload"
-               MENU_INFO_PRELOAD="0 - No I/O sorting.
-Useful on Flash memory for example.
-1 - Sort based on file path only.
-Useful for network filesystems.
-2 -	Sort based on inode number.
-Does less house-keeping I/O than the next option.
-3 - Sort I/O based on disk block.  Most sophisticated.
-And useful for most Linux filesystems.
+               MENU_INFO_PRELOAD="0 - Без сортировки ввода/вывода.
+Подходит для флэш-памяти и SSD.
+1 - Сортировка на основе только пути к файлу.
+Подходит для сетевых файловых систем.
+2 - Сортировка в зависимости от количества индексных дескрипторов.
+Снижает кол-во операций ввода/вывода, чем вариант - 3.
+3 - Сортировка ввода/вывода на основе дискового блока. Самый сложный алгоритм.
+Подходит для большинства файловых систем Linux.
 "
                
                HELP_EXIT="
@@ -93,9 +93,16 @@ ____________________________________
    Справка
 
 $0 - скрипт предназначен для настроки таких параметров системы как: журналирование, подкачка, способы хранения временных файлов, монтирование и т.д.
-__
+_______________
 * $MENU_PARTITION_FORM
-__
+Позволяет настроить параметры монтирования разделов из /etc/fstab:
+- $MENU_DISCARD - включить TRIM с помощью параметра discard, нужно быть умеренным что данный режим поддерживается апаратно и файловой системой
+- $MENU_FSTRIM - включить TRIM по расписанию с помощью fstrim
+- $MENU_BARRIER - позволяет повысить производительность при этом есть риск нарушения целостности ФС, будьте внимательный - компьютер должен иметь гараниторанное электропитание (подходит для ноутбуков и ПК с UPS)
+- установить минутную задержку сброса дискового кэша на сам диск - 
+
+
+_______________
 * $MENU_SYSCTL_FORM
 Позволяет настроить способ подкачки.
 __
@@ -114,6 +121,19 @@ ___________________________________"
              
                ;;
 esac
+
+ #MENU_INFO_PRELOAD="0 - No I/O sorting.
+#Useful on Flash memory for example.
+#1 - Sort based on file path only.
+#Useful for network filesystems.
+#2 -	Sort based on inode number.
+#Does less house-keeping I/O than the next option.
+#3 - Sort I/O based on disk block.  Most sophisticated.
+#And useful for most Linux filesystems.
+#"
+
+
+
 #########################################################
 RestartPC ()
 {
@@ -219,7 +239,7 @@ case $ANSWER in
                      fi
                   done
                   
-                  sudo sed -i '/vm.swappiness/d' /etc/sysctl.conf
+                  sudo sed -i '/^vm.swappiness/d' /etc/sysctl.conf
                   echo -e "vm.swappiness=$SWAPPINESS" | sudo tee -a /etc/sysctl.conf
                   ;;
    "$MENU_VFS_CACHE_PRESSURECAT"* ) while true; do
@@ -233,15 +253,15 @@ case $ANSWER in
                      fi
                   done
                   
-                  sudo sed -i '/vm.vfs_cache_pressure/d' /etc/sysctl.conf
+                  sudo sed -i '/^vm.vfs_cache_pressure/d' /etc/sysctl.conf
                   echo -e "vm.vfs_cache_pressure=$VFS_CACHE_PRESSURECAT" | sudo tee -a /etc/sysctl.conf
                   ;;
    "$MENU_LAPTOPMODE"* ) if [ "$LAPTOP_MODE" = "OFF" ]  
                     then 
-                         sudo sed -i '/vm.laptop_mode/d' /etc/sysctl.conf
+                         sudo sed -i '/^vm.laptop_mode/d' /etc/sysctl.conf
                          echo -e "vm.laptop_mode=5" | sudo tee -a /etc/sysctl.conf
                     else 
-                         sudo sed -i '/vm.laptop_mode/d' /etc/sysctl.conf
+                         sudo sed -i '/^vm.laptop_mode/d' /etc/sysctl.conf
                          echo -e "vm.laptop_mode=0" | sudo tee -a /etc/sysctl.conf
                   fi
                   ;;
@@ -257,7 +277,7 @@ case $ANSWER in
                      fi
                   done
                 
-                  sudo sed -i '/vm.dirty_writeback_centisecs/d' /etc/sysctl.conf
+                  sudo sed -i '/^vm.dirty_writeback_centisecs/d' /etc/sysctl.conf
                   echo -e "vm.dirty_writeback_centisecs=$DIRTY_WRITEBACK_CENTISECS" | sudo tee -a /etc/sysctl.conf
                   ;;
    "$MENU_DIRTY_RATIO"* ) while true; do
@@ -271,7 +291,7 @@ case $ANSWER in
                      fi
                   done
                   
-                  sudo sed -i '/vm.dirty_ratio/d' /etc/sysctl.conf
+                  sudo sed -i '/^vm.dirty_ratio/d' /etc/sysctl.conf
                   echo -e "vm.dirty_ratio=$DIRTY_RATIO" | sudo tee -a /etc/sysctl.conf
                   ;;                  
    "$MENU_DIRTY_BACKGROUND_RATIO"* ) while true; do
@@ -285,7 +305,7 @@ case $ANSWER in
                      fi
                   done
                   
-                  sudo sed -i '/vm.dirty_background_ratio/d' /etc/sysctl.conf
+                  sudo sed -i '/^vm.dirty_background_ratio/d' /etc/sysctl.conf
                   echo -e "vm.dirty_background_ratio=$DIRTY_BACKGROUND_RATIO" | sudo tee -a /etc/sysctl.conf
                   ;; 
 esac
@@ -344,7 +364,7 @@ case $ANSWER in
    "$MENU_LVM"* ) echo lvm
                   ;;
    "$MENU_PRELOAD"* ) while true; do
-                     SETTING_PRELOAD_SORTSTRATEGY=$($DIALOG --title "$MENU_PRELOAD" --inputbox "$MENU_INFO_PRELOAD" 14 60 $SETTING_PRELOAD_SORTSTRATEGY 3>&1 1>&2 2>&3)
+                     SETTING_PRELOAD_SORTSTRATEGY=$($DIALOG --title "$MENU_PRELOAD" --inputbox "$MENU_INFO_PRELOAD" 18 60 $SETTING_PRELOAD_SORTSTRATEGY 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
                         then OtherForm ; break
                      fi
@@ -486,7 +506,7 @@ case $ANSWER in
                     ;;
    "$MENU_FSTRIM"* )                     
                     while true; do
-                      CRON_TRIM=$($DIALOG --title "$MENU_FSTRIM" --inputbox "$MENU_INFO_FSTRIM" 14 60 $CRON_TRIM 3>&1 1>&2 2>&3)
+                      CRON_TRIM=$($DIALOG --title "$MENU_FSTRIM" --inputbox "$MENU_INFO_FSTRIM" 16 60 $CRON_TRIM 3>&1 1>&2 2>&3)
                       if [ $? != 0 ]
                          then PartitionForm ; break
                       fi
@@ -615,7 +635,7 @@ tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
               
               
               # setup sysctl
-              sudo sed -i '/vm./d' /etc/sysctl.conf 
+              sudo sed -i '/^vm./d' /etc/sysctl.conf 
               echo -e "vm.swappiness=0
 vm.vfs_cache_pressure=50
 vm.laptop_mode=5
