@@ -69,8 +69,9 @@ m - включать fstrim каждый месяц"
 Для SSD - 5"               
                
                MENU_SWAP="Подкачка swap"
-               
-               MENU_LVM="TRIM для LVM - пока не доступна"
+               MENU_FILE_SWAP="Файл подкачки"
+               MENU_INFO_FILE_SWAP="Введите объем файла подкачки в МБ от 0 до"
+               MENU_IDLE3="Таймер парковки головок HDD WD"
                MENU_PRELOAD="Сортировка в Preload"
                MENU_INFO_PRELOAD="0 - Без сортировки ввода/вывода.
 Подходит для флэш-памяти и SSD.
@@ -79,8 +80,7 @@ m - включать fstrim каждый месяц"
 2 - Сортировка в зависимости от количества индексных дескрипторов.
 Снижает кол-во операций ввода/вывода, чем вариант - 3.
 3 - Сортировка ввода/вывода на основе дискового блока. Самый сложный алгоритм.
-Подходит для большинства файловых систем Linux.
-"
+Подходит для большинства файловых систем Linux."
                
                HELP_EXIT="
 Нажмите Enter для перехода в главное меню"
@@ -88,6 +88,18 @@ m - включать fstrim каждый месяц"
                RESTART_TEXT="Для применения настроек необходимо перезагрузить ПК! 
 
 Перезагрузить ПК сейчас?"
+               POWER_OFF_TEXT="Для применения настроек необходимо выключить ПК! 
+
+Выключить ПК сейчас?"
+               HIB_FILE_SWAP_TEXT="Вы хотите использовать swapfile при гибернации?"
+               AUTOSETTINGS_SSD_TEXT="Будут произведены следующие действия:
+- изменены параметры монтирования /
+- изменены параметры  sysctl
+- изменены параметры  Preload
+- включено ежедневное fstrim
+- включено монтирование /tmp и логов в ОЗУ
+
+Произвести указанные действия?"
                HELP="
 ____________________________________
    Справка
@@ -143,6 +155,15 @@ if [ $? == 0 ]
 fi
 }
 #########################################################
+
+PowerOffPC ()
+{
+ $DIALOG --title "$ATTENTION" --yesno "$POWER_OFF_TEXT" 10 60
+if [ $? == 0 ]
+   then sudo shutdown now
+fi   
+}
+#########################################################
 CheckStateMain ()
 {
 if [ -f /etc/fstab.backup ]
@@ -187,10 +208,22 @@ if [ "$STATE_STATUS_SWAP" != '' ]
    then STATE_STATUS_SWAP="ON"
    else STATE_STATUS_SWAP="OFF"
 fi
-VALUE_SWAP=$(cat /proc/swaps | sed -e '1d' | awk '{print $3}')
+VALUE_SWAP=$((`free | grep Swap | awk '{print $2}'`/1024))
 if [ "$VALUE_SWAP" != '' ]
-   then VALUE_SWAP=", size-"$VALUE_SWAP
+   then VALUE_SWAP=", size-"$VALUE_SWAP"MB"
 fi
+
+if [ -f /var/swapfile ]
+   then STATE_FILE_SWAP="ON"
+        VALUE_FILE_SWAP=$((`du /var/swapfile | awk '{print $1}'`/1024))
+        VALUE_FILE_SWAP_TEXT=", size-"$VALUE_FILE_SWAP"MB"
+   else STATE_FILE_SWAP="OFF"
+        VALUE_FILE_SWAP_TEXT=""
+fi
+
+FREE_SPASE_ROOT=$((`df / | sed -e '1d' | awk '{print $4}'`/1024-500))
+
+
 }
 #########################################################
 CheckStateSysctl ()
@@ -228,7 +261,8 @@ if [ $? != 0 ]
    then MainForm
 fi
 case $ANSWER in
-   "$MENU_SWAPPINESS"* ) while true; do
+   "$MENU_SWAPPINESS"* ) 
+                  while true; do
                      SWAPPINESS=$($DIALOG --title "$MENU_SWAPPINESS" --inputbox "$MENU_INFO_SWAPPINESS" 14 60 $SWAPPINESS 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
                         then SysctlForm ; break
@@ -242,7 +276,8 @@ case $ANSWER in
                   sudo sed -i '/^vm.swappiness/d' /etc/sysctl.conf
                   echo -e "vm.swappiness=$SWAPPINESS" | sudo tee -a /etc/sysctl.conf
                   ;;
-   "$MENU_VFS_CACHE_PRESSURECAT"* ) while true; do
+   "$MENU_VFS_CACHE_PRESSURECAT"* ) 
+                  while true; do
                      VFS_CACHE_PRESSURECAT=$($DIALOG --title "$MENU_VFS_CACHE_PRESSURECAT" --inputbox "$MENU_INFO_VFS_CACHE_PRESSURECAT" 14 60 $VFS_CACHE_PRESSURECAT 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
                         then SysctlForm ; break
@@ -256,7 +291,8 @@ case $ANSWER in
                   sudo sed -i '/^vm.vfs_cache_pressure/d' /etc/sysctl.conf
                   echo -e "vm.vfs_cache_pressure=$VFS_CACHE_PRESSURECAT" | sudo tee -a /etc/sysctl.conf
                   ;;
-   "$MENU_LAPTOPMODE"* ) if [ "$LAPTOP_MODE" = "OFF" ]  
+   "$MENU_LAPTOPMODE"* ) 
+                  if [ "$LAPTOP_MODE" = "OFF" ]  
                     then 
                          sudo sed -i '/^vm.laptop_mode/d' /etc/sysctl.conf
                          echo -e "vm.laptop_mode=5" | sudo tee -a /etc/sysctl.conf
@@ -265,8 +301,8 @@ case $ANSWER in
                          echo -e "vm.laptop_mode=0" | sudo tee -a /etc/sysctl.conf
                   fi
                   ;;
-     
-   "$MENU_DIRTY_WRITEBACK_CENTISECS"* ) while true; do
+   "$MENU_DIRTY_WRITEBACK_CENTISECS"* ) 
+                  while true; do
                      DIRTY_WRITEBACK_CENTISECS=$($DIALOG --title "$MENU_DIRTY_WRITEBACK_CENTISECS" --inputbox "$MENU_INFO_DIRTY_WRITEBACK_CENTISECS" 14 60 $DIRTY_WRITEBACK_CENTISECS 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
                         then SysctlForm ; break
@@ -280,7 +316,8 @@ case $ANSWER in
                   sudo sed -i '/^vm.dirty_writeback_centisecs/d' /etc/sysctl.conf
                   echo -e "vm.dirty_writeback_centisecs=$DIRTY_WRITEBACK_CENTISECS" | sudo tee -a /etc/sysctl.conf
                   ;;
-   "$MENU_DIRTY_RATIO"* ) while true; do
+   "$MENU_DIRTY_RATIO"* ) 
+                  while true; do
                      DIRTY_RATIO=$($DIALOG --title "$MENU_DIRTY_RATIO" --inputbox "$MENU_INFO_DIRTY_RATIO" 14 60 $DIRTY_RATIO 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
                         then SysctlForm ; break
@@ -294,7 +331,8 @@ case $ANSWER in
                   sudo sed -i '/^vm.dirty_ratio/d' /etc/sysctl.conf
                   echo -e "vm.dirty_ratio=$DIRTY_RATIO" | sudo tee -a /etc/sysctl.conf
                   ;;                  
-   "$MENU_DIRTY_BACKGROUND_RATIO"* ) while true; do
+   "$MENU_DIRTY_BACKGROUND_RATIO"* ) 
+                  while true; do
                      DIRTY_BACKGROUND_RATIO=$($DIALOG --title "$MENU_DIRTY_BACKGROUND_RATIO" --inputbox "$MENU_INFO_DIRTY_BACKGROUND_RATIO" 14 60 $DIRTY_BACKGROUND_RATIO 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
                         then SysctlForm ; break
@@ -322,7 +360,8 @@ CheckStateSwap
 ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SWAP_FORM" --menu \
     "$MAIN_TEXT" 16 64\
     8\
-       "$MENU_SWAP (automount-$STATE_AUTOMOUNT_SWAP, status-$STATE_STATUS_SWAP$VALUE_SWAP)" "" 3>&1 1>&2 2>&3)
+       "$MENU_SWAP (automount-$STATE_AUTOMOUNT_SWAP, status-$STATE_STATUS_SWAP$VALUE_SWAP)" ""\
+       "$MENU_FILE_SWAP (status-$STATE_FILE_SWAP$VALUE_FILE_SWAP_TEXT)" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then MainForm
 fi
@@ -337,6 +376,43 @@ case $ANSWER in
                       else sudo swapoff -a
                    fi
                   ;;
+   "$MENU_FILE_SWAP"* ) 
+                  if [ "$STATE_FILE_SWAP" = "OFF" ]  
+                      then 
+                           while true; do
+                                 VALUE_FILE_SWAP=$($DIALOG --title "$MENU_FILE_SWAP" --inputbox "$MENU_INFO_FILE_SWAP $FREE_SPASE_ROOT" 14 60 $VALUE_FILE_SWAP 3>&1 1>&2 2>&3)
+                                 if [ $? != 0 ]
+                                    then SwapForm ; break
+                                 fi
+                     
+                                 if [[ "$VALUE_FILE_SWAP" -ge 0 ]] && [[ "$VALUE_FILE_SWAP" -le "$FREE_SPASE_ROOT" ]]
+                                     then break
+                                 fi
+                           done
+                           cd /var
+                           sudo touch swapfile
+                           sudo chmod 0600 swapfile
+                           echo "Please wait for the swap file is created..."
+                           sudo dd if=/dev/zero of=/var/swapfile bs=1024k count=$VALUE_FILE_SWAP
+                           sudo mkswap /var/swapfile
+                           echo -e "#Mount /var/swapfile \n/var/swapfile   none    swap    sw    0    0" | sudo tee -a /etc/fstab
+                           sudo swapon /var/swapfile
+                           
+                           $DIALOG --title "$ATTENTION" --yesno "$HIB_FILE_SWAP_TEXT" 10 60
+                           if [ $? == 0 ]
+                               then 
+                                    UUID_FILE_SWAP=`sudo swaplabel /var/swapfile | awk '{print $2}'`
+                                    echo -e "RESUME=UUID=$UUID_FILE_SWAP" | sudo tee /etc/initramfs-tools/conf.d/resume 
+                                    # echo "RESUME=$(grep swap /etc/fstab| awk '{ print $1 }')" > /etc/initramfs-tools/conf.d/resume 
+                                    sudo update-initramfs -u
+                           fi
+                      else 
+                           sudo swapoff /var/swapfile
+                           sudo rm -f /var/swapfile
+                           sudo sed -i '/swapfile/d' /etc/fstab
+                           sudo swapon -a
+                   fi
+                  ;;               
 esac
 
 SwapForm
@@ -344,6 +420,15 @@ SwapForm
 ########################################################
 CheckStateOther ()
 {
+
+STATE_IDLE3_TOOLS=`dpkg -l | grep idle3-tools`
+if [ "$STATE_IDLE3_TOOLS"='' ]
+   then STATE_IDLE3_TOOLS="idle3-tools - is not installed"
+   else sudo idle3ctl -g103 /dev/sda
+fi
+
+
+
 SETTING_PRELOAD_SORTSTRATEGY=`cat /etc/preload.conf | grep ^sortstrategy | awk '{print $NF }'|sed "s/=//g"`
 
 
@@ -355,15 +440,17 @@ CheckStateOther
 ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_OTHER_FORM" --menu \
     "$MAIN_TEXT" 16 64\
     8\
-       "$MENU_LVM" ""\
+       "$MENU_IDLE3" ""\
        "$MENU_PRELOAD (setting-$SETTING_PRELOAD_SORTSTRATEGY)" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then MainForm
 fi
 case $ANSWER in
-   "$MENU_LVM"* ) echo lvm
+   "$MENU_IDLE3"* ) 
+                  PowerOffPC
                   ;;
-   "$MENU_PRELOAD"* ) while true; do
+   "$MENU_PRELOAD"* ) 
+                  while true; do
                      SETTING_PRELOAD_SORTSTRATEGY=$($DIALOG --title "$MENU_PRELOAD" --inputbox "$MENU_INFO_PRELOAD" 18 60 $SETTING_PRELOAD_SORTSTRATEGY 3>&1 1>&2 2>&3)
                      if [ $? != 0 ]
                         then OtherForm ; break
@@ -544,21 +631,24 @@ case $ANSWER in
                       esac
                     done
                     ;;
-   "$MENU_BARRIER"* ) OPTION="barrier=0"
+   "$MENU_BARRIER"* ) 
+                    OPTION="barrier=0"
                     if [ "$MOUNT_BARRIER" = "OFF" ] 
                         then AddParmToFstab $OPTION
                         else RmParmFromFstab $OPTION
                     fi
                     sudo mount -o remount $MOUNT_POINT
                     ;;
-   "$MENU_COMMIT"* ) OPTION="commit=600"
+   "$MENU_COMMIT"* ) 
+                    OPTION="commit=600"
                     if [ "$MOUNT_COMMIT" = "OFF" ] 
                         then AddParmToFstab $OPTION
                         else RmParmFromFstab $OPTION
                     fi
                     sudo mount -o remount $MOUNT_POINT
                     ;;
-   "$MENU_NOATIME"* ) OPTION="noatime"
+   "$MENU_NOATIME"* ) 
+                    OPTION="noatime"
                     if [ "$MOUNT_NOATIME" = "OFF" ] 
                         then AddParmToFstab $OPTION
                         else RmParmFromFstab $OPTION
@@ -605,66 +695,81 @@ if [ $? != 0 ]
    then echo Exit ; exit 0
 fi
 case $ANSWER in
-   "$MENU_PARTITION_FORM" ) MountForm
+   "$MENU_PARTITION_FORM" ) 
+              MountForm
               ;;
-   "$MENU_SYSCTL_FORM" ) SysctlForm
+   "$MENU_SYSCTL_FORM" ) 
+              SysctlForm
               ;;
-   "$MENU_SWAP_FORM" ) SwapForm
+   "$MENU_SWAP_FORM" ) 
+              SwapForm
               ;;
-   "$MENU_OTHER_FORM" ) OtherForm
+   "$MENU_OTHER_FORM" ) 
+              OtherForm
               ;;
-   "$MENU_TMP_TO_RAM"* ) if [ "$STATE_AUTOMOUNT_TMP" = "OFF" ]  
-               then echo -e "#Mount /tmp to RAM ( /tmp tmpfs) \ntmpfs /tmp tmpfs rw,nosuid,nodev 0 0" | sudo tee -a /etc/fstab
-               else sudo sed -i '/ \/tmp tmpfs/d' /etc/fstab
+   "$MENU_TMP_TO_RAM"* ) 
+              if [ "$STATE_AUTOMOUNT_TMP" = "OFF" ]  
+                 then echo -e "#Mount /tmp to RAM ( /tmp tmpfs) \ntmpfs /tmp tmpfs rw,nosuid,nodev 0 0" | sudo tee -a /etc/fstab
+                 else sudo sed -i '/ \/tmp tmpfs/d' /etc/fstab
               fi
               RestartPC
               ;;
-   "$MENU_LOG_TO_RAM"* ) if [ "$STATE_AUTOMOUNT_LOG" = "OFF" ]  
-               then echo -e "#Mount /var/* to RAM 
+   "$MENU_LOG_TO_RAM"* ) 
+              if [ "$STATE_AUTOMOUNT_LOG" = "OFF" ]  
+                 then echo -e "#Mount /var/* to RAM 
 tmpfs /var/tmp tmpfs defaults 0 0
 tmpfs /var/lock tmpfs defaults 0 0
 tmpfs /var/log tmpfs defaults,size=20M 0 0
 tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
-               else sudo sed -i '/\/var\//d' /etc/fstab
+                 else sudo sed -i '/\/var\//d' /etc/fstab
               fi
               RestartPC
               ;;
    "$MENU_AUTOSETTINGS_SSD" ) 
-                            
-              # setup mount /
-              
-              
-              # setup sysctl
-              sudo sed -i '/^vm./d' /etc/sysctl.conf 
-              echo -e "vm.swappiness=0
+              $DIALOG --title "$ATTENTION" --yesno "$AUTOSETTINGS_SSD_TEXT" 16 60
+              if [ $? == 0 ]
+                 then              
+                      # setup mount /
+                      PARTITION=`cat /etc/fstab | grep -P "\t/\t" | awk '{print $1}'`
+                      if [ "$PARTITION"='' ]
+                         then ARTITION=`cat /etc/fstab | grep -P " / " | awk '{print $1}'`
+                      fi
+                      OPTION="barrier=0,commit=600,noatime"
+                      AddParmToFstab $OPTION
+                      sudo mount -o remount /
+                      
+                      # setup sysctl
+                      sudo sed -i '/^vm./d' /etc/sysctl.conf 
+                      echo -e "vm.swappiness=0
 vm.vfs_cache_pressure=50
 vm.laptop_mode=5
 vm.dirty_writeback_centisecs=6000
 vm.dirty_ratio=60
 vm.dirty_background_ratio=5" | sudo tee -a /etc/sysctl.conf
-              sudo sync
-              sudo sysctl -p
+                      sudo sync
+                      sudo sysctl -p
               
-              # logs and tmp to RAM
-              sudo sed -i '/ \/tmp tmpfs/d' /etc/fstab
-              sudo sed -i '/\/var\//d' /etc/fstab
-              echo -e "#Mount /tmp to RAM ( /tmp tmpfs) \ntmpfs /tmp tmpfs rw,nosuid,nodev 0 0" | sudo tee -a /etc/fstab
-              echo -e "#Mount /var/* to RAM 
+                      # logs and tmp to RAM
+                      sudo sed -i '/ \/tmp tmpfs/d' /etc/fstab
+                      sudo sed -i '/\/var\//d' /etc/fstab
+                      echo -e "#Mount /tmp to RAM ( /tmp tmpfs) \ntmpfs /tmp tmpfs rw,nosuid,nodev 0 0" | sudo tee -a /etc/fstab
+                      echo -e "#Mount /var/* to RAM 
 tmpfs /var/tmp tmpfs defaults 0 0
 tmpfs /var/lock tmpfs defaults 0 0
 tmpfs /var/log tmpfs defaults,size=20M 0 0
 tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
               
-              # setup preload sortstrategy
-              sudo sed -i '/^sortstrategy/d' /etc/preload.conf
-              echo -e "sortstrategy = 0" | sudo tee -a /etc/preload.conf
-              sudo /etc/init.d/preload restart
+                      # setup preload sortstrategy
+                      sudo sed -i '/^sortstrategy/d' /etc/preload.conf
+                      echo -e "sortstrategy = 0" | sudo tee -a /etc/preload.conf
+                      sudo /etc/init.d/preload restart
               
-              #setup auto fstrim
-              echo -e "#\x21/bin/sh\\nfstrim -v / " | sudo tee /etc/cron.daily/trim
-              sudo chmod +x /etc/cron.daily/trim
+                      #setup auto fstrim
+                      echo -e "#\x21/bin/sh\\nfstrim -v / " | sudo tee /etc/cron.daily/trim
+                      sudo chmod +x /etc/cron.daily/trim
 
-              RestartPC
+                      RestartPC
+              fi
               ;;
    "$MENU_BACKUP"* )  
               if [ "$TIME_BACKUP" == "(make backup)" ]
@@ -682,11 +787,14 @@ tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
                       RestartPC
               fi
               ;;              
-   "$MENU_EDIT_FSTAB" ) sudo $EDITOR /etc/fstab
+   "$MENU_EDIT_FSTAB" ) 
+              sudo $EDITOR /etc/fstab
               ;;
-   "$MENU_EDIT_SYSCTLCONF" ) sudo $EDITOR /etc/sysctl.conf
+   "$MENU_EDIT_SYSCTLCONF" ) 
+              sudo $EDITOR /etc/sysctl.conf
               ;;              
-   "$MENU_HELP" ) echo "$HELP"
+   "$MENU_HELP" ) 
+              echo "$HELP"
               echo "$HELP_EXIT"
               read x
               ;;
