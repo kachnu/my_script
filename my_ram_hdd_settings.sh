@@ -146,6 +146,10 @@ esac
 
 
 
+
+
+SWAPFILE="/var/swapfile"
+
 #########################################################
 RestartPC ()
 {
@@ -213,9 +217,9 @@ if [ "$VALUE_SWAP" != '' ]
    then VALUE_SWAP=", size-"$VALUE_SWAP"MB"
 fi
 
-if [ -f /var/swapfile ]
+if [ -f $SWAPFILE ]
    then STATE_FILE_SWAP="ON"
-        VALUE_FILE_SWAP=$((`du /var/swapfile | awk '{print $1}'`/1024))
+        VALUE_FILE_SWAP=$((`du $SWAPFILE | awk '{print $1}'`/1024))
         VALUE_FILE_SWAP_TEXT=", size-"$VALUE_FILE_SWAP"MB"
    else STATE_FILE_SWAP="OFF"
         VALUE_FILE_SWAP_TEXT=""
@@ -389,26 +393,27 @@ case $ANSWER in
                                      then break
                                  fi
                            done
-                           cd /var
-                           sudo touch swapfile
-                           sudo chmod 0600 swapfile
+                           sudo touch $SWAPFILE
+                           sudo chmod 0600 $SWAPFILE
                            echo "Please wait for the swap file is created..."
-                           sudo dd if=/dev/zero of=/var/swapfile bs=1024k count=$VALUE_FILE_SWAP
-                           sudo mkswap /var/swapfile
-                           echo -e "#Mount /var/swapfile \n/var/swapfile   none    swap    sw    0    0" | sudo tee -a /etc/fstab
-                           sudo swapon /var/swapfile
+                           sudo dd if=/dev/zero of=$SWAPFILE bs=1024k count=$VALUE_FILE_SWAP
+                           sudo mkswap $SWAPFILE
+                           echo -e "#Mount $SWAPFILE \n$SWAPFILE   none    swap    sw    0    0" | sudo tee -a /etc/fstab
+                           sudo swapon $SWAPFILE
                            
                            $DIALOG --title "$ATTENTION" --yesno "$HIB_FILE_SWAP_TEXT" 10 60
                            if [ $? == 0 ]
                                then 
-                                    UUID_FILE_SWAP=`sudo swaplabel /var/swapfile | awk '{print $2}'`
-                                    echo -e "RESUME=UUID=$UUID_FILE_SWAP" | sudo tee /etc/initramfs-tools/conf.d/resume 
+                                    UUID_FILE_SWAP=`sudo swaplabel $SWAPFILE | awk '{print $2}'`
+                                    RESUME_OFFSET=`sudo filefrag -v $SWAPFILE | grep -P " 0:" | awk '{print $4}' | sed "s/\.//g"`
+                                    echo djahskjdhkjashd $RESUME_OFFSET
+                                    echo -e "resume=UUID=$UUID_FILE_SWAP resume_offset=$RESUME_OFFSET" | sudo tee /etc/initramfs-tools/conf.d/resume 
                                     # echo "RESUME=$(grep swap /etc/fstab| awk '{ print $1 }')" > /etc/initramfs-tools/conf.d/resume 
                                     sudo update-initramfs -u
                            fi
                       else 
-                           sudo swapoff /var/swapfile
-                           sudo rm -f /var/swapfile
+                           sudo swapoff $SWAPFILE
+                           sudo rm -f $SWAPFILE
                            sudo sed -i '/swapfile/d' /etc/fstab
                            sudo swapon -a
                    fi
