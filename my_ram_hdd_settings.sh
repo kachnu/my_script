@@ -71,6 +71,7 @@ m - включать fstrim каждый месяц"
                MENU_SWAP="Подкачка swap"
                MENU_FILE_SWAP="Файл подкачки"
                MENU_INFO_FILE_SWAP="Введите объем файла подкачки в МБ от 0 до"
+               MENU_PARTITION_SWAP="Раздел подкачки"
                MENU_IDLE3="Таймер парковки головок HDD WD"
                MENU_PRELOAD="Сортировка в Preload"
                MENU_INFO_PRELOAD="0 - Без сортировки ввода/вывода.
@@ -228,6 +229,18 @@ fi
 FREE_SPASE_ROOT=$((`df / | sed -e '1d' | awk '{print $4}'`/1024-500))
 
 
+STATE_PARTITION_SWAP=`cat /proc/swaps | grep partition`
+if [ "$STATE_PARTITION_SWAP" != '' ]
+   then STATE_PARTITION_SWAP="ON"
+        SWAP_PARTITION=`cat /proc/swaps | grep partition | awk '{print $1}'`
+        SWAP_PARTITION_XXX=`echo "$SWAP_PARTITION" | awk  -F"/" '{print $3}'`
+        UUID_SWAP_PARTITION=`ls -l /dev/disk/by-uuid | grep $SWAP_PARTITION_XXX | awk '{print $9}'`
+        VALUE_SWAP_PARTITION=$((`cat /proc/swaps | grep partition | awk '{print $3}'`/1024)) 
+        VALUE_PARTITION_SWAP_TEXT=", size-"$VALUE_SWAP_PARTITION"MB"
+   else STATE_PARTITION_SWAP="OFF"
+fi
+
+
 }
 #########################################################
 CheckStateSysctl ()
@@ -365,7 +378,8 @@ ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SWAP_FORM" --menu \
     "$MAIN_TEXT" 16 64\
     8\
        "$MENU_SWAP (automount-$STATE_AUTOMOUNT_SWAP, status-$STATE_STATUS_SWAP$VALUE_SWAP)" ""\
-       "$MENU_FILE_SWAP (status-$STATE_FILE_SWAP$VALUE_FILE_SWAP_TEXT)" "" 3>&1 1>&2 2>&3)
+       "$MENU_FILE_SWAP (present-$STATE_FILE_SWAP$VALUE_FILE_SWAP_TEXT)" ""\
+       "$MENU_PARTITION_SWAP (status-$STATE_PARTITION_SWAP$VALUE_PARTITION_SWAP_TEXT)" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then MainForm
 fi
@@ -417,6 +431,12 @@ case $ANSWER in
                            sudo sed -i '/swapfile/d' /etc/fstab
                            sudo swapon -a
                    fi
+                  ;;
+   "$MENU_PARTITION_SWAP"* ) 
+                  if [ "$STATE_PARTITION_SWAP" = "OFF" ]  
+                      then echo ""
+                      else echo ""
+                  fi    
                   ;;               
 esac
 
@@ -469,7 +489,6 @@ case $ANSWER in
                   echo -e "sortstrategy = $SETTING_PRELOAD_SORTSTRATEGY" | sudo tee -a /etc/preload.conf
                   sudo /etc/init.d/preload restart
                   ;;
-            
 esac
 
 OtherForm
