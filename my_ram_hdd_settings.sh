@@ -72,6 +72,10 @@ m - включать fstrim каждый месяц"
                MENU_FILE_SWAP="Файл подкачки"
                MENU_INFO_FILE_SWAP="Введите объем файла подкачки в МБ от 0 до"
                MENU_PARTITION_SWAP="Раздел подкачки"
+               MENU_ZRAM="Технология ZRAM"
+               MENU_ZSWAP="Технология ZSWAP"
+               
+               
                MENU_IDLE3="Таймер парковки головок HDD WD"
                MENU_PRELOAD="Сортировка в Preload"
                MENU_INFO_PRELOAD="0 - Без сортировки ввода/вывода.
@@ -147,7 +151,7 @@ esac
 
 
 
-
+#########################################################
 
 SWAPFILE="/var/swapfile"
 
@@ -160,7 +164,6 @@ if [ $? == 0 ]
 fi
 }
 #########################################################
-
 PowerOffPC ()
 {
  $DIALOG --title "$ATTENTION" --yesno "$POWER_OFF_TEXT" 10 60
@@ -228,18 +231,39 @@ fi
 
 FREE_SPASE_ROOT=$((`df / | sed -e '1d' | awk '{print $4}'`/1024-500))
 
-
-STATE_PARTITION_SWAP=`cat /proc/swaps | grep partition`
+STATE_PARTITION_SWAP=`cat /proc/swaps | grep partition | grep sd..`
 if [ "$STATE_PARTITION_SWAP" != '' ]
    then STATE_PARTITION_SWAP="ON"
-        SWAP_PARTITION=`cat /proc/swaps | grep partition | awk '{print $1}'`
+        SWAP_PARTITION=`cat /proc/swaps | grep partition | grep sd.. | awk '{print $1}'`
         SWAP_PARTITION_XXX=`echo "$SWAP_PARTITION" | awk  -F"/" '{print $3}'`
         UUID_SWAP_PARTITION=`ls -l /dev/disk/by-uuid | grep $SWAP_PARTITION_XXX | awk '{print $9}'`
-        VALUE_SWAP_PARTITION=$((`cat /proc/swaps | grep partition | awk '{print $3}'`/1024)) 
+        VALUE_SWAP_PARTITION=$((`cat /proc/swaps | grep partition | grep sd.. | awk '{print $3}'`/1024)) 
         VALUE_PARTITION_SWAP_TEXT=", size-"$VALUE_SWAP_PARTITION"MB"
    else STATE_PARTITION_SWAP="OFF"
 fi
 
+STATE_ZRAM=`cat /proc/swaps | grep zram`
+if [ "$STATE_ZRAM" != '' ]
+   then STATE_ZRAM="ON"
+        CPUS=`grep -c processor /proc/cpuinfo`
+        VALUE_ZRAM=$((`cat /proc/swaps | grep zram1 | awk '{print $3}'`/1024*$CPUS))
+        VALUE_ZRAMP_TEXT=", size-"$VALUE_ZRAM"MB"
+   else STATE_ZRAM="OFF"
+        VALUE_ZRAMP_TEXT=""
+fi
+
+
+STATE_ZSWAP=`dmesg | grep zswap`
+if [ "$STATE_ZSWAP" != '' ]
+   then STATE_ZSWAP="ON"
+   else STATE_ZSWAP="OFF"
+fi
+
+STATE_AUTORUN_ZSWAP=`cat /etc/default/grub | grep zswap`
+if [ "$STATE_AUTORUN_ZSWAP" != '' ]
+   then STATE_AUTORUN_ZSWAP="ON"
+   else STATE_AUTORUN_ZSWAP="OFF"
+fi
 
 }
 #########################################################
@@ -379,7 +403,9 @@ ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SWAP_FORM" --menu \
     8\
        "$MENU_SWAP (automount-$STATE_AUTOMOUNT_SWAP, status-$STATE_STATUS_SWAP$VALUE_SWAP)" ""\
        "$MENU_FILE_SWAP (present-$STATE_FILE_SWAP$VALUE_FILE_SWAP_TEXT)" ""\
-       "$MENU_PARTITION_SWAP (status-$STATE_PARTITION_SWAP$VALUE_PARTITION_SWAP_TEXT)" "" 3>&1 1>&2 2>&3)
+       "$MENU_PARTITION_SWAP (status-$STATE_PARTITION_SWAP$VALUE_PARTITION_SWAP_TEXT)" ""\
+       "$MENU_ZRAM (status-$STATE_ZRAM$VALUE_ZRAMP_TEXT)" ""\
+       "$MENU_ZSWAP (status-$STATE_ZSWAP, autorun-$STATE_AUTORUN_ZSWAP)" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then MainForm
 fi
@@ -391,7 +417,24 @@ case $ANSWER in
                   
                    if [ "$STATE_STATUS_SWAP" = "OFF" ]  
                       then sudo swapon -a
+                           sudo rm /etc/polkit-1/localauthority/90-mandatory.d/disable-hibernate.pkla
                       else sudo swapoff -a
+                           echo -e "[Disable hibernate (upower)]
+Identity=unix-user:*
+Action=org.freedesktop.upower.hibernate
+ResultActive=no
+ResultInactive=no
+ResultAny=no
+
+[Disable hibernate (logind)]
+Identity=unix-user:*
+Action=org.freedesktop.login1.hibernate
+ResultActive=no
+
+[Disable hibernate for all sessions (logind)]
+Identity=unix-user:*
+Action=org.freedesktop.login1.hibernate-multiple-sessions
+ResultActive=no" | sudo tee /etc/polkit-1/localauthority/90-mandatory.d/disable-hibernate.pkla
                    fi
                   ;;
    "$MENU_FILE_SWAP"* ) 
@@ -421,34 +464,102 @@ case $ANSWER in
                                     UUID_FILE_SWAP=`sudo swaplabel $SWAPFILE | awk '{print $2}'`
                                     RESUME_OFFSET=`sudo filefrag -v $SWAPFILE | grep -P " 0:" | awk '{print $4}' | sed "s/\.//g"`
                                     echo -e "resume=UUID=$UUID_FILE_SWAP resume_offset=$RESUME_OFFSET" | sudo tee /etc/initramfs-tools/conf.d/resume 
-                                    FOR_GRUB=`cat /etc/initramfs-tools/conf.d/resume`
-                                    sudo sed -i "s/GRUB_CMDLINE_LINUX=\(.*\)/GRUB_CMDLINE_LINUX=\"${FOR_GRUB}\"/g" /etc/default/grub
                                     sudo update-initramfs -u
-                                    sudo update-grub                                    
+                                    FOR_GRUB=`cat /etc/initramfs-tools/conf.d/resume`
+                                    AddParmToGrub "$FOR_GRUB"
+                                    sudo update-grub
+                                    sudo rm /etc/polkit-1/localauthority/90-mandatory.d/disable-hibernate.pkla                                
                            fi
                       else 
                            sudo swapoff $SWAPFILE
                            sudo rm -f $SWAPFILE
                            sudo sed -i '/swapfile/d' /etc/fstab
                            sudo swapon -a
-                           sudo sed -i "s/GRUB_CMDLINE_LINUX=\(.*\)/GRUB_CMDLINE_LINUX=\"\"/g" /etc/default/grub
+                           FOR_GRUB=`cat /etc/initramfs-tools/conf.d/resume`
+                           RmParmFromGrub "$FOR_GRUB"
                            sudo update-grub
                    fi
                   ;;
    "$MENU_PARTITION_SWAP"* ) 
-                  
                   $DIALOG --title "$ATTENTION" --yesno "$HIB_SWAP_TEXT" 10 60
                            if [ $? == 0 ]
                                then 
                                     echo -e "RESUME=$(grep swap /etc/fstab| awk '{ print $1 }')" | sudo tee /etc/initramfs-tools/conf.d/resume 
                                     sudo update-initramfs -u
+                                    sudo rm /etc/polkit-1/localauthority/90-mandatory.d/disable-hibernate.pkla
                            fi
                   if [ "$STATE_PARTITION_SWAP" = "OFF" ]  
                       then echo ""
                     
                       else echo ""
                   fi    
-                  ;;               
+                  ;;
+   "$MENU_ZRAM"* ) 
+                  if [ "$STATE_ZRAM" = "OFF" ] 
+                     then echo '#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          zram
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     S
+# Default-Stop:      0 1 6
+# Short-Description: Use compressed RAM as in-memory swap
+# Description:       Use compressed RAM as in-memory swap
+### END INIT INFO
+
+# Author: Antonio Galea <antonio.galea@gmail.com>
+# Thanks to Przemysław Tomczyk for suggesting swapoff parallelization
+
+FRACTION=50
+
+MEMORY=$((`cat /proc/meminfo | grep ^MemTotal: | sed -e "s/[^0-9]//g"`* 1024))
+CPUS=`grep -c processor /proc/cpuinfo`
+SIZE=$(( MEMORY * FRACTION / 100 / CPUS ))
+
+case "$1" in
+  "start")
+    param=`modinfo zram|grep num_devices|cut -f2 -d:|tr -d " "`
+    modprobe zram $param=$CPUS
+    for n in `seq $CPUS`; do
+      i=$((n - 1))
+      echo $SIZE > /sys/block/zram$i/disksize
+      mkswap /dev/zram$i
+      swapon /dev/zram$i -p 10
+    done
+    ;;
+  "stop")
+    for n in `seq $CPUS`; do
+      i=$((n - 1))
+      swapoff /dev/zram$i && echo "disabled disk $n of $CPUS" &
+    done
+    wait
+    sleep .5
+    modprobe -r zram
+    ;;
+  *)
+    echo "Usage: `basename $0` (start | stop)"
+    exit 1
+    ;;
+esac' | sudo tee /etc/init.d/zram
+                          sudo chmod +x /etc/init.d/zram
+                          sudo /etc/init.d/zram start
+                          sudo insserv zram
+                     else
+                          sudo insserv -r zram
+                          sudo /etc/init.d/zram stop
+                          sudo rm -f /etc/init.d/zram
+                  fi    
+                  ;;
+   "$MENU_ZSWAP"* )
+                  if [ "$STATE_ZSWAP" = "OFF" ] 
+                     then AddParmToGrub "zswap.enabled=1"
+                          sudo update-grub
+                          RestartPC
+                     else RmParmFromGrub "zswap.enabled=1"
+                          sudo update-grub
+                          RestartPC
+                  fi
+                  ;;    
 esac
 
 SwapForm
@@ -463,11 +574,7 @@ if [ "$STATE_IDLE3_TOOLS"='' ]
    else sudo idle3ctl -g103 /dev/sda
 fi
 
-
-
 SETTING_PRELOAD_SORTSTRATEGY=`cat /etc/preload.conf | grep ^sortstrategy | awk '{print $NF }'|sed "s/=//g"`
-
-
 }
 ########################################################
 OtherForm ()
@@ -594,6 +701,22 @@ PARM=$1","
 DATA=`cat /etc/fstab | grep $PARTITION`
 NEW_DATA=`echo $DATA | sed "s/${PARM}//g" | sed "s/ /\t/g"`
 sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/fstab
+}
+#########################################################
+AddParmToGrub ()
+{
+PARM="$1"
+DATA=`cat /etc/default/grub | grep GRUB_CMDLINE_LINUX_DEFAULT`
+NEW_DATA=`echo $DATA | sed "s/\"//g" | awk -F= -v v1="$PARM" '{print $1"=\""v1" " $2"\""}'`
+sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/default/grub
+}
+#########################################################
+RmParmFromGrub ()
+{
+PARM="$1"
+DATA=`cat /etc/default/grub | grep GRUB_CMDLINE_LINUX_DEFAULT`
+NEW_DATA=`echo $DATA | sed "s/${PARM} //g"`
+sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/default/grub
 }
 #########################################################
 PartitionForm ()
