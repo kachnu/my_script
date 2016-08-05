@@ -92,7 +92,7 @@ m - включать fstrim каждый месяц"
                POWER_OFF_TEXT="Для применения настроек необходимо выключить ПК! 
 
 Выключить ПК сейчас?"
-               HIB_FILE_SWAP_TEXT="Вы хотите использовать swapfile при гибернации?"
+               HIB_SWAP_TEXT="Вы хотите использовать этот swap при гибернации?"
                AUTOSETTINGS_SSD_TEXT="Будут произведены следующие действия:
 - изменены параметры монтирования /
 - изменены параметры  sysctl
@@ -415,26 +415,37 @@ case $ANSWER in
                            echo -e "#Mount $SWAPFILE \n$SWAPFILE   none    swap    sw    0    0" | sudo tee -a /etc/fstab
                            sudo swapon $SWAPFILE
                            
-                           $DIALOG --title "$ATTENTION" --yesno "$HIB_FILE_SWAP_TEXT" 10 60
+                           $DIALOG --title "$ATTENTION" --yesno "$HIB_SWAP_TEXT" 10 60
                            if [ $? == 0 ]
                                then 
                                     UUID_FILE_SWAP=`sudo swaplabel $SWAPFILE | awk '{print $2}'`
                                     RESUME_OFFSET=`sudo filefrag -v $SWAPFILE | grep -P " 0:" | awk '{print $4}' | sed "s/\.//g"`
-                                    echo djahskjdhkjashd $RESUME_OFFSET
                                     echo -e "resume=UUID=$UUID_FILE_SWAP resume_offset=$RESUME_OFFSET" | sudo tee /etc/initramfs-tools/conf.d/resume 
-                                    # echo "RESUME=$(grep swap /etc/fstab| awk '{ print $1 }')" > /etc/initramfs-tools/conf.d/resume 
+                                    FOR_GRUB=`cat /etc/initramfs-tools/conf.d/resume`
+                                    sudo sed -i "s/GRUB_CMDLINE_LINUX=\(.*\)/GRUB_CMDLINE_LINUX=\"${FOR_GRUB}\"/g" /etc/default/grub
                                     sudo update-initramfs -u
+                                    sudo update-grub                                    
                            fi
                       else 
                            sudo swapoff $SWAPFILE
                            sudo rm -f $SWAPFILE
                            sudo sed -i '/swapfile/d' /etc/fstab
                            sudo swapon -a
+                           sudo sed -i "s/GRUB_CMDLINE_LINUX=\(.*\)/GRUB_CMDLINE_LINUX=\"\"/g" /etc/default/grub
+                           sudo update-grub
                    fi
                   ;;
    "$MENU_PARTITION_SWAP"* ) 
+                  
+                  $DIALOG --title "$ATTENTION" --yesno "$HIB_SWAP_TEXT" 10 60
+                           if [ $? == 0 ]
+                               then 
+                                    echo -e "RESUME=$(grep swap /etc/fstab| awk '{ print $1 }')" | sudo tee /etc/initramfs-tools/conf.d/resume 
+                                    sudo update-initramfs -u
+                           fi
                   if [ "$STATE_PARTITION_SWAP" = "OFF" ]  
                       then echo ""
+                    
                       else echo ""
                   fi    
                   ;;               
