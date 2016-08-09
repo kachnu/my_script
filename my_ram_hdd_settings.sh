@@ -476,22 +476,47 @@ ResultActive=no" | sudo tee /etc/polkit-1/localauthority/90-mandatory.d/disable-
                            sudo sed -i '/swapfile/d' /etc/fstab
                            sudo swapon -a
                            FOR_GRUB=`cat /etc/initramfs-tools/conf.d/resume`
-                           RmParmFromGrub "$FOR_GRUB"
-                           sudo update-grub
+                           if [ "$(cat /etc/default/grub | grep resume)"!='' ]
+                              then RmParmFromGrub "$FOR_GRUB"
+                                   sudo update-grub
+                           fi
                    fi
                   ;;
    "$MENU_PARTITION_SWAP"* ) 
-                  $DIALOG --title "$ATTENTION" --yesno "$HIB_SWAP_TEXT" 10 60
+                  if [ "$STATE_PARTITION_SWAP" = "OFF" ]  
+                      then 
+                           SWAP_PARTITIONS=`sudo lsblk -f -l | grep swap | awk '{print $1" "$2}'`
+                           SWAP_PARTITION=$($DIALOG  --cancel-button "Back" --title "$MENU_PARTITION_SWAP" --menu \
+                           "$MAIN_PART" 16 60 8 $SWAP_PARTITIONS 3>&1 1>&2 2>&3)
+                           if [ $? != 0 ]
+                               then echo "Cancel or not found a swap partition"
+                                    SwapForm
+                           fi
+                       
+                           UUID_SWAP_PARTITION=`ls -l /dev/disk/by-uuid | grep $SWAP_PARTITION | awk '{print $9}'`
+                           echo "$UUID_SWAP_PARTITION"
+                           if [[ `cat /etc/fstab | grep $UUID_SWAP_PARTITION` ]]
+                               then sudo sed -i '/swap/s/\#//g' /etc/fstab
+                               else echo -e "#Mount $SWAP_PARTITION \nUUID=$UUID_SWAP_PARTITION	swap	swap	sw	0	0" | sudo tee -a /etc/fstab
+                           fi
+                           sudo swapon -a
+                           $DIALOG --title "$ATTENTION" --yesno "$HIB_SWAP_TEXT" 10 60
                            if [ $? == 0 ]
                                then 
+                                    FOR_GRUB=`cat /etc/initramfs-tools/conf.d/resume`
+                                    if [ "$(cat /etc/default/grub | grep resume)"!='' ]
+                                       then RmParmFromGrub "$FOR_GRUB"
+                                            sudo update-grub
+                                    fi
                                     echo -e "RESUME=$(grep swap /etc/fstab| awk '{ print $1 }')" | sudo tee /etc/initramfs-tools/conf.d/resume 
                                     sudo update-initramfs -u
                                     sudo rm /etc/polkit-1/localauthority/90-mandatory.d/disable-hibernate.pkla
+                                    
                            fi
-                  if [ "$STATE_PARTITION_SWAP" = "OFF" ]  
-                      then echo ""
-                    
-                      else echo ""
+                      else 
+                           sudo sed -i "/${UUID_SWAP_PARTITION}/d" /etc/fstab
+                           sudo sed -i "/ ${SWAP_PARTITION_XXX}/d" /etc/fstab
+                           sudo swapoff -U $UUID_SWAP_PARTITION
                   fi    
                   ;;
    "$MENU_ZRAM"* ) 
@@ -590,6 +615,7 @@ if [ $? != 0 ]
 fi
 case $ANSWER in
    "$MENU_IDLE3"* ) 
+   
                   PowerOffPC
                   ;;
    "$MENU_PRELOAD"* ) 
