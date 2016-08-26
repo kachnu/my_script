@@ -153,7 +153,7 @@ esac
 
 #########################################################
 
-SWAPFILE="/var/swapfile"
+SWAPFILE="/swapfile"
 
 #########################################################
 RestartPC ()
@@ -476,7 +476,7 @@ ResultActive=no" | sudo tee /etc/polkit-1/localauthority/90-mandatory.d/disable-
                            sudo sed -i '/swapfile/d' /etc/fstab
                            sudo swapon -a
                            FOR_GRUB=`cat /etc/initramfs-tools/conf.d/resume`
-                           if [ "$(cat /etc/default/grub | grep resume)"!='' ]
+                           if [ "$(cat /etc/default/grub | grep resume)" != '' ]
                               then RmParmFromGrub "$FOR_GRUB"
                                    sudo update-grub
                            fi
@@ -504,7 +504,7 @@ ResultActive=no" | sudo tee /etc/polkit-1/localauthority/90-mandatory.d/disable-
                            if [ $? == 0 ]
                                then 
                                     FOR_GRUB=`cat /etc/initramfs-tools/conf.d/resume`
-                                    if [ "$(cat /etc/default/grub | grep resume)"!='' ]
+                                    if [ "$(cat /etc/default/grub | grep resume)" != '' ]
                                        then RmParmFromGrub "$FOR_GRUB"
                                             sudo update-grub
                                     fi
@@ -864,6 +864,7 @@ CheckStateMain
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
     "$MAIN_TEXT" 20 60\
     12\
+       "$MENU_BACKUP $TIME_BACKUP" ""\
        "$MENU_PARTITION_FORM" ""\
        "$MENU_SYSCTL_FORM" ""\
        "$MENU_SWAP_FORM" ""\
@@ -871,7 +872,6 @@ ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
        "$MENU_TMP_TO_RAM (automount-$STATE_AUTOMOUNT_TMP, status-$STATE_STATUS_TMP)" ""\
        "$MENU_LOG_TO_RAM (automount-$STATE_AUTOMOUNT_LOG, status-$STATE_STATUS_LOG)" ""\
        "$MENU_AUTOSETTINGS_SSD" ""\
-       "$MENU_BACKUP $TIME_BACKUP" ""\
        "$MENU_EDIT_FSTAB" ""\
        "$MENU_EDIT_SYSCTLCONF" ""\
        "$MENU_HELP" "" 3>&1 1>&2 2>&3)
@@ -960,10 +960,16 @@ tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
                  then 
                       sudo cp /etc/fstab  /etc/fstab.backup
                       sudo cp /etc/sysctl.conf /etc/sysctl.conf.backup
+                      sudo cp /etc/default/grub /etc/default/grub.backup
                  else 
                       sudo mv /etc/fstab.backup /etc/fstab
                       sudo mv /etc/sysctl.conf.backup /etc/sysctl.conf
-                      
+                      DIFF_GRUB=`diff /etc/default/grub.backup /etc/default/grub`
+                      echo diff $DIFF_GRUB
+                      if [ "$DIFF_GRUB" != '' ]
+                          then sudo mv /etc/default/grub.backup /etc/default/grub
+                               sudo update-grub
+                      fi
                       sudo rm /etc/cron.daily/trim
                       sudo rm /etc/cron.weekly/trim
                       sudo rm /etc/cron.monthly/trim
