@@ -576,7 +576,7 @@ esac' | sudo tee /etc/init.d/zram
                   fi    
                   ;;
    "$MENU_ZSWAP"* )
-                  if [ "$STATE_ZSWAP" = "OFF" ] 
+                  if [ "$STATE_AUTORUN_ZSWAP" = "OFF" ] 
                      then AddParmToGrub "zswap.enabled=1"
                           sudo update-grub
                           RestartPC
@@ -733,7 +733,7 @@ AddParmToGrub ()
 {
 PARM="$1"
 DATA=`cat /etc/default/grub | grep GRUB_CMDLINE_LINUX_DEFAULT`
-NEW_DATA=`echo $DATA | sed "s/\"//g" | awk -F= -v v1="$PARM" '{print $1"=\""v1" " $2"\""}'`
+NEW_DATA=`echo "$DATA" | sed "s/\"//g" | awk -F= -v v1="$PARM" '{print $1"=\""v1" " $2"\""}'`
 sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/default/grub
 }
 #########################################################
@@ -741,7 +741,7 @@ RmParmFromGrub ()
 {
 PARM="$1"
 DATA=`cat /etc/default/grub | grep GRUB_CMDLINE_LINUX_DEFAULT`
-NEW_DATA=`echo $DATA | sed "s/${PARM} //g"`
+NEW_DATA=`echo "$DATA" | sed "s/${PARM} //g"`
 sudo sed -i "s|${DATA}|${NEW_DATA}|g" /etc/default/grub
 }
 #########################################################
