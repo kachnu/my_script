@@ -250,7 +250,7 @@ STATE_ZRAM=`cat /proc/swaps | grep zram`
 if [ "$STATE_ZRAM" != '' ]
    then STATE_ZRAM="ON"
         CPUS=`grep -c processor /proc/cpuinfo`
-        VALUE_ZRAM=$((`cat /proc/swaps | grep zram1 | awk '{print $3}'`/1024*$CPUS))
+        VALUE_ZRAM=$((`cat /proc/swaps | grep zram0 | awk '{print $3}'`/1024*$CPUS))
         VALUE_ZRAMP_TEXT=", size-"$VALUE_ZRAM"MB"
    else STATE_ZRAM="OFF"
         VALUE_ZRAMP_TEXT=""
@@ -562,7 +562,7 @@ case "$1" in
       swapoff /dev/zram$i && echo "disabled disk $n of $CPUS" &
     done
     wait
-    sleep .5
+    sleep 2
     modprobe -r zram
     ;;
   *)
