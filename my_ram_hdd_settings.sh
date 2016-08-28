@@ -77,6 +77,10 @@ m - включать fstrim каждый месяц"
                
                
                MENU_IDLE3="Таймер парковки головок HDD WD"
+               MENU_INFO_IDLE3="Значение может быть целым числом от 1 до 255. 
+Таймер устанавливается в 0.1 сек для диапазона 1-128, и в 30 сек для диапазона 129-255.
+Значение равное 0 - отключает парковку.
+Скрипт работает для /dev/sda"
                MENU_PRELOAD="Сортировка в Preload"
                MENU_INFO_PRELOAD="0 - Без сортировки ввода/вывода.
 Подходит для флэш-памяти и SSD.
@@ -592,11 +596,13 @@ SwapForm
 ########################################################
 CheckStateOther ()
 {
-
 STATE_IDLE3_TOOLS=`dpkg -l | grep idle3-tools`
-if [ "$STATE_IDLE3_TOOLS"='' ]
-   then STATE_IDLE3_TOOLS="idle3-tools - is not installed"
-   else sudo idle3ctl -g103 /dev/sda
+if [ "$STATE_IDLE3_TOOLS" = '' ]
+   then STATE_IDLE3_TOOLS="idle3-tools is not installed"
+   else STATE_IDLE3_TOOLS=`sudo idle3ctl -g103 /dev/sda | awk '{print $5}'`
+        if [ "$STATE_IDLE3_TOOLS" = '' ]
+           then STATE_IDLE3_TOOLS=`sudo idle3ctl -g103 /dev/sda`
+        fi
 fi
 
 SETTING_PRELOAD_SORTSTRATEGY=`cat /etc/preload.conf | grep ^sortstrategy | awk '{print $NF }'|sed "s/=//g"`
@@ -606,17 +612,36 @@ OtherForm ()
 {
 CheckStateOther
 ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_OTHER_FORM" --menu \
-    "$MAIN_TEXT" 16 64\
+    "$MAIN_TEXT" 16 70\
     8\
-       "$MENU_IDLE3" ""\
+       "$MENU_IDLE3 (state-$STATE_IDLE3_TOOLS)" ""\
        "$MENU_PRELOAD (setting-$SETTING_PRELOAD_SORTSTRATEGY)" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then MainForm
 fi
 case $ANSWER in
    "$MENU_IDLE3"* ) 
-   
-                  PowerOffPC
+                  if [ "$STATE_IDLE3_TOOLS" != "idle3-tools is not installed" ]
+                      then 
+                           while true; do
+                                IDLE3=`sudo idle3ctl -g /dev/sda | awk '{print $5}'`
+                                IDLE3=$($DIALOG --title "$MENU_IDLE3" --inputbox "$MENU_INFO_IDLE3" 14 60 $IDLE3 3>&1 1>&2 2>&3)
+                                if [ $? != 0 ]
+                                   then OtherForm ; break
+                                fi
+                     
+                                if [[ "$IDLE3" -ge 0 ]] && [[ "$IDLE3" -le 255 ]]
+                                   then break
+                                fi
+                           done
+                           if [ $IDLE3 = 0 ]
+                              then sudo idle3ctl -d /dev/sda 
+                              else sudo idle3ctl -s$IDLE3 /dev/sda
+                           fi
+                           PowerOffPC
+                      else echo Please install idle3-tools !
+                           sleep 1
+                  fi
                   ;;
    "$MENU_PRELOAD"* ) 
                   while true; do
