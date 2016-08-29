@@ -21,7 +21,7 @@ case $LANG in
                MENU3="Редактирование /etc/apt/sources.list"
                MENU4="Очистить кэш пакетов"
                MENU5="Автоматическое обновление"
-               MENU6="Обновление flashplugin-nonfree"
+               MENU6="Обновление flashplugin"
                MENUh="Справка"
                MENU1_2="Вкл/выкл автообновление (ON или OFF)"
                MENU2_2="Час (0-23)"
@@ -58,7 +58,7 @@ ___________________________________"
                MENU3="Edit /etc/apt/sources.list"
                MENU4="Clear"
                MENU5="Auto-upgrade"
-               MENU6="Update flashplugin-nonfree"
+               MENU6="Update flashplugin"
                MENUh="Help"
                PRELINK_TEXT="To speed up the application launch is recommended to use the utility prelink!
                
@@ -191,12 +191,6 @@ MainForm
 #########################################################
 MainForm () #Главная форма
 {
-flash="6"
-if ! [ -f /usr/lib/flashplugin-nonfree/libflashplayer.so ]
- then flash=''
-  MENU6=''
-fi
-
 if [ -f /etc/cron.d/autoupgrade ]
    then
 		HOUR=`cat /etc/cron.d/autoupgrade | grep beep | awk '{print $2}'`
@@ -224,6 +218,9 @@ else
    fi
 fi
 
+
+#       5 "$MENU5 $autoupgrade"\
+
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
     "$MAIN_TEXT" 13 50\
     7\
@@ -231,8 +228,7 @@ ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
         2 "$MENU2"\
         3 "$MENU3"\
         4 "$MENU4"\
-        5 "$MENU5 $autoupgrade"\
-        "$flash" "$MENU6"\
+        5 "$MENU6"\
         h "$MENUh" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Exit ; exit 0
@@ -243,18 +239,23 @@ case $ANSWER in
 	  3 ) Check nano; sudo nano /etc/apt/sources.list ;;
 	  4 ) sudo rm -r /var/cache/apt/archives && echo "remove /var/cache/apt/archive"
 		  sudo rm -r /var/cache/apt-xapian-index && echo "remove /var/cache/apt-xapian-index";;
-	  5 ) Autoupgrade ;;
-	  $flash ) Check sudo update-flashplugin-nonfree; 
-		  sudo cp /etc/wgetrc /etc/wgetrc.bak
-		  if [ "$ftp_proxy" != '' ] || [ "$http_proxy" != '' ] || [ "$https_proxy" != '' ]
-			then echo "ftp_proxy = $ftp_proxy
+	  #5 ) Autoupgrade ;;
+      5 ) if [ -x "`sudo which update-flashplugin-nonfree`" ]
+		     then
+		     sudo cp /etc/wgetrc /etc/wgetrc.bak
+		     if [ "$ftp_proxy" != '' ] || [ "$http_proxy" != '' ] || [ "$https_proxy" != '' ]
+			    then echo "ftp_proxy = $ftp_proxy
 http_proxy = $http_proxy
 https_proxy = $https_proxy
 use_proxy = on" | sudo tee --append /etc/wgetrc > /dev/null
+		     fi
+		     sudo update-flashplugin-nonfree --install
+		     sudo update-flashplugin-nonfree --status
+		     sudo mv /etc/wgetrc.bak /etc/wgetrc
 		  fi
-		  sudo update-flashplugin-nonfree --install
-		  sudo update-flashplugin-nonfree --status
-		  sudo mv /etc/wgetrc.bak /etc/wgetrc
+		  if [ -x "`sudo which update-pepperflashplugin-nonfree-direct`" ]
+		     then sudo update-pepperflashplugin-nonfree-direct
+		  fi
 		  ;;
 	  h ) Help;;
 	 '' ) ;;
