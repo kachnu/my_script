@@ -98,6 +98,12 @@ lang=ru_ru" > "/home/$USER/.config/Code Industry/Master PDF Editor.conf"
   esac 
 fi
 
+#moc
+if [ -f "/home/$USER/.moc/config" ] && [ -x "/home/$USER/.moc/onsongchange.sh" ] ; then
+    sed -i "/^OnSongChange/s/^OnSongChange =/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" /home/$USER/.moc/config
+fi
+
+
 
 #Убираем данный скрипт из автозапуска
 if [ -f "/home/$USER/.config/autostart/firstrun.desktop" ]; then
