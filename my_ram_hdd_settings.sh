@@ -4,8 +4,8 @@
 # http://vasilisc.com/tmp-on-tmpfs
 # http://fx-files.ru/archives/704
 # https://wiki.archlinux.org/index.php/Solid_State_Drives_(%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9)
-#
-#
+# https://mikekuriger.wordpress.com/2013/06/13/how-to-tweak-and-optimize-ssd-in-ubuntu-linux/
+# https://habrahabr.ru/post/129551/
 #
 # author: kachnu
 # email: ya.kachnu@yandex.ua
@@ -22,7 +22,7 @@ fi
 EDITOR=nano
 
 case $LANG in
-  uk*|ru*|be*|*) #UA RU BE locales
+  uk*|ru*|be*) #UA RU BE locales
                MAIN_LABEL="Настройка параметров работы с дисками и памятью"
                MAIN_TEXT="Выберите действие:"
                
@@ -131,6 +131,16 @@ ____________________________________
   - $MENU_NOATIME - не записывать время последнего доступа к файлам (использование данного параметра довольно спорно и не должно приносить существенной пользы, т.к. по умолчанию идет relatime - записывает последнее время, только если файл изменился)
 ____________________________________
 * $MENU_SYSCTL_FORM - Позволяет настроить режимы работы системы, а именно пороги свопирования, установить отложенную записть и пороги сброса грязных страниц памяти.
+  - $MENU_SWAPPINESS - установить размер свободной памяти ОЗУ при котором начинается высвобождение ОЗУ и кеширование в swap, т.е. объем свободной памяти при котором будет задействован swap
+  - $MENU_VFS_CACHE_PRESSURECAT - установить уровень выделяемой памяти под кэш. Значение по умолчанию: 100. Увеличение этого параметра заставляет ядро активнее выгружать неиспользуемые страницы памяти из кеша, т.е. количество выделяемой оперативной памяти под кеш будет расти медленнее, что в свою очередь снизит вероятность того, что будет задействован раздел swap. При уменьшении этого параметра ядро, наоборот, будет дольше держать страницы памяти в кеше, в том числе и в swap'е. Это имеет смысл при небольшом количестве ОЗУ, например, если у нас 512 МБ памяти, то параметр vfs_cache_pressure можно выставить равным 50. Это позволит сократить количество дисковых операций в swap разделе, так удаление неиспользуемых страниц будет происходить реже. Дальнейшее уменьшение этого параметра может привести к нехватке памяти.
+  - $MENU_LAPTOPMODE - при ключении режима laptopmode ядро будет копить данные, ожидающие записи на диск, и записывать их либо при острой необходимости, либо по истечении таймаута. Таймаут настраивается в dirty_writeback_centisecs
+  - $MENU_DIRTY_WRITEBACK_CENTISECS - (default 500): в сотых долях секунд. Этот параметр означает как часто pdflush возобновляет работу для записи данных на диск. По умолчанию возобновляет работу 2 потока каждые 5 секунд.
+Возможно недокументированное поведение, которое пресекает попытки уменьшения dirty_writeback_centisecs для более агрессивного кэширования данных процессом pdflush. Например, в ранних версиях ядра 2.6 Linux в файле mm/page-writeback.c код включал логику, которая описывалась \"если запись на диск длится дольше, чем параметр dirty_writeback_centisecs, тогда нужно поставить интервал в 1 секунду\". Эта логика описана только в коде ядра, и ее функционирование зависит от версии ядра Linux. Так как это не очень хорошо, поэтому вы будете защищены от уменьшения этого параметра.
+  - $MENU_DIRTY_RATIO - (default 40) - максимальный процент общей оперативной памяти, который может быть выделен под страничный кэш, до того как pdflush будет писать данные на диск.
+Второй по значимости параметр для настройки. При значительном снижении этого параметра приложения, которые должны писать на диск, будут блокироваться все вместе.
+  - $MENU_DIRTY_BACKGROUND_RATIO - (default 10): Максимальный процент оперативной памяти, который может быть заполнен страничным кэшем до записи данных на диск. Некоторые версии ядра Linux могут этот параметр устанавливать в 5%.
+В большинстве документации этот параметр описывается как процент от общей оперативной памяти, но согласно исходным кодам ядра Linux это не так. Глядя на meminfo, параметр dirty_background_ratio расчитывается от величины MemFree + Cached - Mapped. Поэтому для нашей демонстрационной системы 10% составляет немного меньше, чем 250MB, но не 400MB.
+Основной инструмент настройки. Обычно уменьшают этот параметр. Если ваша цель снизить количество данных, хранимое в кэше, так что данные будут писаться на диск постепенно, а не все сразу, то уменьшение этого параметра наиболее эффективный путь. Значение по умолчанию наиболее приемлимо для систем имеющих много оперативной памяти и медленные диски.
 ____________________________________
 * $MENU_SWAP_FORM - Позволяет настроить подкачку SWAP в системе.
   - $MENU_SWAP - вкл/откл подкачки, при этом также вкл/откл \"Спящий режим\"
@@ -152,17 +162,150 @@ ____________________________________
 * $MENU_AUTOSETTINGS_SSD - Автоматическое конфигурирование системы (параметров монтирования, свопирования, пределов сброса страниц памяти и т.д.) на работу с SSD
 ____________________________________"
                ;;
+            *) #All locales
+               MAIN_LABEL="Configure disk and memory"
+               MAIN_TEXT="Select an action:"
+               
+               MENU_BACKUP="Backup settings"
+               MENU_PARTITION_FORM="Mount options"
+               MENU_SYSCTL_FORM="Settings Sysctl"
+               MENU_SWAP_FORM="Settings Swap"
+               MENU_OTHER_FORM="Additional settings"
+               MENU_TMP_TO_RAM="Temporary files / tmp on RAM"
+               MENU_LOG_TO_RAM="Logs /var/* to RAM"
+               MENU_AUTOSETTINGS_SSD="Auto-tuning for the SSD"
+               MENU_EDIT_FSTAB="Edit /etc/fstab"
+               MENU_EDIT_SYSCTLCONF="Edit /etc/sysctl.conf"
+               MENU_EDIT_GRUB="Edit /etc/default/grub"
+               MENU_HELP="Help"
+               
+               MAIN_PART="Choose partition:"
+               MENU_DISCARD="TRIM with discard"
+               MENU_FSTRIM="TRIM scheduled fstrim"
+               MENU_INFO_FSTRIM="n - off fstrim
+d - on fstrim everyday
+w - on fstrim every week
+m - on fstrim every month"
+
+               MENU_BARRIER="Remove the barrier barrier=0"
+               MENU_COMMIT="Reset delay commit=600"
+               MENU_NOATIME="Do not track access - noatime"              
+               
+               MENU_SWAPPINESS="Adjust the threshold swappiness"
+               MENU_INFO_SWAPPINESS="Enter the value in % (0 to 100) of free memory, in which the activation of the swap.
+For RAM 2 GB = 30 GB = 4, 10, 6 GB or more = 0."
+               MENU_VFS_CACHE_PRESSURECAT="Customize vfs_cache_pressure cat"
+               MENU_INFO_VFS_CACHE_PRESSURECAT="Enter a value (from 0 to 1000) to determine the ratio of the core to make a memory page.
+The lower the value, the longer the information is stored in the RAM and is cached smaller value above 100 facilitates aggressive caching.
+For SSD recommend 50 to HDD - 1000."
+               MENU_LAPTOPMODE="Laptop mode and activate delayed write"
+               MENU_DIRTY_WRITEBACK_CENTISECS="Delayed entry dirty_writeback_centisecs"
+               MENU_INFO_DIRTY_WRITEBACK_CENTISECS="Enter a value (from 0 to 60000), to set the delay time of recording (start pdflush) on the hard disk (100 pcs. = 1 second).
+For SSD - 6000 (1 minute)"
+               MENU_DIRTY_RATIO="Customize dirty_ratio"
+               MENU_INFO_DIRTY_RATIO="Enter a value in % (0 to 100) - the proportion of free system memory as a percentage, which reaches the process leading to the disk recording initiates record \"dirty\" data.
+For SSD - 60"
+               MENU_DIRTY_BACKGROUND_RATIO="Customize dirty_background_ratio"
+               MENU_INFO_DIRTY_BACKGROUND_RATIO="Enter a value in % (0 to 100) - the proportion of free memory as a percentage of the total memory of the entire system, which reaches pdflush demon begins to dump their data in the disk cache disk itself.
+For SSD - 5"               
+               
+               MENU_SWAP="Swapping"
+               MENU_FILE_SWAP="Swap file"
+               MENU_INFO_FILE_SWAP="Enter the swap file size in MB from 0 to"
+               MENU_PARTITION_SWAP="Swap partition"
+               MENU_ZRAM="Technology ZRAM"
+               MENU_ZSWAP="Technology ZSWAP"
+               
+               MENU_IDLE3="Parking Timer HDD WD heads"
+               MENU_INFO_IDLE3="The value can be an integer from 1 to 255.
+The timer is set to 0.1 seconds for the range of 1-128, and 30 seconds for the 129-255 range.
+A value of 0 - disables the parking lot.
+The script works for /dev/sda"
+               MENU_PRELOAD="Sorting Preload"
+               MENU_INFO_PRELOAD="0 - No I/O sorting.
+Useful on Flash memory for example.
+1 - Sort based on file path only.
+Useful for network filesystems.
+2 -	Sort based on inode number.
+Does less house-keeping I/O than the next option.
+3 - Sort I/O based on disk block.  Most sophisticated.
+And useful for most Linux filesystems."
+               
+               HELP_EXIT="
+Press Enter to go to the main menu"
+               ATTENTION="ATTENTION!"
+               RESTART_TEXT="To apply the settings, restart the PC!
+
+Restart the PC now?"
+               POWER_OFF_TEXT="To apply the settings, turn on the PC!
+               
+Turn off the PC now?"
+               GRUB_TEXT="To apply changes to Grub, you must execute sudo update-grub
+               
+Update Grub now?"
+               HIB_SWAP_TEXT="You want to use this swap during hibernation?"
+               AUTOSETTINGS_SSD_TEXT="The following actions will be performed:
+- Change mount options /
+- Sysctl settings changed
+- Preload parameters changed
+- Inclusive daily fstrim
+- Inclusive mounting /tmp and logs in RAM
+
+Perform these steps?"
+               HELP="
+____________________________________
+   Справка
+
+$0 - скрипт предназначен для настроки таких параметров системы как: журналирование, подкачка, способы хранения временных файлов, монтирование и т.д.
+____________________________________
+* $MENU_BACKUP - сохраняет/восстанавливает конфиругационые файлы:
+  - /etc/fstab
+  - /etc/sysctl.conf
+  - /etc/default/grub
+____________________________________
+* $MENU_PARTITION_FORM - Позволяет настроить параметры монтирования разделов в /etc/fstab:
+  - $MENU_DISCARD - включить TRIM с помощью параметра discard, нужно быть уверенным, что данный режим поддерживается апаратно и файловой системой
+  - $MENU_FSTRIM - включить TRIM по расписанию с помощью fstrim
+  - $MENU_BARRIER - позволяет повысить производительность за счет снятия барьера на запись, при этом есть риск нарушения целостности ФС, будьте внимательны - компьютер должен иметь гараниторанное электропитание (подходит для ноутбуков и ПК с UPS)
+  - $MENU_COMMIT - установить минутную задержку сброса дискового кэша на сам диск
+  - $MENU_NOATIME - не записывать время последнего доступа к файлам (использование данного параметра довольно спорно и не должно приносить существенной пользы, т.к. по умолчанию идет relatime - записывает последнее время, только если файл изменился)
+____________________________________
+* $MENU_SYSCTL_FORM - Позволяет настроить режимы работы системы, а именно пороги свопирования, установить отложенную записть и пороги сброса грязных страниц памяти.
+  - $MENU_SWAPPINESS - установить размер свободной памяти ОЗУ при котором начинается высвобождение ОЗУ и кеширование в swap, т.е. объем свободной памяти при котором будет задействован swap
+  - $MENU_VFS_CACHE_PRESSURECAT - установить уровень выделяемой памяти под кэш. Значение по умолчанию: 100. Увеличение этого параметра заставляет ядро активнее выгружать неиспользуемые страницы памяти из кеша, т.е. количество выделяемой оперативной памяти под кеш будет расти медленнее, что в свою очередь снизит вероятность того, что будет задействован раздел swap. При уменьшении этого параметра ядро, наоборот, будет дольше держать страницы памяти в кеше, в том числе и в swap'е. Это имеет смысл при небольшом количестве ОЗУ, например, если у нас 512 МБ памяти, то параметр vfs_cache_pressure можно выставить равным 50. Это позволит сократить количество дисковых операций в swap разделе, так удаление неиспользуемых страниц будет происходить реже. Дальнейшее уменьшение этого параметра может привести к нехватке памяти.
+  - $MENU_LAPTOPMODE - при ключении режима laptopmode ядро будет копить данные, ожидающие записи на диск, и записывать их либо при острой необходимости, либо по истечении таймаута. Таймаут настраивается в dirty_writeback_centisecs
+  - $MENU_DIRTY_WRITEBACK_CENTISECS - (default 500): в сотых долях секунд. Этот параметр означает как часто pdflush возобновляет работу для записи данных на диск. По умолчанию возобновляет работу 2 потока каждые 5 секунд.
+Возможно недокументированное поведение, которое пресекает попытки уменьшения dirty_writeback_centisecs для более агрессивного кэширования данных процессом pdflush. Например, в ранних версиях ядра 2.6 Linux в файле mm/page-writeback.c код включал логику, которая описывалась \"если запись на диск длится дольше, чем параметр dirty_writeback_centisecs, тогда нужно поставить интервал в 1 секунду\". Эта логика описана только в коде ядра, и ее функционирование зависит от версии ядра Linux. Так как это не очень хорошо, поэтому вы будете защищены от уменьшения этого параметра.
+  - $MENU_DIRTY_RATIO - (default 40) - максимальный процент общей оперативной памяти, который может быть выделен под страничный кэш, до того как pdflush будет писать данные на диск.
+Второй по значимости параметр для настройки. При значительном снижении этого параметра приложения, которые должны писать на диск, будут блокироваться все вместе.
+  - $MENU_DIRTY_BACKGROUND_RATIO - (default 10): Максимальный процент оперативной памяти, который может быть заполнен страничным кэшем до записи данных на диск. Некоторые версии ядра Linux могут этот параметр устанавливать в 5%.
+В большинстве документации этот параметр описывается как процент от общей оперативной памяти, но согласно исходным кодам ядра Linux это не так. Глядя на meminfo, параметр dirty_background_ratio расчитывается от величины MemFree + Cached - Mapped. Поэтому для нашей демонстрационной системы 10% составляет немного меньше, чем 250MB, но не 400MB.
+Основной инструмент настройки. Обычно уменьшают этот параметр. Если ваша цель снизить количество данных, хранимое в кэше, так что данные будут писаться на диск постепенно, а не все сразу, то уменьшение этого параметра наиболее эффективный путь. Значение по умолчанию наиболее приемлимо для систем имеющих много оперативной памяти и медленные диски.
+____________________________________
+* $MENU_SWAP_FORM - Позволяет настроить подкачку SWAP в системе.
+  - $MENU_SWAP - вкл/откл подкачки, при этом также вкл/откл \"Спящий режим\"
+  - $MENU_FILE_SWAP - ипользование файла в качестве подкачки
+  - $MENU_PARTITION_SWAP - использование раздела жесткого диска в качестве подкачки
+  - $MENU_ZRAM - создание в ОЗУ сжатого раздела подкачки SWAP, уменьшает износ HDD и SSD
+  - $MENU_ZSWAP - отличается от ZRAM тем, что использует существующий swap-раздел на диске, а в ОЗУ создаётся пул со сжатыми данными (кэшем). После того как пул до отказа забьётся сжатыми данными, он сбросит их в раздел подкачки и снова начнёт принимать и сжимать данные
+____________________________________
+* $MENU_OTHER_FORM
+  - $MENU_IDLE3 - установить время парковки головок жесткого диска WD и продлить время работы жиска (только для /dev/sda).
+  - $MENU_PRELOAD - установить тип сортировки блоков информации для preload
+____________________________________
+* $MENU_TMP_TO_RAM - Все временные файлы будут храниться в ОЗУ, что повышает быстродействие и уменьшает износ HDD и SSD.
+Данная технология уже давно применяется в Solaris, Fedora и ArchLinux
+Не рекомендуется использовать на ПК с малым объемом ОЗУ 
+____________________________________
+* $MENU_LOG_TO_RAM - Позволяет хранить логи в ОЗУ, уменьшает износ HDD и SSD, однако логи исчезают после перезагрузки ПК. 
+____________________________________
+* $MENU_AUTOSETTINGS_SSD - Автоматическое конфигурирование системы (параметров монтирования, свопирования, пределов сброса страниц памяти и т.д.) на работу с SSD
+____________________________________"
+               ;;
+            
 esac
 
- #MENU_INFO_PRELOAD="0 - No I/O sorting.
-#Useful on Flash memory for example.
-#1 - Sort based on file path only.
-#Useful for network filesystems.
-#2 -	Sort based on inode number.
-#Does less house-keeping I/O than the next option.
-#3 - Sort I/O based on disk block.  Most sophisticated.
-#And useful for most Linux filesystems.
-#"
+
 
 
 

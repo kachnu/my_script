@@ -100,7 +100,7 @@ fi
 
 #moc
 if [ -f "/home/$USER/.moc/config" ] && [ -x "/home/$USER/.moc/onsongchange.sh" ] ; then
-    sed -i "/^OnSongChange/s/^OnSongChange =/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" /home/$USER/.moc/config
+    sed -i "/^OnSongChange/s/^OnSongChange = \"\/\"/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" /home/$USER/.moc/config
 fi
 
 
