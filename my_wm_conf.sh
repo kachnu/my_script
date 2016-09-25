@@ -357,6 +357,7 @@ then
         sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz/compizconfig/$profile.ini   
         $WM --replace &
         xfce4-panel -r                   
+        notify-send -i dialog-information $WM
         sleep 1
         MainForm
         ;;
@@ -368,6 +369,7 @@ then
         $WM --replace &
         xfce4-panel -r
         dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE        
+        notify-send -i dialog-information $WM
         sleep 1
         MainForm
         ;;
@@ -379,6 +381,7 @@ then
         $WM --replace &
         xfce4-panel -r
         xfconf-query -c xfwm4 -p /general/workspace_count -s $NUMBER_WORKSPACE
+        notify-send -i dialog-information $WM
         sleep 1
         MainForm
         ;;

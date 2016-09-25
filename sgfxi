@@ -3,10 +3,10 @@
 ####  Script Name: simple/system graphics installer: sgfxi
 ####  Debian Sid, Testing, and Stable graphic driver install.
 ####  New: Ubuntu support in progress. Arch/Fedora Support under development
-####  version: 4.23.56
-####  Date: 2014-07-14
+####  version: 4.24.79
+####  Date: 2016-09-08
 ########################################################################
-####  Copyright (C) Harald Hope 2007-2014
+####  Copyright (C) Harald Hope 2007-2016
 ####  Code contributions copyright: Latino 2008
 ####  Contributors: ati card driver and xorg configuration in general: damentz and d2kx
 ####  function check_ia32_libs by Steven Barrett (damentz, maintainer of zen/liquorix projects).
@@ -21,7 +21,7 @@
 ####  Get the full text of the GPL here: http://www.gnu.org/licenses/gpl.txt
 ########################################################################
 ####  Script URL: http://smxi.org/sg/sgfxi
-####  Script SVN: http://code.google.com/p/sgfxi
+####  Script GIT: https://github.com/smxi/sgfxi
 ####  Script Documentation: http://smxi.org/docs/
 ####  Script Home page: http://techpatterns.com/forums/about933.html
 ########################################################################
@@ -170,6 +170,7 @@ B_USE_DIRECT_KERNEL_HEADER='false' # deprecated, commented out use
 B_USE_DISTRO_DRIVER='false'
 # force (for nvidia), using old method of kernel source /m-a module build. New default dkms
 B_USE_DISTRO_MODULE_MA='false' 
+B_USE_EVENTS='true'
 B_USE_XVMC='false'
 B_XORG_BACKED_UP='false'
 
@@ -229,34 +230,40 @@ OTHER_VERSIONS=''
 # main url: ftp://download.nvidia.com/XFree86/
 # http://us.download.nvidia.com/XFree86/Linux-x86/latest.txt
 # 304.88, 310.44, 313.30 fix buffer overflow issue
-NV_VERSIONS='340.24:304.123:173.14.39:96.43.23:71.86.15'
+NV_VERSIONS='367.44:340.96:304.131:173.14.39:96.43.23:71.86.15'
 # in case the new ones don't support 3.10 kernel
 # NV_VERSIONS='325.15:304.88:173.14.37:96.43.23:71.86.15'
 NV_DEFAULT=$( echo $NV_VERSIONS | cut -d ':' -f 1 ) # >= 6xxx
-NV_LEGACY_1=$( echo $NV_VERSIONS | cut -d ':' -f 5 ) # old, tnt etc
-NV_LEGACY_2=$( echo $NV_VERSIONS | cut -d ':' -f 4 ) # ge4xx cards
-NV_LEGACY_3=$( echo $NV_VERSIONS | cut -d ':' -f 3 ) # 5xxx cards
-NV_LEGACY_4=$( echo $NV_VERSIONS | cut -d ':' -f 2 ) # 5xxx cards
+NV_LEGACY_1=$( echo $NV_VERSIONS | cut -d ':' -f 6 ) # old, tnt etc
+NV_LEGACY_2=$( echo $NV_VERSIONS | cut -d ':' -f 5 ) # ge4xx cards
+NV_LEGACY_3=$( echo $NV_VERSIONS | cut -d ':' -f 4 ) # 5xxx cards
+NV_LEGACY_4=$( echo $NV_VERSIONS | cut -d ':' -f 3 ) # 6/7xxx cards
+NV_LEGACY_5=$( echo $NV_VERSIONS | cut -d ':' -f 2 ) # 8xxx/21x cards
 
 ## beta drivers 
 # use null for position (ie, ::) if no newer beta is availablet than current stable
-NV_VERSIONS_BETA='::::'
+NV_VERSIONS_BETA='370.28:::::'
 NV_DEFAULT_BETA=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 1 ) # >= 6xxx
-NV_LEGACY_BETA_1=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 5 ) # old, tnt etc
-NV_LEGACY_BETA_2=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 4 ) # ge4xx cards
-NV_LEGACY_BETA_3=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 3 ) # 5xxx cards
-NV_LEGACY_BETA_4=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 2 ) # 5xxx cards
+NV_LEGACY_BETA_1=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 6 ) # old, tnt etc
+NV_LEGACY_BETA_2=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 5 ) # ge4xx cards
+NV_LEGACY_BETA_3=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 4 ) # 5xxx cards
+NV_LEGACY_BETA_4=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 3 ) # 6/7xxx cards
+NV_LEGACY_BETA_5=$( echo $NV_VERSIONS_BETA | cut -d ':' -f 2 ) # 8xxx/21x cards
 
 # latest quad: http://www.nvidia.com/object/linux_display_archive.html
 NV_QUAD=$NV_DEFAULT # no more individual quad drivers
 # this is what gets tested, and any other beta drivers remaining
 NV_BETA="$NV_VERSIONS_BETA:::"
-# stable primary: 325.15 331.20 331.38 331.49 334.21 337.25 340.24
+# stable primary: 355.11 361.28 361.42 364.19 367.27 367.35 367.44
+# stable primary: 343.36 346.35 346.47 346.59 349.16 346.72 352.21 352.30 352.41
+# stable primary: 325.15 331.20 331.38 331.49 334.21 337.25 340.24 340.32 343.22
 # stable primary: 304.60 304.64 310.19 313.18 313.26 313.30 319.17 319.23 319.32
 # stable primary: 295.49 295.53 295.59 295.71 302.17 304.30 304.37 304.43 304.51
 # stable primary: 280.13 285.05.09 290.10 295.20 295.33 295.40
 # stable primary: 275.09.07 275.19 275.21 
-# lt stable primary: 331.89 340.24
+# lt stable primary: 367.35 367.44
+# lt stable primary: 346.72 346.82 346.87 352.41 352.55 352.63 361.28 361.42 367.27
+# lt stable primary: 331.89 340.24 340.32 340.46 340.58 340.65 346.35 346.47 346.59
 # lt stable primary: 319.49 319.60 319.82 319.72 331.20 331.38 331.49 331.67 331.79
 # lt stable primary: 304.37 304.43 304.51 310.19 310.32 310.40 310.44 319.17 319.23
 # lt stable primary: 275.28 275.36 275.43 295.20 295.40 295.49 295.53 295.59 295.71
@@ -273,28 +280,35 @@ NV_BETA="$NV_VERSIONS_BETA:::"
 # stable legacy 2: 96.43.11 96.43.13 96.43.14 96.43.16 96.43.18 96.43.19 96.43.20 96.43.23 (ends with xorg 11/12 support)
 # stable legacy 3: 173.14.12 173.14.18 173.14.20 173.14.22 173.14.25 173.14.27 173.14.28 173.14.30
 #                  173.14.31 173.14.35 173.14.36 173.14.37 173.14.38 173.14.39 (ends with xorg 1.15 support)
-# stabel legacy 4: 304.64 304.84 304.88 304.108 304.116 304.117 304.119 304.121 304.123
-# beta/others: 310.14 313.09 319.12
+# stable legacy 4: 304.128
+# stable legacy 4: 304.64 304.84 304.88 304.108 304.116 304.117 304.119 304.121 304.123 304.125 304.131
+# stable legacy 5: 340.24 340.32 340.46 340.58 340.65 340.76 340.93 340.96
+
+# beta/others: 310.14 313.09 319.12 355.06
 ## note: no earlier 302 or 295 drivers offered because they had a security hole
-NV_OTHERS='340.24:337.25:334.21:331.89:331.79:331.67:325.15:319.72:319.82:319.60:313.30:310.44:304.123:304.121:304.119:295.71:290.10:285.05.09:280.13:275.43:270.41.19:260.19.44:256.53:195.36.31:190.53:185.18.36:180.60:177.82:173.14.37:169.12:100.14.19:96.43.20:71.86.14'
+NV_OTHERS='367.44:367.35:367.27:364.19:361.42:358.16:355.11:352.63:352.55:346.87:346.82:343.36:340.96:340.93:337.25:334.21:331.89:325.15:319.72:313.30:310.44:304.131:304.128:295.71:290.10:285.05.09:280.13:275.43:270.41.19:260.19.44:256.53:195.36.31:190.53:185.18.36:180.60:177.82:173.14.37:169.12:100.14.19:96.43.20:71.86.14'
 
 # distro legacies (default to Debian packages):
+NV_DEBIAN_LEGACY_5='340xx'
 NV_DEBIAN_LEGACY_4='304xx'
 NV_DEBIAN_LEGACY_3='173xx'
 NV_DEBIAN_LEGACY_2='96xx'
 NV_DEBIAN_LEGACY_1='71xx'
 # arch linux
 NV_AR_CURRENT=''
+NV_AR_LEGACY_5='340xx'304.128
 NV_AR_LEGACY_4='304xx'
 NV_AR_LEGACY_3='173xx'
 NV_AR_LEGACY_2='96xx'
 # ubuntu 
-NV_UB_CURRENT='331'
+NV_UB_CURRENT='343'
+NV_UB_LEGACY_5='340'
 NV_UB_LEGACY_4='304'
 NV_UB_LEGACY_3='173'
 NV_UB_LEGACY_2='96'
 # fedora
 NV_FED_CURRENT="-$NV_DEFAULT" # note this will be out of sync until repo catches up, needs tests
+NV_FED_LEGACY_5='-340xx'
 NV_FED_LEGACY_4='-304xx'
 NV_FED_LEGACY_3='-173xx'
 NV_FED_LEGACY_2='-96xx'
@@ -334,12 +348,12 @@ NV_64_ARCH='' # if nvidia changes file name use this
 # www2.ati.com/drivers/linux/amd-catalyst-14-4-rev2-linux-x86-x86-64-may6.zip
 # www2.ati.com/drivers/linux/linux-amd-catalyst-14.4-rc-v1.0-apr17.zip
 # www2.ati.com/drivers/beta/linux-amd-catalyst-14.6-beta-v1.0-may23.zip
-FG_VERSIONS='14.5.1:14.4.2:13.12'
-FG_DEFAULT='14.5.1'
+FG_VERSIONS='15.12.1:15.11.1:15.9.1'
+FG_DEFAULT='15.12.1'
 FG_LEGACY_2='' # random releases/xorg support, hard to follow. note as of 2012-1, legacy uses changed paths
 # note, the programming supports various formats for these because AMD simply is incapable of 
 # making a file name format decision and sticking to it. ie: betav1 beta beta6 and so on.
-FG_DEFAULT_BETA='14.7.1'
+FG_DEFAULT_BETA=''
 FG_BETA="$FG_DEFAULT_BETA:"
 
 # note: amd release a zip file that contains a space in the name, so I'm not spending 
@@ -349,7 +363,7 @@ FG_BETA_VERSION='' # legacy, but leaving in case needed in future
 FGLRX_PACKAGE_PREFIX='' # set to amd or ati, amd is for >= 12-1
 
 ### Stable Series: ###
-# 14.4.1 14.4.2 14.5.1
+# 13.12.1 14.4.1 14.4.2 14.5.1 14.9.1 14.12.1 15.6.1 15.7.1 15.9.1 15.11.1 15.12.1
 # 12-1 12-2 12-3 12-4 12-6 12-7 12.10 13.1 13-4 13.9 13:12
 # 11-12 11-11 11-10 11-9 11-8 11-7 11-6 11-5 11-4 11-3 11-2 11-1
 # 10-12 10-11 10-10 10-9 10-8 10-7 10-6 10-5 10-4 10-3 10-2 10-1
@@ -357,10 +371,10 @@ FGLRX_PACKAGE_PREFIX='' # set to amd or ati, amd is for >= 12-1
 ### FG Legacy 2: ###
 # 12-6 13.1
 ### Beta Series: ###
-# 14.3.14 14.5.2
+# 14.3.14 14.5.2 14.7.1
 ### Older Betas: ###
 # 13.8-beta2
-FG_OTHERS='14.5.1:14.4.2:13.12:13.9:13-4:13.1:12.10:12-7:12-6:12-4:12-3:12-2:12-1:11-12:11-11:11-10:11-9:11-8:11-7:11-6:11-5:11-4:11-3:11-2:11-1'
+FG_OTHERS='15.12.1:15.11.1:15.9.1:15.7.1:15.6.1:14.12.1:14.9.1:14.5.2:13.12.1:13.12:13.9:13-4:13.1:12.10:12-7:12-6:12-4:12-3:12-2:12-1:11-12:11-11:11-10:11-9:11-8:11-7:11-6:11-5:11-4:11-3:11-2:11-1'
 
 # set to sid/lenny/etch
 FG_DISTRIB_ID=''
@@ -399,7 +413,9 @@ EAS='/etc/apt/sources.list'
 EXXC='/etc/X11/xorg.conf'
 EAR='/etc/arch-release'
 EDV='/etc/debian_version'
+EDVV='/etc/devuan_version'
 EFR='/etc/fedora-release'
+EIT='/etc/inittab'
 ELR='/etc/lsb-release'
 ELRC='/etc/lsb-release-crunchbang'
 GRUB1='/boot/grub/menu.lst'
@@ -427,8 +443,8 @@ BASE_INDEX=$(( $( date +%s ) % ${#A_BASE_URLS[@]} ))
 SCRIPT_DOWNLOAD_ALT=${A_BASE_URLS[${BASE_INDEX}]}
 SCRIPT_DOWNLOAD_VERSION='http://smxi.org/sm/sm-versions'
 SCRIPT_DOWNLOAD_DEV='http://techpatterns.com/downloads/distro/'
-SCRIPT_DOWNLOAD_BRANCH_1='http://sgfxi.googlecode.com/svn/branches/one/'
-SCRIPT_DOWNLOAD_BRANCH_2='http://sgfxi.googlecode.com/svn/branches/two/'
+SCRIPT_DOWNLOAD_BRANCH_1='https://github.com/smxi/sgfxi/raw/one/'
+SCRIPT_DOWNLOAD_BRANCH_2='https://github.com/smxi/sgfxi/raw/one/'
 
 ARCH_FGLRX='arch-fglrx'
 ARCH_NVIDIA='arch-nvidia'
@@ -493,23 +509,23 @@ set_test_data()
 #		# latest script versions
 
 # 		# note: devs: double check this output to make sure it's your user name
-#		username=$( getent passwd 1000|cut -d \: -f1 )
-#		SCRIPT_HOME="/home/$username/bin/scripts/sgfxi/dev/"
-#		SCRIPT_WORKING_DIR="/home/$username/bin/scripts/sgfxi/dev"
-#		# INSTALL_DIRECTORY='' # for stuff like patches etc
-#		LOG_FILE_DIR="/home/$username/bin/scripts/sgfxi/dev/logs/"
+		username=$( getent passwd 1000|cut -d \: -f1 )
+		SCRIPT_HOME="/home/$username/bin/scripts/sgfxi/dev/"
+		SCRIPT_WORKING_DIR="/home/$username/bin/scripts/sgfxi/dev"
+		# INSTALL_DIRECTORY='' # for stuff like patches etc
+		LOG_FILE_DIR="/home/$username/bin/scripts/sgfxi/dev/logs/"
 # 		PATCH_DOWNLOAD='http://smxi.org/sg/'
-#		cd $SCRIPT_HOME
-#		rm -f $LOG_FILE_DIR$SCRIPT_NAME.log
+		cd $SCRIPT_HOME
+		rm -f $LOG_FILE_DIR$SCRIPT_NAME.log
 # 		# sgfxi doesn't support any legacy ATI stuff
 # 		CARD_DATA=1002:7280 # fake ati pre x2000 card
 # 		CARD_DATA=1002:9442 # fake ati hd2000-hd4xxx
-#		CARD_DATA=1002:9805 # fake ati hd 6250 card
+#  		CARD_DATA=1002:9805 # fake ati hd 6250 card
 # 		CARD_DATA=10de:0020 # fake nvidia oldest legacy (7x.xx.xx drivers)
 # 		CARD_DATA=10de:0280 # fake nvidia mid legacy (9x.xx.xx drivers)
 # 		CARD_DATA=10de:0322 # fake nvidia 5xxx legacy (173.xx.xx drivers)
 # 		CARD_DATA=10de:0392 # fake nvidia 7xxx legacy (304.xx drivers)
-# 		CARD_DATA=10de:0422 # fake nvidia current card (GS 8400)
+# 		CARD_DATA=10de:0422 # fake nvidia 8-9xxx- (GS 8400)
 # 		FG_DEFAULT='8-5'
 # 		NV_DEFAULT='177.80'
 # 		# set system bits to test 32/64 specific behaviors
@@ -518,8 +534,8 @@ set_test_data()
 # 		B_IS_APTOSID_KERNEL='false'
 # 		# to test patches/error handling for a specific kernel major version,
 # 		# ie: 3-7 here
-#		KERNEL_BASE=3
-#		KERNEL_MATH=14
+		KERNEL_BASE=4
+		KERNEL_MATH=7
 # 		# values: '' or 'true'
 # 		B_IS_XEN='false'
 # 		# check for specific system base tests, can be:
@@ -640,9 +656,25 @@ driver_support_tests()
 					# drivers for now until old driver support is dropped, then change to
 					# blacklist
 					case $X_VERSION in
+						1.17*|1.16.99*)
+							case $DRIVER_DEFAULT in
+								15.9.*|15.1[0-9].*|$DISTRO_FGLRX)
+									if [ "$LEGACY_LEVEL" -lt 3 ];then
+										if [ "$B_TESTING_3" != 'true' ];then
+											error_handler 212
+										fi
+									fi
+									;;
+								*)
+									if [ "$B_TESTING_3" != 'true' ];then
+										error_handler 226
+									fi
+									;;
+							esac
+							;;
 						1.16*|1.15.99*)
 							case $DRIVER_DEFAULT in
-								15.*|$DISTRO_FGLRX)
+								16.*|15.*|14.12.*|$DISTRO_FGLRX)
 									if [ "$LEGACY_LEVEL" -lt 3 ];then
 										if [ "$B_TESTING_3" != 'true' ];then
 											error_handler 212
@@ -658,7 +690,7 @@ driver_support_tests()
 							;;
 						1.15.[0-8].*)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|$DISTRO_FGLRX)
+								16.*|15.*|14.*|$DISTRO_FGLRX)
 									if [ "$LEGACY_LEVEL" -lt 3 ];then
 										if [ "$B_TESTING_3" != 'true' ];then
 											error_handler 212
@@ -674,7 +706,7 @@ driver_support_tests()
 							;;
 						1.14*)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[.-][6-9]|13[.-]1[0-2]|$DISTRO_FGLRX)
+								16.*|15.*|14.*|13[.-][6-9]|13[.-]1[0-2]|$DISTRO_FGLRX)
 									if [ "$LEGACY_LEVEL" -lt 3 ];then
 										if [ "$B_TESTING_3" != 'true' ];then
 											error_handler 212
@@ -690,7 +722,7 @@ driver_support_tests()
 							;;
 						1.13*)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[-.][3-9]|13[-.]1[0-2]|$DISTRO_FGLRX)
+								16.*|15.*|14.*|13[-.][3-9]|13[-.]1[0-2]|$DISTRO_FGLRX)
 									if [ "$LEGACY_LEVEL" -lt 3 ];then
 										if [ "$B_TESTING_3" != 'true' ];then
 											error_handler 212
@@ -706,7 +738,7 @@ driver_support_tests()
 							;;
 						1.12*)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[.-]*|12[-.][6-9]|12[-.]1[0-2]|$DISTRO_FGLRX)
+								16.*|15.*|14.*|13[.-]*|12[-.][6-9]|12[-.]1[0-2]|$DISTRO_FGLRX)
 									if [ "$LEGACY_LEVEL" -lt 3 ];then
 										if [ "$B_TESTING_3" != 'true' ];then
 											error_handler 212
@@ -722,7 +754,7 @@ driver_support_tests()
 							;;
 						1.11*)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[.-]*|12[.-]*|11-1[0-2]|$DISTRO_FGLRX) 
+								16.*|15.*|14.*|13[.-]*|12[.-]*|11-1[0-2]|$DISTRO_FGLRX) 
 									: # all other drivers fail to support xorg >= 1.9
 									;;
 								*)
@@ -734,7 +766,7 @@ driver_support_tests()
 							;;
 						1.10*)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[.-]*|12[.-]*|11-[4-9]|11-1[0-2]|$DISTRO_FGLRX) 
+								16.*|15.*|14.*|13[.-]*|12[.-]*|11-[4-9]|11-1[0-2]|$DISTRO_FGLRX) 
 									: # all other drivers fail to support xorg >= 1.9
 									;;
 								*)
@@ -746,7 +778,7 @@ driver_support_tests()
 							;; 
 						1.9.*)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[.-]*|12[.-]*|11[.-]*|10-1[0-2]|$DISTRO_FGLRX) 
+								16.*|15.*|14.*|13[.-]*|12[.-]*|11[.-]*|10-1[0-2]|$DISTRO_FGLRX) 
 									: # all other drivers fail to support xorg >= 1.9
 									;;
 								*)
@@ -758,7 +790,7 @@ driver_support_tests()
 							;;
 						1.8.*|7.6)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[.-]*|12[.-]*|11[.-]*|10-[7-9]|10-1[0-2]|$DISTRO_FGLRX) # update when 1.8 is actually supported
+								16.*|15.*|14.*|13[.-]*|12[.-]*|11[.-]*|10-[7-9]|10-1[0-2]|$DISTRO_FGLRX) # update when 1.8 is actually supported
 									: # all other drivers fail to support xorg >= 1.8
 									;;
 								*)
@@ -770,7 +802,7 @@ driver_support_tests()
 							;;
 						1.7.*|7.5)
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[.-]*|12[.-]*|11[.-]*|10-[4-9]|10-1[0-2]|$DISTRO_FGLRX)
+								16.*|15.*|14.*|13[.-]*|12[.-]*|11[.-]*|10-[4-9]|10-1[0-2]|$DISTRO_FGLRX)
 									: # all other drivers fail to support xorg >= 1.7
 									;;
 								*)
@@ -782,7 +814,7 @@ driver_support_tests()
 							;;
 						1.6.*|7.[3-4])
 							case $DRIVER_DEFAULT in
-								15.*|14.*|13[.-]*|12[.-]*|11[.-]*|10-*|9-[4-9]|9-1[0-2]|$DISTRO_FGLRX)
+								16.*|15.*|14.*|13[.-]*|12[.-]*|11[.-]*|10-*|9-[4-9]|9-1[0-2]|$DISTRO_FGLRX)
 									: # all other drivers fail to support xorg >= 1.6
 									;;
 								*)
@@ -854,7 +886,7 @@ driver_support_tests()
 									;;
 								29)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-*|10-*|9.2|9-[3-9]|9-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-*|10-*|9.2|9-[3-9]|9-1[0-2]|$DISTRO_FGLRX)
 											: 
 											;;
 										*)
@@ -866,7 +898,7 @@ driver_support_tests()
 									;;
 								30)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-*|10-*|9-8|9-9|9-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-*|10-*|9-8|9-9|9-1[0-2]|$DISTRO_FGLRX)
 											: 
 											;;
 										*)
@@ -878,7 +910,7 @@ driver_support_tests()
 									;;
 								31|32)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-*|10-*|9-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-*|10-*|9-1[0-2]|$DISTRO_FGLRX)
 											: 
 											;;
 										*)
@@ -890,7 +922,7 @@ driver_support_tests()
 									;;
 								33)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-*|10-[2-9]|10-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-*|10-[2-9]|10-1[0-2]|$DISTRO_FGLRX)
 											:
 											;;
 										*)
@@ -902,7 +934,7 @@ driver_support_tests()
 									;;
 								34)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-*|10-[5-9]|10-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-*|10-[5-9]|10-1[0-2]|$DISTRO_FGLRX)
 											:
 											;;
 										*)
@@ -914,7 +946,7 @@ driver_support_tests()
 									;;
 								35)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-*|10-[8-9]|10-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-*|10-[8-9]|10-1[0-2]|$DISTRO_FGLRX)
 											:
 											;;
 										*)
@@ -928,7 +960,7 @@ driver_support_tests()
 									case $DRIVER_DEFAULT in
 										# note: unknown if -11 will support 36, -10 doesn't, assume -12 will
 										# patch from Arch works in application, don't know if it really works
-										15.*|14.*|13[.-]*|12[.-]*|11-*|10-1[0-2]|$DISTRO_FGLRX) 
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-*|10-1[0-2]|$DISTRO_FGLRX) 
 											:
 											;;
 										*)
@@ -942,7 +974,7 @@ driver_support_tests()
 									case $DRIVER_DEFAULT in
 										# note: unknown if -11 will support 36, -10 doesn't, assume -12 will
 										# patch from Arch works in application, don't know if it really works
-										15.*|14.*|13[.-]*|12[.-]*|11-*|$DISTRO_FGLRX) 
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-*|$DISTRO_FGLRX) 
 											:
 											;;
 										*)
@@ -954,7 +986,7 @@ driver_support_tests()
 									;;	
 								39)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-[6-9]|11-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-[6-9]|11-1[0-2]|$DISTRO_FGLRX)
 											:
 											;;
 										*)
@@ -965,12 +997,13 @@ driver_support_tests()
 									esac
 									;;
 							esac
+							# end kernel math
 							;;
 						3)
 							case $KERNEL_MATH in
 								0)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-[6-9]|11-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-[6-9]|11-1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -981,7 +1014,7 @@ driver_support_tests()
 									;;
 								1)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|11-[8-9]|11-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|11-[8-9]|11-1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -992,7 +1025,7 @@ driver_support_tests()
 									;;
 								2)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12[.-]*|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12[.-]*|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1003,7 +1036,7 @@ driver_support_tests()
 									;;
 								3)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12-[4-9]|12-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12-[4-9]|12-1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1014,7 +1047,7 @@ driver_support_tests()
 									;;
 								4)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12-[7-9]|12-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12-[7-9]|12-1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1025,7 +1058,7 @@ driver_support_tests()
 									;;
 								5)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12-9|12-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12-9|12-1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1036,7 +1069,7 @@ driver_support_tests()
 									;;
 								6)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-]*|12-9|12-1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-]*|12-9|12-1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1048,7 +1081,7 @@ driver_support_tests()
 								7)
 									case $DRIVER_DEFAULT in
 										# amd release notes say it only supports kernel 3.5, but that's probably wrong
-										15.*|14.*|13[.-][3-9]|13[.-]1[0-2]12.10|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-][3-9]|13[.-]1[0-2]12.10|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1060,7 +1093,7 @@ driver_support_tests()
 								8)
 									case $DRIVER_DEFAULT in
 										# amd release notes say it only supports kernel 3.5, but that's probably wrong
-										15.*|14.*|13[.-][4-9]|13[.-]1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-][4-9]|13[.-]1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1071,7 +1104,7 @@ driver_support_tests()
 									;;
 								9)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-][8-9]|13[.-]1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-][8-9]|13[.-]1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1082,7 +1115,7 @@ driver_support_tests()
 									;;
 								10)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-][8-9]|13[.-]1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-][8-9]|13[.-]1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1093,7 +1126,7 @@ driver_support_tests()
 									;;
 								11)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-][9]|13[.-]1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-][9]|13[.-]1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1104,7 +1137,7 @@ driver_support_tests()
 									;;
 								12)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-][9]|13[.-]1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-][9]|13[.-]1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1115,7 +1148,7 @@ driver_support_tests()
 									;;
 								13)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|13[.-][9]|13[.-]1[0-2]|$DISTRO_FGLRX)
+										16.*|15.*|14.*|13[.-][9]|13[.-]1[0-2]|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1126,7 +1159,7 @@ driver_support_tests()
 									;;
 								14)
 									case $DRIVER_DEFAULT in
-										15.*|14.*|$DISTRO_FGLRX)
+										16.*|15.*|14.*|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1137,7 +1170,40 @@ driver_support_tests()
 									;;
 								15)
 									case $DRIVER_DEFAULT in
-										15.*|14.[5-9].*|14.1[0-2].*|$DISTRO_FGLRX)
+										16.*|15.*|14.[5-9].*|14.1[0-2].*|$DISTRO_FGLRX)
+											: # do nothing
+											;;
+										*) # use 225 for beta testing errors
+											if [ "$B_TESTING_3" != 'true' ];then
+												error_handler 234 $KERNEL_NUMBER
+											fi
+									esac
+									;;
+								16)
+									case $DRIVER_DEFAULT in
+										16.*|15.*|14.9.*|14.1[0-2].*|$DISTRO_FGLRX)
+											: # do nothing
+											;;
+										*) # use 225 for beta testing errors
+											if [ "$B_TESTING_3" != 'true' ];then
+												error_handler 234 $KERNEL_NUMBER
+											fi
+									esac
+									;;
+								17)
+									case $DRIVER_DEFAULT in
+										16.*|15.*|14.9.*|14.1[0-2].*|$DISTRO_FGLRX)
+											: # do nothing
+											;;
+										*) # use 225 for beta testing errors
+											if [ "$B_TESTING_3" != 'true' ];then
+												error_handler 234 $KERNEL_NUMBER
+											fi
+									esac
+									;;
+								18|19)
+									case $DRIVER_DEFAULT in
+										16.*|15.*|14.1[0-2].*|$DISTRO_FGLRX)
 											: # do nothing
 											;;
 										*) # use 225 for beta testing errors
@@ -1147,6 +1213,67 @@ driver_support_tests()
 									esac
 									;;
 							esac
+							# end kernel math
+							;;
+						4)
+							case $KERNEL_MATH in
+								0)
+									case $DRIVER_DEFAULT in
+										16.*|15.*|$DISTRO_FGLRX)
+											: # do nothing
+											;;
+										*) # use 225 for beta testing errors
+											if [ "$B_TESTING_3" != 'true' ];then
+												error_handler 234 $KERNEL_NUMBER
+											fi
+									esac
+									;;
+								1)
+									case $DRIVER_DEFAULT in
+										16.*|15.9.*|15.12.*|$DISTRO_FGLRX)
+											: # do nothing
+											;;
+										*) # use 225 for beta testing errors
+											if [ "$B_TESTING_3" != 'true' ];then
+												error_handler 234 $KERNEL_NUMBER
+											fi
+									esac
+									;;
+								2)
+									case $DRIVER_DEFAULT in
+										16.*|15.9.*|15.12.*|$DISTRO_FGLRX)
+											: # do nothing
+											;;
+										*) # use 225 for beta testing errors
+											if [ "$B_TESTING_3" != 'true' ];then
+												error_handler 234 $KERNEL_NUMBER
+											fi
+									esac
+									;;
+								3)
+									case $DRIVER_DEFAULT in
+										16.*|15.12.*|$DISTRO_FGLRX)
+											: # do nothing
+											;;
+										*) # use 225 for beta testing errors
+											if [ "$B_TESTING_3" != 'true' ];then
+												error_handler 234 $KERNEL_NUMBER
+											fi
+									esac
+									;;
+								4)
+									case $DRIVER_DEFAULT in
+										16.*|15.12.*|$DISTRO_FGLRX)
+											: # do nothing
+											;;
+										*) # use 225 for beta testing errors
+											if [ "$B_TESTING_3" != 'true' ];then
+												error_handler 234 $KERNEL_NUMBER
+											fi
+									esac
+									;;
+							esac
+							# end kernel math
 							;;
 					esac
 					;;
@@ -1174,10 +1301,34 @@ driver_support_tests()
 						esac
 						# note: the legacy 1 latest should handle xorg 1.7
 						case $X_VERSION in
+							1.18*|1.17.99*)
+								case $DRIVER_DEFAULT in
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|340.[8-9][0-9]|304.1[2-9][0-9]|$DISTRO_NVIDIA)
+										:
+										;;
+									*)
+										if [ "$B_TESTING_3" != 'true' ];then
+											error_handler 226
+										fi
+										;;
+								esac
+								;;
+							1.17*|1.16.99*)
+								case $DRIVER_DEFAULT in
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.[3-9][0-9]|340.[6-9][0-9]|304.1[2-9][0-9]|$DISTRO_NVIDIA)
+										:
+										;;
+									*)
+										if [ "$B_TESTING_3" != 'true' ];then
+											error_handler 226
+										fi
+										;;
+								esac
+								;;
 							1.16*|1.15.99*)
 								# note: 173.14.39 is last legacy 3/5xxx card branch release so xorg support cuts off here
 								case $DRIVER_DEFAULT in
-									340.*|337.*|304.12[3-9]|304.1[3-9]*|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|304.12[3-9]|304.1[3-9]*|$DISTRO_NVIDIA)
 										:
 										;;
 									*)
@@ -1190,7 +1341,7 @@ driver_support_tests()
 							1.15.[0-8]*)
 								# note: 173.14.39 is last legacy 3/5xxx card branch release so xorg support cuts off here
 								case $DRIVER_DEFAULT in
-									340.*|337.*|334.*|331.*|304.11[7-9]|304.1[2-9][0-9]|173.14.3[9]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|304.11[7-9]|304.1[2-9][0-9]|173.14.3[9]|$DISTRO_NVIDIA)
 										:
 										;;
 									*)
@@ -1202,7 +1353,7 @@ driver_support_tests()
 								;;
 							1.14*)
 								case $DRIVER_DEFAULT in
-									340.*|337.*|334.*|331.*|325.*|319.*|313.*|31[4-9].[0-9][0-9]|304.[89][0-9]|304.[1-9][0-9][0-9]|310.[4-9][0-9]|173.14.3[7-9]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|31[4-9].[0-9][0-9]|304.[89][0-9]|304.[1-9][0-9][0-9]|310.[4-9][0-9]|173.14.3[7-9]|$DISTRO_NVIDIA)
 										:
 										;;
 									*)
@@ -1214,7 +1365,7 @@ driver_support_tests()
 								;;
 							1.13*)
 								case $DRIVER_DEFAULT in
-									340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.[3-9][0-9]|304.[1-9][0-9][0-9]|173.14.3[6-9]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.[3-9][0-9]|304.[1-9][0-9][0-9]|173.14.3[6-9]|$DISTRO_NVIDIA)
 										:
 										;;
 									*)
@@ -1226,7 +1377,7 @@ driver_support_tests()
 								;;
 							1.12*)
 								case $DRIVER_DEFAULT in
-									340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.[3-9][0-9]|173.14.[3][4-9]|96.43.2[3-9]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.[3-9][0-9]|173.14.[3][4-9]|96.43.2[3-9]|$DISTRO_NVIDIA)
 										:
 										;;
 									*)
@@ -1238,7 +1389,7 @@ driver_support_tests()
 								;;
 							1.11*)
 								case $DRIVER_DEFAULT in
-									340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.0[5-9].*|173.14.[3][4-9]|96.43.2[3-9]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.0[5-9].*|173.14.[3][4-9]|96.43.2[3-9]|$DISTRO_NVIDIA)
 										:
 										;;
 									285.03|280.*|275.28)
@@ -1255,7 +1406,7 @@ driver_support_tests()
 							1.10*)
 								case $DRIVER_DEFAULT in
 									# not positive about legacy drivers yet
-									340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|173.14.3*|96.43.2[0-9]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|173.14.3*|96.43.2[0-9]|$DISTRO_NVIDIA)
 										: # all other drivers fail to support xorg >= 1.9
 										;;
 									*)
@@ -1268,7 +1419,7 @@ driver_support_tests()
 							1.9.*)
 								case $DRIVER_DEFAULT in
 									# not positive about 256 series + 1.9, or 96
-									340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|173.14.3*|173.14.2[89]|96.43.19|96.43.2[0-9]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|173.14.3*|173.14.2[89]|96.43.19|96.43.2[0-9]|$DISTRO_NVIDIA)
 										: # all other drivers fail to support xorg >= 1.9
 										;;
 									*)
@@ -1280,7 +1431,7 @@ driver_support_tests()
 								;;
 							1.8.*)
 								case $DRIVER_DEFAULT in
-									340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.36.[2-9][0-9]|173.14.3*|173.14.2[789]|96.43.19|96.43.2[0-9]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.36.[2-9][0-9]|173.14.3*|173.14.2[789]|96.43.19|96.43.2[0-9]|$DISTRO_NVIDIA)
 										: # all other drivers fail to support xorg >= 1.8
 										;;
 									*)
@@ -1292,7 +1443,7 @@ driver_support_tests()
 								;;
 							1.7.*|7.[5])
 								case $DRIVER_DEFAULT in
-									340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.53|173.14.3*|173.14.2*|96.43.1*|96.43.2*|71.86.1[34567]|$DISTRO_NVIDIA)
+									370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.53|173.14.3*|173.14.2*|96.43.1*|96.43.2*|71.86.1[34567]|$DISTRO_NVIDIA)
 										: # all other drivers fail to support xorg >= 1.7
 										;;
 									*)
@@ -1325,7 +1476,7 @@ driver_support_tests()
 							190.53|190.42|185.18.36|180.60|177.82|173.14.2[25]|169.12|100.14.19|96.43.1[46]|71.86.1[134]|71.86.09)
 								NVIDIA_DOWNLOAD_SITE='http://download.nvidia.com'
 								;;
-							302.17|285.03|280.13|275.*|173.14.39)
+							343.22|340.46|302.17|285.03|280.13|275.*|173.14.39)
 								NVIDIA_DOWNLOAD_SITE='http://us.download.nvidia.com'
 								;;
 							*)
@@ -1374,7 +1525,7 @@ driver_support_tests()
 										;;
 									26)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|180.*|177.*|173.*.*|100.*.*|96.*.*|71.*.*|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|180.*|177.*|173.*.*|100.*.*|96.*.*|71.*.*|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*)
@@ -1386,7 +1537,7 @@ driver_support_tests()
 										;;
 									27)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|180.*|177.*|173.*.*|100.*.*|96.*.*|71.*.*|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|180.*|177.*|173.*.*|100.*.*|96.*.*|71.*.*|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*)
@@ -1398,7 +1549,7 @@ driver_support_tests()
 										;;
 									28)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|180.*|177.*|173.14.[23]*|96.43.[12]*|71.86.1*|71.86.09|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|180.*|177.*|173.14.[23]*|96.43.[12]*|71.86.1*|71.86.09|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*)
@@ -1410,7 +1561,7 @@ driver_support_tests()
 										;;
 									29)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|180.*|177.*|173.14.[23]*|96.43.[12]*|71.86.1*|71.86.09|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|180.*|177.*|173.14.[23]*|96.43.[12]*|71.86.1*|71.86.09|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1422,7 +1573,7 @@ driver_support_tests()
 										;;
 									30)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|173.14.[23]*|96.43.[12]*|71.86.1*|71.86.09|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|173.14.[23]*|96.43.[12]*|71.86.1*|71.86.09|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1435,7 +1586,7 @@ driver_support_tests()
 									# note: 34 not fully confirmed yet for all drivers/legacy levels
 									31|32|33|34)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|173.14.[23]*|96.43.[12]*|71.86.1*|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|256.*|195.*|190.*|185.*|173.14.[23]*|96.43.[12]*|71.86.1*|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1448,7 +1599,7 @@ driver_support_tests()
 									35|36|37|38)
 										# we'll assume the older drivers don't work here
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|173.14.[23]*|96.43.[12]*|71.86.1*|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|260.*|173.14.[23]*|96.43.[12]*|71.86.1*|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1463,7 +1614,7 @@ driver_support_tests()
 										case $DRIVER_DEFAULT in
 											# note that the current 96xx can be patched if xorg version
 											# is old, 1.7, but that's an unusual case
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|173.14.[3]*|96.43.[2]*|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|173.14.[3]*|96.43.[2]*|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1479,7 +1630,7 @@ driver_support_tests()
 								case $KERNEL_MATH in
 									0)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|173.14.[3]*|96.43.[2]*|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|280.*|275.*|270.*|173.14.[3]*|96.43.[2]*|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1491,7 +1642,7 @@ driver_support_tests()
 										;;
 									1)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|173.14.[3]*|96.43.[2]*|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.*|173.14.[3]*|96.43.[2]*|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1503,7 +1654,7 @@ driver_support_tests()
 										;;
 									2)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.05.09|173.14.[3][0-9]|96.43.[2]*|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|290.*|285.05.09|173.14.[3][0-9]|96.43.[2]*|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1517,7 +1668,7 @@ driver_support_tests()
 										case $DRIVER_DEFAULT in
 											# note that patches are needed for rc 3.3 kernels, we'll wait
 											# http://weltall.heliohost.org/wordpress/2012/01/20/linux-kernel-3-3-rc1-and-nvidia-drivers/
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|173.14.[3][4-9]|96.43.23|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|173.14.[3][4-9]|96.43.23|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1529,7 +1680,7 @@ driver_support_tests()
 										;;
 									4)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|173.14.[3][4-9]|96.43.23|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|295.*|173.14.[3][4-9]|96.43.23|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1541,7 +1692,7 @@ driver_support_tests()
 										;;
 									5)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|173.14.[3][4-9]|96.43.23|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|302.*|173.14.[3][4-9]|96.43.23|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1553,7 +1704,7 @@ driver_support_tests()
 										;;
 									6)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|173.14.[3][6-9]|96.43.23|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.*|173.14.[3][6-9]|96.43.23|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1566,7 +1717,7 @@ driver_support_tests()
 									7)
 										case $DRIVER_DEFAULT in
 											# note: 173 probably does not work with 3.7 kernel but wait for error reports.
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.[689][0-9]|304.[1-9][0-9][0-9]|173.14.[3][6-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.[689][0-9]|304.[1-9][0-9][0-9]|173.14.[3][6-9]|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1578,7 +1729,7 @@ driver_support_tests()
 										;;
 									8)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.[89][0-9]|304.[1-9][0-9][0-9]|173.14.[3][6-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.[89][0-9]|304.[1-9][0-9][0-9]|173.14.[3][6-9]|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1590,7 +1741,7 @@ driver_support_tests()
 										;;
 									9)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.[89][0-9]|304.[1-9][0-9][0-9]|173.14.[3-9][6-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.*|313.*|310.*|304.[89][0-9]|304.[1-9][0-9][0-9]|173.14.[3-9][6-9]|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1602,7 +1753,7 @@ driver_support_tests()
 										;;
 									10)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.[4-9][0-9]|304.[89][0-9]|304.[1-9][0-9][0-9]|173.14.[3-9][0-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.[4-9][0-9]|304.[89][0-9]|304.[1-9][0-9][0-9]|173.14.[3-9][0-9]|$DISTRO_NVIDIA)
 												: # do nothing
 												;;
 											*) # use 225 for beta testing errors
@@ -1614,7 +1765,7 @@ driver_support_tests()
 										;;
 									11)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.[4-9][0-9]|304.1[0-9][0-9]|173.14.[3-9][0-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.[4-9][0-9]|304.1[0-9][0-9]|173.14.[3-9][0-9]|$DISTRO_NVIDIA)
 												# trigger installer flag if needed
 												driver_version_hacks "$DRIVER_DEFAULT"
 												;;
@@ -1627,7 +1778,7 @@ driver_support_tests()
 										;;
 									12)
 										case $DRIVER_DEFAULT in
-											340.*|337.*|334.*|331.*|325.*|319.[6-9][0-9]|304.1[0-9][0-9]|173.14.[3-9][0-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.*|325.*|319.[6-9][0-9]|304.1[0-9][0-9]|173.14.[3-9][0-9]|$DISTRO_NVIDIA)
 												# trigger installer flag if needed
 												driver_version_hacks "$DRIVER_DEFAULT"
 												;;
@@ -1642,7 +1793,7 @@ driver_support_tests()
 										# echo driver default $DRIVER_DEFAULT
 										case $DRIVER_DEFAULT in
 											# waiting for patches and confirmations
-											340.*|337.*|334.*|331.3[89]|331.[4-9][0-9]|304.119|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.3[89]|331.[4-9][0-9]|304.119|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
 												# trigger installer flag if needed
 												driver_version_hacks "$DRIVER_DEFAULT"
 												;;
@@ -1665,7 +1816,7 @@ driver_support_tests()
 										# echo driver default $DRIVER_DEFAULT
 										case $DRIVER_DEFAULT in
 											# waiting for patches and confirmations
-											340.*|337.*|334.*|331.[4-9][0-9]|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|337.*|334.*|331.[4-9][0-9]|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
 												# trigger installer flag if needed
 												driver_version_hacks "$DRIVER_DEFAULT"
 												;;
@@ -1680,7 +1831,52 @@ driver_support_tests()
 										# echo driver default $DRIVER_DEFAULT
 										case $DRIVER_DEFAULT in
 											# waiting for patches and confirmations
-											340.*|337.*|334.*|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
+												# trigger installer flag if needed
+												driver_version_hacks "$DRIVER_DEFAULT"
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									16|17)
+										# echo driver default $DRIVER_DEFAULT
+										case $DRIVER_DEFAULT in
+											# waiting for patches and confirmations
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.*|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
+												# trigger installer flag if needed
+												driver_version_hacks "$DRIVER_DEFAULT"
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									18)
+										# echo driver default $DRIVER_DEFAULT
+										case $DRIVER_DEFAULT in
+											# waiting for patches and confirmations
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|343.*|340.[6-9][0-9]|340.[1-9][0-9][0-9]|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
+												# trigger installer flag if needed
+												driver_version_hacks "$DRIVER_DEFAULT"
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									19)
+										# echo driver default $DRIVER_DEFAULT
+										case $DRIVER_DEFAULT in
+											# waiting for patches and confirmations
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|340.[7-9][0-9]|340.[1-9][0-9][0-9]|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
 												# trigger installer flag if needed
 												driver_version_hacks "$DRIVER_DEFAULT"
 												;;
@@ -1692,8 +1888,110 @@ driver_support_tests()
 										esac
 										;;
 								esac
+								# end KERNEL_MATH
 								;;
-						esac # end KERNEL_BASE
+							4)
+								case $KERNEL_MATH in
+									0)
+										case $DRIVER_DEFAULT in
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|349.*|346.*|340.[7-9][0-9]|340.[1-9][0-9][0-9]|304.[1-9][2-9][0-9]|$DISTRO_NVIDIA)
+												: # do nothing
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									1) # reports build failure with 340.46 AND 340.93 but some work with 340.93
+										case $DRIVER_DEFAULT in
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|340.9[3-9]|340.[1-9][0-9][0-9]|304.12[89]|304.1[3-9][0-9]|$DISTRO_NVIDIA)
+												: # do nothing
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									2) # reports build failure with 340.46 AND 340.93
+										case $DRIVER_DEFAULT in
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|340.9[3-9]|340.[1-9][0-9][0-9]|304.12[89]|304.1[3-9][0-9]|$DISTRO_NVIDIA)
+												: # do nothing
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									3) # reports build failure with 340.46
+										case $DRIVER_DEFAULT in
+											370.*|367.*|364.*|361.*|358.*|355.*|352.*|340.9[6-9]|340.[1-9][0-9][0-9]|304.12[89]|304.1[3-9][0-9]|$DISTRO_NVIDIA)
+												: # do nothing
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									4) # reports build failure with 340.46
+										case $DRIVER_DEFAULT in
+											370.*|367.*|364.*|361.*|358.*|355.*|340.9[6-9]|340.[1-9][0-9][0-9]|304.1[3-9][0-9]|$DISTRO_NVIDIA)
+												: # do nothing
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									5) # reports build failure with 340.46
+										case $DRIVER_DEFAULT in
+											370.*|367.*|364.*|361.*|358.*|355.*|340.9[6-9]|340.[1-9][0-9][0-9]|304.1[3-9][0-9]|$DISTRO_NVIDIA)
+												: # do nothing
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									6) # reports build failure with 340.46
+										case $DRIVER_DEFAULT in
+											370.*|367.*|364.*|361.*|358.*|355.*|340.9[6-9]|340.[1-9][0-9][0-9]|304.1[3-9][0-9]|$DISTRO_NVIDIA)
+												: # do nothing
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+									7) # reports build failure with 340.46
+										case $DRIVER_DEFAULT in
+											370.*|367.[4-9][0-9]|364.*|361.*|358.*|355.*|340.9[6-9]|340.[1-9][0-9][0-9]|304.1[3-9][0-9]|$DISTRO_NVIDIA)
+												: # do nothing
+												;;
+											*) # use 225 for beta testing errors
+												if [ "$B_TESTING_3" != 'true' ];then
+													error_handler 234 $KERNEL_NUMBER
+												fi
+												;;
+										esac
+										;;
+								esac
+								# end KERNEL_MATH
+								;;
+						esac
 # 					fi
 					;;
 			esac
@@ -1943,6 +2241,19 @@ check_patch_driver()
 									;;
 								304.119)
 									patchFile='NVIDIA-304.119-3.13.patch'
+									apply_patch_file $patchFile "$1"
+									;;
+							esac
+							;;
+					esac
+					;;
+				4)
+					case $KERNEL_MATH in
+						6|7)
+							case $DRIVER_DEFAULT in
+								# patch url: https://devtalk.nvidia.com/default/topic/699422/nvidia-linux-334-21-drivers/?offset=4
+								340.96)
+									patchFile='NVIDIA-340.96-kernel-4.6.patch'
 									apply_patch_file $patchFile "$1"
 									;;
 							esac
@@ -2717,6 +3028,7 @@ detect_card_version()
 			case $cardNumber in
 				# http://listing.driveragent.com/pci/10de/?q=94c3 # later series
 				# http://listing.driveragent.com/pci/12d2/?q=94c3 # full legacy
+				# http://www.nvidia.com/object/linux-amd64-display-archive.html
 				0008|0009|0010|0018|0019)
 					error_handler 253 # if card in this list exit
 					LEGACY_LEVEL=0
@@ -2747,7 +3059,9 @@ detect_card_version()
 					;;
 				# This is for the GeForce FX 5xxx series. Not sure about the quadro fx series:
 				# 004d 004e 09d0 009d 00cd 00ce 00fe 019d 019e
-				004d|004e|09d0|009d|00cd|00ce|00fe|019d|019e|00fa|00fb|00fc|031a|031b|0301|0302|0308|0309|0311|0312|0314|0319|0320|0321|0322|0323|0324|0325|0326|0327|0328|0329|032c|032d|0330|0331|0332|0333|0334|0341|0342|0343|0344|0347|0348)
+				# http://www.nvidia.com/object/IO_32667.html
+				# gawk '{t=t tolower($NF) "|"}END{gsub(/0x/,"",t);print t}'
+				00fa|00fb|00fc|00fd|00fe|0301|0302|0308|0309|0311|0312|0314|031a|031b|031c|0320|0321|0322|0323|0324|0325|0326|0327|0328|032a|032b|032c|032d|0330|0331|0332|0333|0334|0338|033f|0341|0342|0343|0344|0347|0348|034c|034e)
 					DRIVER_INSTALL=$( assign_standard_or_beta_driver 'legacy-3' 'driver' )
 					B_BETA_EXISTS=$( assign_standard_or_beta_driver 'legacy-3' 'set-exists' )
 					LEGACY_LEVEL=3
@@ -2756,7 +3070,9 @@ detect_card_version()
 					fi
 					;;
 				# list of 6/7xxx devices: http://nvidia.custhelp.com/app/answers/detail/a_id/3142
-				0040|0041|0042|0043|0044|0045|0046|0047|0048|004e|0090|0091|0092|0093|0095|0098|0099|009d|00c0|00c1|00c2|00c3|00c8|00c9|00cc|00cd|00ce|00f1|00f2|00f3|00f4|00f5|00f6|00f8|00f9|0140|0141|0142|0143|0144|0145|0146|0147|0148|0149|014a|014c|014d|014e|014f|0160|0161|0162|0163|0164|0165|0166|0167|0168|0169|016a|01d0|01d1|01d2|01d3|01d6|01d7|01d8|01da|01db|01dc|01dd|01de|01df|0211|0212|0215|0218|0221|0222|0240|0241|0242|0244|0245|0247|0290|0x0291|0292|0293|0294|0295|0297|0298|0299|029a|029b|029c|029d|029e|029f|02e0|02e1|02e2|02e3|02e4|038b|0390|0391|0392|0393|0394|0395|0397|0398|0399|039c|039e|03d0|03d1|03d2|03d5|03d6|0531|0533|053a|053b|053e|07e0|07e1|07e2|07e3|07e5)
+				# http://www.nvidia.com/object/IO_32667.html
+				# gawk '{t=t tolower($NF) "|"}END{gsub(/0x/,"",t);print t}'
+				0040|0041|0042|0043|0044|0045|0046|0047|0048|004e|0090|0091|0092|0093|0095|0098|0099|009d|00c0|00c1|00c2|00c3|00c8|00c9|00cc|00cd|00ce|00f1|00f2|00f3|00f4|00f5|00f6|00f8|00f9|0140|0141|0142|0143|0144|0145|0146|0147|0148|0149|014a|014c|014d|014e|014f|0160|0161|0162|0163|0164|0165|0166|0167|0168|0169|016a|01d0|01d1|01d2|01d3|01d6|01d7|01d8|01da|01db|01dc|01dd|01de|01df|0211|0212|0215|0218|0221|0222|0240|0241|0242|0244|0245|0247|0290|0291|0292|0293|0294|0295|0297|0298|0299|029a|029b|029c|029d|029e|029f|02e0|02e1|02e2|02e3|02e4|038b|0390|0391|0392|0393|0394|0395|0397|0398|0399|039c|039e|03d0|03d1|03d2|03d5|03d6|0531|0533|053a|053b|053e|07e0|07e1|07e2|07e3|07e5)
 					DRIVER_INSTALL=$( assign_standard_or_beta_driver 'legacy-4' 'driver' )
 					B_BETA_EXISTS=$( assign_standard_or_beta_driver 'legacy-4' 'set-exists' )
 					LEGACY_LEVEL=4
@@ -2764,9 +3080,17 @@ detect_card_version()
 						B_COMPOSITE='true'
 					fi
 					;;
-# 				0191|0193)
-# 					: # this handles the lack of xvmc support in 8xxx cards
-# 					;;
+				# 8/9xxx gt100-300 series
+				# http://www.nvidia.com/object/IO_32667.html
+				# gawk '{t=t tolower($NF) "|"}END{gsub(/0x/,"",t);print t}'
+				0191|0193|0194|0197|019d|019e|0400|0401|0402|0403|0404|0405|0406|0407|0408|0409|040a|040b|040c|040d|040e|040f|0410|0420|0421|0422|0423|0424|0425|0426|0427|0428|0429|042a|042b|042c|042d|042e|042f|05e0|05e1|05e2|05e3|05e6|05e7|0595|068f|0697|0714|0743|05ea|05eb|05ed|05f8|05f9|05fd|05fe|05ff|0600|0601|0602|0603|0604|0605|0606|0607|0608|0609|00a7|060a|060b|060c|060d|060f|0610|0611|0612|0613|0614|0615|0617|0618|0619|061a|061b|061c|061d|061e|061f|0621|0622|0623|0625|0626|0627|0628|062a|062b|062c|062d|062e|0605|0630|0631|0632|0635|0637|0638|063a|0640|0641|0643|0644|0645|0646|0647|0648|0649|202d|064a|064b|064c|0651|0652|0850|0653|0654|14a2|14d2|0633|0693|0658|0659|065a|065b|065c|06e0|06e1|06e2|06e3|06e4|06e5|06e6|06e7|06e8|360b|06e9|06ea|06eb|06ec|06ef|06f1|06f8|06f9|060d|06fa|06fb|06fd|06ff|0711|0840|0844|0845|0846|0847|0848|0849|084a|084b|084c|084d|084f|0860|0861|0862|0863|0864|0865|0866|00b1|0867|0868|0869|086a|086c|086d|086e|086f|0870|0871|0872|1c42|0873|1c52|0874|0876|087a|087d|087e|087f|08a0|08a2|08a3|08a4|08a5|0a20|0a22|0a23|0a26|0a27|0a28|0a29|0a2a|0a2b|0a2c|0a2d|0a32|0a34|0a35|0a38|0a3c|0a60|0a62|0a63|0a64|0a65|0a66|0a67|0a68|0a69|0a6a|0a6c|0a6e|3607|0a6f|0a70|3605|3617|0a71|0a72|0a73|3607|3610|0a74|903a|0a75|3605|0a76|0a78|0a7a|0003|3950|397d|3980|8006|90b4|aa51|aa58|ac71|ac82|0a7c|0ca0|0ca2|0ca3|0ca4|0ca5|0ca7|0ca8|0ca9|0cac|0caf|0cb0|0cb1|0cbc|10c0|10c3|10c5|10d8)
+					DRIVER_INSTALL=$( assign_standard_or_beta_driver 'legacy-5' 'driver' )
+					B_BETA_EXISTS=$( assign_standard_or_beta_driver 'legacy-5' 'set-exists' )
+					LEGACY_LEVEL=5
+					if [ "$B_FORCE_NO_COMPOSITE" != 'true' ];then
+						B_COMPOSITE='true'
+					fi
+					;;
 				*)
 					# set flags for fully supported non-legacy cards
 					B_USE_XVMC='true'
@@ -2882,7 +3206,7 @@ detect_card_version()
 assign_standard_or_beta_driver()
 {
 	local betaDriver='' stableDriver='' liveBetas='' betaVersion='' 
-	local betaCurrent='' beta304='' beta173='' beta96='' beta71='' 
+	local betaCurrent='' beta340='' beta304='' beta173='' beta96='' beta71='' 
 	
 	case $CARD in
 		$NVIDIA)
@@ -2890,15 +3214,22 @@ assign_standard_or_beta_driver()
 			if [ "$B_USE_BETA" == 'true' -a "$1" == 'default' -a "$2" == 'driver' ];then
 				liveBetas=$( get_live_beta_drivers )
 				betaCurrent=$( cut -d ':' -f 1 <<< "$liveBetas" )
-				beta304=$( cut -d ':' -f 2 <<< "$liveBetas" )
-				beta173=$( cut -d ':' -f 3 <<< "$liveBetas" )
-				beta96=$( cut -d ':' -f 4 <<< "$liveBetas" )
-				beta71=$( cut -d ':' -f 5 <<< "$liveBetas" )
+				beta340=$( cut -d ':' -f 2 <<< "$liveBetas" )
+				beta304=$( cut -d ':' -f 3 <<< "$liveBetas" )
+				beta173=$( cut -d ':' -f 4 <<< "$liveBetas" )
+				beta96=$( cut -d ':' -f 5 <<< "$liveBetas" )
+				beta71=$( cut -d ':' -f 6 <<< "$liveBetas" )
 				## assign live defaults if required
 				if [ -n "$betaCurrent" ];then
 					if [ -z "$NV_DEFAULT_BETA" -o "$( compare_numbers $betaCurrent $NV_DEFAULT_BETA )" -eq 0 ];then
 						NV_DEFAULT_BETA=$betaCurrent
 						NV_BETA="$NV_BETA:$betaCurrent"
+					fi
+				fi
+				if [ -n "$beta340" ];then
+					if [ -z "$NV_LEGACY_BETA_5" -o "$( compare_numbers $beta340 $NV_LEGACY_BETA_5 )" -eq 0 ];then
+						NV_LEGACY_BETA_5=$beta340
+						NV_BETA="$NV_BETA:$beta340"
 					fi
 				fi
 				if [ -n "$beta304" ];then
@@ -2947,6 +3278,10 @@ assign_standard_or_beta_driver()
 				legacy-4)
 					betaDriver=$NV_LEGACY_BETA_4
 					stableDriver=$NV_LEGACY_4
+					;;
+				legacy-5)
+					betaDriver=$NV_LEGACY_BETA_5
+					stableDriver=$NV_LEGACY_5
 					;;
 			esac
 			;;
@@ -3057,7 +3392,7 @@ assign_standard_or_beta_driver()
 
 get_live_beta_drivers()
 {
-	local driverList='' betaCurrent='' beta304='' beta173='' beta96='' beta71=''
+	local driverList='' betaCurrent='' beta340='' beta304='' beta173='' beta96='' beta71=''
 	
 	# get data
 	if [ "$B_SKIP_WGET" != 'true' ];then
@@ -3066,6 +3401,7 @@ get_live_beta_drivers()
 				driverList="$( wget -T 3 -t 2 -qO - $NV_LIVE_DRIVERS )"
 				# get beta drivers
 				betaCurrent=$( awk '/^curr.*beta/ {print $3}' <<< "$driverList" )
+				beta340=$( awk '/^340.*beta/ {print $3}' <<< "$driverList" )
 				beta304=$( awk '/^304.*beta/ {print $3}' <<< "$driverList" )
 				beta173=$( awk '/^173.*beta/ {print $3}' <<< "$driverList" )
 				beta96=$( awk '/^96.*beta/ {print $3}' <<< "$driverList" )
@@ -3105,7 +3441,8 @@ reset_using_live_driver_data()
 			NV_LEGACY_2=$( awk '{print $10}' <<< "$nvidiaDefault" ) # ge4xx cards
 			NV_LEGACY_3=$( awk '{print $14}' <<< "$nvidiaDefault" ) # 5xxx cards
 			NV_LEGACY_4=$( awk '{print $18}' <<< "$nvidiaDefault" ) # 6/7xxx cards
-			NV_VERSIONS=$( awk '{print $2 ":" $6 ":" $10 ":" $14 ":" $18 }' <<< "$nvidiaDefault" )
+			NV_LEGACY_5=$( awk '{print $22}' <<< "$nvidiaDefault" ) # 8/9xxx/21x cards
+			NV_VERSIONS=$( awk '{print $2 ":" $6 ":" $10 ":" $14 ":" $18 ":" $22 }' <<< "$nvidiaDefault" )
 			
 			# DEFAULT: 260.19.06 :: LEGACY 3: N/A :: LEGACY 2: N/A  :: LEGACY 1: N/A
 			## beta drivers 
@@ -3114,6 +3451,7 @@ reset_using_live_driver_data()
 			NV_LEGACY_BETA_2=$( awk '{print $10}' <<< "$nvidiaBeta" ) # ge4xx cards
 			NV_LEGACY_BETA_3=$( awk '{print $14}' <<< "$nvidiaBeta" ) # 5xxx cards
 			NV_LEGACY_BETA_4=$( awk '{print $18}' <<< "$nvidiaBeta" ) # 5xxx cards
+			NV_LEGACY_BETA_5=$( awk '{print $22}' <<< "$nvidiaBeta" ) # 5xxx cards
 			
 			# DEFAULT: 10-9 :: PREVIOUS 1: 10-8 :: PREVIOUS 2: 9-3
 			# fglrx drivers
@@ -3443,7 +3781,7 @@ check_kernel_headers()
 		arch)
 			headerName="linux-headers"
 			headerPresent="$( ls /lib/modules/$KERNEL_FULL/build/ 2>/dev/null )"
-			testKernel=$( grep -Esi '^(2\.6|[3-6]\.[0-9]+)\.[0-9]+-ARCH$' <<< $KERNEL_FULL )
+			testKernel=$( grep -Esi '^(2\.6|[3-9]\.[0-9]+)\.[0-9]+-ARCH$' <<< $KERNEL_FULL )
 			# 2.6.32-ARCH
 			if [ -z "$headerPresent" ];then
 				# if it's a custom kernel, no package available so die
@@ -3750,9 +4088,15 @@ check_set_distro()
 		workingId='linuxmint'
 	# debian defaults, might miss other ubuntu derived distros but those will
 	# be handled as we find them, empirically.
-	elif [ -f "$EDV" ];then
+	elif [ -f "$EDV" -o -f "$EDVV" ];then # edvv is devuan
 		# set files to ram first, no need to keep reading them
-		local edvContent='' easContent='' eaaContent=''
+		local edvContent='' easContent='' eaaContent='' edvFile=''
+		
+		if [ -f "$EDV" ];then
+			edvFile=$EDV
+		elif [ -f "$EDVV" ];then
+			edvFile=$EDVV
+		fi
 		
 		workingId='debian'
 		
@@ -3760,8 +4104,8 @@ check_set_distro()
 			workingId='linuxmint-debian'
 		fi
 		
-		if [ -f "$EDV" ];then
-			edvContent="$( cat $EDV )"
+		if [ -f "$edvFile" ];then
+			edvContent="$( cat $edvFile )"
 		fi
 		if [ -f "$EAS" -o -d "$EAS.d" ];then
 			easContent="$( cat $EAS $EAS.d/*.list 2>/dev/null )"
@@ -3776,15 +4120,16 @@ check_set_distro()
 		local isSqueeze=$( grep -Eis '^(squeeze|6\.)' <<< "$edvContent" )
 		local isWheezy=$( grep -Eis '^(wheezy|7\.)' <<< "$edvContent" )
 		local isJessie=$( grep -Eis '^(jessie|8\.)' <<< "$edvContent" )
+		local isStretch=$( grep -Eis '^(stretch|9\.)' <<< "$edvContent" )
 
 		# first tests sources
-		local isStable=$( grep -Esiw '^[[:space:]]*deb' <<< "$easContent" | grep -Eiv "$NON_DEBIAN_PATTERN" | grep -Eicw '(stable|wheezy|squeeze|lenny|etch)' )
-		local isTesting=$( grep -Esiw '^[[:space:]]*deb' <<< "$easContent" | grep -Eiv "$NON_DEBIAN_PATTERN" | grep -Eicw '(jessie|testing)' )
+		local isStable=$( grep -Esiw '^[[:space:]]*deb' <<< "$easContent" | grep -Eiv "$NON_DEBIAN_PATTERN" | grep -Eicw '(stable|wheezy|squeeze|lenny|etch|jessie)' )
+		local isTesting=$( grep -Esiw '^[[:space:]]*deb' <<< "$easContent" | grep -Eiv "$NON_DEBIAN_PATTERN" | grep -Eicw '(stretch|testing)' )
 		local isUnstable=$( grep -Esiw '^[[:space:]]*deb' <<< "$easContent" | grep -Eiv "$NON_DEBIAN_PATTERN" | grep -Eicw '(sid|unstable)' )
-
+		
 		# then test conf for default version
-		local isStableDefault=$( grep -Esi 'APT::Default-Release[[:space:]]"(stable|etch|lenny|squeeze|wheezy)"' <<< "$eaaContent" )
-		local isTestingDefault=$( grep -Esi 'APT::Default-Release[[:space:]]"(testing|jessie)"' <<< "$eaaContent" )
+		local isStableDefault=$( grep -Esi 'APT::Default-Release[[:space:]]"(stable|etch|lenny|squeeze|wheezy|jessie)"' <<< "$eaaContent" )
+		local isTestingDefault=$( grep -Esi 'APT::Default-Release[[:space:]]"(testing|stretch)"' <<< "$eaaContent" )
 		local isUnstableDefault=$( grep -Esi 'APT::Default-Release[[:space:]]"(sid|unstable)"' <<< "$eaaContent" )
 	# arch tests
 	elif [ -f "$EAR" ] || [ -n "$( grep -si '^arch' <<< $etcIssue  )" ];then
@@ -3826,9 +4171,8 @@ check_set_distro()
 			if [ "$workingId" == 'linuxmint-debian' ];then
 				APT_TYPE='apt-get'
 			fi
-
 			# set system type. This test will never be perfect, but it's a good approximation
-			if [ -n "$isEtch" -o -n "$isLenny" -o -n "$isSqueeze" -o -n "$isWheezy" -o -n "$isStableDefault" ] || [ "$isStable" -gt 0 -a "$isUnstable" -eq 0  -a "$isTesting" -eq 0 ];then
+			if [ -n "$isEtch" -o -n "$isLenny" -o -n "$isSqueeze" -o -n "$isWheezy"  -o -n "$isJessie" -o -n "$isStableDefault" ] || [ "$isStable" -gt 0 -a "$isUnstable" -eq 0  -a "$isTesting" -eq 0 ];then
 				if [ -n "$isEtch" ];then
 					FG_DISTRIB_CODENAME='etch'
 					SYSTEM_CODENAME='etch'
@@ -3841,11 +4185,14 @@ check_set_distro()
 				elif [ -n "$isWheezy" ];then
 					FG_DISTRIB_CODENAME='wheezy' # note: 'stable' breaks the installer
 					SYSTEM_CODENAME='wheezy'
+				elif [ -n "$isJessie" ];then
+					FG_DISTRIB_CODENAME='jessie' # note: 'stable' breaks the installer
+					SYSTEM_CODENAME='jessie'
 				else
 					FG_DISTRIB_CODENAME='stable'
 					SYSTEM_CODENAME='stable'
 				fi
-			elif [ "$isUnstable" -eq 0 -o -n "$isTestingDefault" ] && [ -n "$isJessie" -o "$isTesting" -gt 0 ];then
+			elif [ "$isUnstable" -eq 0 -o -n "$isTestingDefault" ] && [ -n "$isStretch" -o "$isTesting" -gt 0 ];then
 				FG_DISTRIB_CODENAME='sid'
 				SYSTEM_CODENAME='testing'
 			else
@@ -4671,7 +5018,7 @@ check_update_script()
 					echo "$fileDataTemp" > $1
 					chmod 705 $1
 					if [ "$B_FORCE_UPDATE" != 'true' ];then
-						./$1 -R$START_OPTIONS
+						exec ./$1 -R$START_OPTIONS
 					else
 						print_information
 						echo "${C}$SCRIPT_NAME${S} was successfully updated. Please start the script again to access"
@@ -5100,6 +5447,12 @@ debugger_data_collector()
 	ls -R /usr/src/*/dkms.conf &> $debug_data_dir/usr-src-ls-dkms-files.txt
 	ls -R /usr/src/*/dkms.conf | grep -iE '(catalyst|fglrx|nvidia)' &> $debug_data_dir/usr-src-ls-dkms-video-files.txt
 	
+	ps aux &> $debug_data_dir/ps-aux.txt
+	ps -e &> $debug_data_dir/ps-e.txt
+	ps -p 1 &> $debug_data_dir/ps-p-1.txt
+	cat /proc/1/comm &> $debug_data_dir/proc-1-comm.txt
+	runlevel &> $debug_data_dir/runlevel.txt
+	
 	if [ -f /etc/modprobe.d/dkms.conf ];then
 		cat /etc/modprobe.d/dkms.conf &> $debug_data_dir/etc-modprobe-dkms.conf.txt
 	else
@@ -5225,7 +5578,7 @@ debugger_data_collector()
 		echo "$SCRIPT_NAME will now try to upload this data to the script server..."
 		echo $LINE
 		# -Nc is creating really weird download anomolies, so using -O instead
-		xiin_download="$( wget -q -O - http://inxi.googlecode.com/svn/branches/xiin/$xiin_file )"
+		xiin_download="$( wget -q -O - https://github.com/smxi/inxi/raw/xiin/$xiin_file )"
 		# if nothing got downloaded kick out error, otherwise we'll use an older version
 		if [[ $? -gt 0 && ! -f $xiin_file ]];then
 			echo -e "ERROR: Failed to download ftp uploader file: $xiin_file\nMaybe the remote site is down or your networking is broken?"
@@ -6451,7 +6804,7 @@ download_extract_driver()
 prep_install()
 {
 	eval $LOGPS
-	local gccVersion=$( grep -Eio 'gcc[[:space:]]*version[[:space:]]*[4-6]\.[0-9]{1,2}' /proc/version | grep -Eo '[4-6]\.[0-9]{1,2}' )
+	local gccVersion=$( grep -Eio 'gcc[[:space:]]*version[[:space:]]*[4-7]\.[0-9]{1,2}' /proc/version | grep -Eo '[4-7]\.[0-9]{1,2}' )
 	local gccPackage="gcc-$gccVersion"  
 	local libMesaGlx='' ubgv='' bUpdateGcc='false'
 
@@ -6466,9 +6819,18 @@ prep_install()
 			;;
 		debian)
 			libMesaGlx='libgl1-mesa-glx'
+			# it looks like maybe as of gcc 5 debian dropped the decimal
+			if [ -n "$gccVersion" -a -n "$( grep -E '^[5-9]' <<< $gccVersion)" ];then
+				gccVersion=$(grep -Eo '^[5-9]' <<< $gccVersion )
+				gccPackage="gcc-$gccVersion"
+			fi
 			;;
 		ubuntu)
 			libMesaGlx='libgl1-mesa-glx'
+			if [ -n "$gccVersion" -a -n "$( grep -E '^[5-9]' <<< $gccVersion)" ];then
+				gccVersion=$(grep -Eo '^[5-9]' <<< $gccVersion )
+				gccPackage="gcc-$gccVersion"
+			fi
 			;;
 		fedora)
 			gccPackage='gcc'
@@ -6913,7 +7275,6 @@ build_kernel_module_only()
 	local runPackage="$DRIVER_FILE.run"
 	
 	# double check that target kernel, or current one, has stuff in /lib/modules
-	
 	case $CARD in
 		$NVIDIA)
 			B_SKIP_INSTALL='true'
@@ -7281,6 +7642,9 @@ install_distro_drivers()
 						4)	nvidiaDriver="nvidia-$NV_AR_LEGACY_4"
 							nvidiaUtils="nvidia-$NV_AR_LEGACY_4-utils"
 							;;
+						5)	nvidiaDriver="nvidia-$NV_AR_LEGACY_5"
+							nvidiaUtils="nvidia-$NV_AR_LEGACY_5-utils"
+							;;
 						*)	nvidiaDriver="nvidia"
 							nvidiaUtils="nvidia-utils"
 							;;
@@ -7317,6 +7681,11 @@ install_distro_drivers()
 							nvidiaSettings="nvidia-settings-legacy-$NV_DEBIAN_LEGACY_4"
 							nvidiaSource="nvidia-legacy-$NV_DEBIAN_LEGACY_4-kernel-source"
 							;;
+						5)	nvidiaDriver="nvidia-legacy-$NV_DEBIAN_LEGACY_5-driver"
+							nvidiaGlx="nvidia-glx-legacy-$NV_DEBIAN_LEGACY_5"
+							nvidiaSettings="nvidia-settings-legacy-$NV_DEBIAN_LEGACY_5"
+							nvidiaSource="nvidia-legacy-$NV_DEBIAN_LEGACY_5-kernel-source"
+							;;
 						*)	nvidiaDriver="nvidia-driver"
 							nvidiaGlx='nvidia-glx'
 							nvidiaSettings="nvidia-settings"
@@ -7325,7 +7694,7 @@ install_distro_drivers()
 					esac
 					# start the install/73xx not supported for a while now. Note that this is actually set
 					# in the card/xorg version handling, so I don't really need this legacy level test
-					if [ "$LEGACY_LEVEL" -gt 1 ];then
+					if [ "$LEGACY_LEVEL" -gt 2 ];then
 						if [ "$B_USE_DISTRO_MODULE_MA" == 'true' ];then
 							echo "${S}Installing ${C}$DISTRO_NVIDIA${S} components for ${C}m-a module build${S}...${N}"
 							install_package 'nvidia-kernel-common'
@@ -7384,6 +7753,12 @@ install_distro_drivers()
 								nvidiaDriver2="xorg-x11-drv-nvidia$NV_FED_LEGACY_4-libs.$archExt64"
 							fi
 							;;
+						5)	akmodNvidia="akmod-nvidia$NV_FED_LEGACY_5"
+							nvidiaDriver="xorg-x11-drv-nvidia$NV_FED_LEGACY_5-libs.$archExt"
+							if [ "$BITS" == '64' ];then
+								nvidiaDriver2="xorg-x11-drv-nvidia$NV_FED_LEGACY_5-libs.$archExt64"
+							fi
+							;;
 						*)	akmodNvidia="akmod-nvidia"
 							nvidiaDriver="xorg-x11-drv-nvidia-libs.$archExt"
 							if [ "$BITS" == '64' ];then
@@ -7425,6 +7800,10 @@ install_distro_drivers()
 						4)	nvidiaDriver="nvidia${ubGlx}-$NV_UB_LEGACY_4"
 							nvidiaModal="nvidia-$NV_UB_LEGACY_4-modaliases"
 							nvidiaSettings="nvidia-settings-$NV_UB_LEGACY_4"
+							;;
+						5)	nvidiaDriver="nvidia${ubGlx}-$NV_UB_LEGACY_5"
+							nvidiaModal="nvidia-$NV_UB_LEGACY_5-modaliases"
+							nvidiaSettings="nvidia-settings-$NV_UB_LEGACY_5"
 							;;
 						*)	nvidiaDriver="nvidia${ubGlx}-$NV_UB_CURRENT"
 							nvidiaModal="nvidia-$NV_UB_CURRENT-modaliases"
@@ -7972,11 +8351,14 @@ start_x_question()
 start_stop_x()
 {
 	eval $LOGUS
-	local displayManagers='entrance gdm gdm3 kdm kdm-trinity lightdm lxdm mdm nodm slim wdm xdm' dman='' success=''
+	local displayManagers='entrance gdm gdm3 kdm kdm-trinity lightdm lxdm mdm nodm sddm slim wdm xdm' dman='' success=''
 	# setting the default will handle cases like default 2 while still handling 3/5
 	# also note, future systems will probably not use inittab, ubuntu doesn't, but
 	# they will read it, so we'll always use this as default to respect user changes
-	local defaultRunlevel=$( grep -Es '^id.*:initdefault:' /etc/inittab | grep -Eo '[0-5]' )
+	local defaultRunlevel=''
+	if [ -f $EIT ];then
+		defaultRunlevel=$( grep -Es '^id.*:initdefault:' $EIT | grep -Eo '[0-5]' )
+	fi
 	# default, this prevents errors when these don't exist in for ex. fedora
 	local serviceControl='/etc/init.d/' startPath='/etc/init.d/' bSkipXKill='false'
 	local noHup='nohup' xActionString='' finalXKill='' dmanCommand=''
@@ -8036,7 +8418,7 @@ start_stop_x()
 					dmanCommand="systemctl $action $dman.service"
 				elif [ "$B_UPSTART" == 'true' ];then
 					dmanCommand="initctl $action $dman"
-				elif [ -x $startPath$dman  ];then
+				elif [ -x "$startPath$dman"  ];then
 					dmanCommand="$serviceControl$dman $action"
 				fi
 				defaultDM=$dman
@@ -8062,7 +8444,7 @@ start_stop_x()
 				dmanCommand="systemctl $action $defaultDM.service"
 			elif [ "$B_UPSTART" == 'true' ];then
 				dmanCommand="initctl $action $defaultDM"
-			elif [ -x $startPath$defaultDM ];then
+			elif [ -x "$startPath$defaultDM" ];then
 				dmanCommand="$serviceControl$defaultDM $action"
 			fi
 		elif [ -n "$gdmCommand" ];then
@@ -8098,6 +8480,7 @@ start_stop_x()
 			log_function_data "Display manager $action status: $success"
 		fi
 	fi
+	log_function_data "Reached post dmancommand: $dmanCommand"
 	# this handles cases where somehow X is still running
 	# startx x starts can for example bypass kdm tests, etc
 	if [ "$1" == 'stop' ];then
@@ -8121,9 +8504,12 @@ start_stop_x()
 	fi
 	# this will exit the root shell on successful run of start x
 	if [ "$1" == 'start' -a "$success" == 'true' ];then
-		if [ "$B_SM_INSTALL" != 'true' ];then
+		# trying to bypass this because smxi is failing to restart x after driver install, so
+		# I will make smxi exit after running sgfxi
+		# if [ "$B_SM_INSTALL" != 'true' ];then
 			# the failure case handels a weird thing when kill gives error
 			if [ -n "$LOGIN_PID" ];then
+				log_function_data "Kill login PID for dm start: $LOGIN_PID"
 				# too many oddities with systemd kill root/tty, so not doing anything for now
 				if [ "$B_SYSTEMD" == 'true' ];then
 					#kill_systemd_tty || ttyKill=$?
@@ -8137,6 +8523,7 @@ start_stop_x()
 					kill $LOGIN_PID && exit 0 || exit 1
 				fi
 			else
+				log_function_data "No login PID found, trying default runlevel: $defaultRunlevel"
 				if [ -n "$defaultRunlevel" ];then
 					echo "${E}No login Pid found to kill, starting init $defaultRunlevel and leaving root logged in.${N}"
 					init $defaultRunlevel && exit 0 || exit 1
@@ -8145,9 +8532,9 @@ start_stop_x()
 					exit 0
 				fi
 			fi
-		else
-			exit 0 # smxi will handle the pid root kill
-		fi
+		#else
+		#	exit 0 # smxi will handle the pid root kill
+		# fi
 	fi
 	eval $LOGUE
 }
@@ -8199,6 +8586,10 @@ x_is_running()
 	# different possible X detections in etch, lenny, and sid, then filtering out the grep
 	local xIsRunning=$( ps aux | grep -E '/usr.*/X([[:space:]]|$)' | grep -v 'grep' )
 	
+	if [ -z "$xIsRunning" -a "$B_SYSTEMD" == 'true' ];then
+		xIsRunning=$( systemd_dm_test )
+	fi
+	
 	log_function_data "X ps aux: $xIsRunning"
 
 	if [ -n "$xIsRunning" ];then
@@ -8210,18 +8601,28 @@ x_is_running()
 	log_function_data "returnVal: $returnVal"
 	eval $LOGUE
 }
+# in some cases X will be off but dm is still on, which breaks restarts of desktop
+systemd_dm_test()
+{
+	local dm=$( do_display_manager_pid_test )
+	local unit=''
+	if [ -n "$dm" ];then
+		unit=$( systemctl list-units | grep -E "^[[:space:]]*$dm\.service[[:space:]]+(loaded|active|running)[[:space:]](loaded|active|running)" )
+	fi
+	echo $unit
+}
 
 # get active pid for dm. Note: for systemd, this doesn't matter since dm is loaded but not active (ACtive: inactive)
 do_display_manager_pid_test()
 {
 	eval $LOGUS
-	local dmIdList='entrance/entranced.pid gdm.pid gdm3.pid kdm.pid lightdm.pid lxdm.pid mdm.pid nodm.pid slim.lock wdm.pid xdm.pid' dmId='' dmInstance=''
+	local dmIdList='entranced.pid gdm.pid gdm3.pid kdm.pid lightdm.pid lxdm.pid mdm.pid nodm.pid sddm.pid sddm slim.lock wdm.pid xdm.pid' dmId='' dmInstance=''
 	
 	for dmId in $dmIdList
 	do
 		# trim off extension of dm
-		if [ -e /var/run/$dmId -o -e /run/$dmId ];then
-			dmInstance=$( sed -r 's/\.(pid|lock))//' <<< $dmId )
+		if [ -f /run/$dmId -o -f /run/${dmId%.*}/$dmId -o -f /var/run/$dmId -o -f /var/run/${dmId%.*}/$dmId  ];then
+			dmInstance=${dmId%.*}
 		fi
 	done
 
@@ -8267,6 +8668,21 @@ get_default_display_manager()
 ### -------------------------------------------------------------------
 ### xorg configuration (previously in sgfxi-lib-xorg)
 ### -------------------------------------------------------------------
+
+fix_xorg_device_id()
+{
+	eval $LOGUS
+	if [ -n "$( grep -s 'Card0' $EXXC )" ];then
+		echo "${S}Updating ${C}$EXXC${S} syntax. Changing ${C}Card[x]${S} to ${C}Device[x]${S}${N}"
+		sed -r -i 's/Card([0-9]+)/Device\1/g' $EXXC
+		#sed -i 's/Identifier[[:space:]]*"Card/Identifier "Device/' $EXXC
+		#sed -i 's/Device[[:space:]]*"Card/Device "Device/' $EXXC
+		log_function_data "$EXXC updated. CardX changed to DeviceX."
+	else
+		log_function_data "No CardX in $EXXC."
+	fi
+	eval $LOGUE
+}
 
 move_x_conf()
 {
@@ -8406,7 +8822,7 @@ create_section_device()
 	if [ "$( grep -Esic 'Section[ \t]*"Device"' $EXXC )" -eq 0 ];then
 		echo  >> $EXXC
 		echo -e 'Section "Device"' >> $EXXC
-		echo -e '\tIdentifier "Card0"' >> $EXXC
+		echo -e '\tIdentifier "Device0"' >> $EXXC
 		# the vesa is a just a failsafe, the actual driver will be set in driver version
 # 		echo -e '\tDriver "vesa"' >> $EXXC
 # 		echo -e '\tBusID "PCI:'$BUS_ID'"' >> $EXXC
@@ -8628,6 +9044,8 @@ clear_prep_xorg()
 	s/^.*AddARGBGLXVisuals.*\n?//;
 	s/^.*DisableGLXRootClipping.*\n?//;
 	s/^.*TripleBuffer.*\n?//;
+	s/^.*OnDemandVBlankInterrupts.*\n?//;
+	s/^.*UseEvents.*\n?//;
 	s/^.*UseEDID.*\n?//;
 	s/^.*UseEdidFreqs.*\n?//;
 	s/^.*DynamicTwinView.*\n?//;
@@ -8680,7 +9098,7 @@ update_xorg()
 	#  note: putting a space in these subsitution patterns breaks perl -e
 	local ignoreDisplay='Option\t"IgnoreDisplayDevices"\t"TV"\n\t'
 	# fglrx stuff, we're using default agpart 'on' now instead
-	local agpart='on' layout='AUTO,AUTO' allowGlx=''
+	local agpart='on' layout='AUTO,AUTO' allowGlx='' useEvents=$stateFalse
 
 	# this is set in rare cases of dual card early copy of xorg.conf
 	if [ "$B_XORG_BACKED_UP" != 'true' ];then
@@ -8696,6 +9114,7 @@ update_xorg()
 	clear_prep_xorg # bring xorg.conf to default condition
 	check_extensions
 	remove_modelines
+	fix_xorg_device_id # fix the CardX change to DeviceX
 	if [ "$B_SET_IGNOREABI" == 'true' ];then
 		set_server_flag 'ignoreABI'
 	fi
@@ -8707,8 +9126,15 @@ update_xorg()
 				#[ "$B_RENDER_ACCEL" != 'true' ] && rend=$stateOff
 				# switching off this, making default always off, watch for user feedback
 # 				if [ "$B_DISPLAY_DEVICES" == 'true' ];then
-					ignoreDisplay=''
+# 					ignoreDisplay=''
 # 				fi
+				# UseEvents can reduce the cpu usage of Xorg on nVidia cards at the cost
+				# of instability on old versions of Xorg.  Since Xorg development has
+				# stabilizied and all the big distributions run the latest Xserver, this
+				# is safe to turn on.  
+				if [ "$B_USE_EVENTS" ]; then
+					useEvents=$stateTrue
+				fi
 				# this is legacy, new default is on
 				#[ "$B_TWINVIEW" == 'true' ] && twin=$stateOn
 				# triplebuffer can reduce 3d performance on cards with low graphics memory
@@ -8724,7 +9150,11 @@ update_xorg()
 				# note: coolbits requires an integer value
 				# \n\tOption      "RandRRotation"\t"'$stateTrue'"
 				# \n\tOption      "DynamicTwinView"\t"'$twin'"
-				perl -pi -e 's/^([\s]*Driver\s*"nvidia")/\1\n\t'$ignoreDisplay$allowGlx'Option      "Coolbits"\t"1"\n\tOption      "AddARGBGLXVisuals"\t"'$stateTrue'"\n\tOption      "TripleBuffer"\t"'$triple'"/' $EXXC
+				# perl -pi -e 's/^([\s]*Driver\s*"nvidia")/\1\n\t'$ignoreDisplay$allowGlx'Option      "Coolbits"\t"1"\n\tOption      "AddARGBGLXVisuals"\t"'$stateTrue'"\n\tOption      "TripleBuffer"\t"'$triple'"/' $EXXC
+				## NOTE: ignoreDisplay makes 352 series fail to start x;
+				## xorg reports: 15.059] (WW) NVIDIA(0): Option "UseEvents" is not used
+				# perl -pi -e 's/^([\s]*Driver\s*"nvidia")/\1\n\t'$ignoreDisplay$allowGlx'Option      "Coolbits"\t"8"\n\tOption      "TripleBuffer"\t"'$triple'"\n\tOption      "UseEvents"\t"'$useEvents'"/' $EXXC
+				perl -pi -e 's/^([\s]*Driver\s*"nvidia")/\1\n\t'$allowGlx'Option      "Coolbits"\t"8"\n\tOption      "TripleBuffer"\t"'$triple'"\n/' $EXXC
 				;;
 			$FGLRX)
 				# set any custom stuff here
