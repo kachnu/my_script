@@ -11,13 +11,15 @@ if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
       exit 1
 fi
 
-ReadVar ()
-{
 case $LANG in
   uk*|ru*|be*|*) #UA RU BE locales
                MAIN_LABEL="Настройка удаленного рабочего стола VNC (vino)"
                MAIN_TEXT="Выберите действие:"
                
+               VNC_INSTALL_VINO="Для работы необходимо установить vino.
+Потребуется подключение к Интернет.
+
+Вы хотите произвести установку данного ПО?"
                VNC_VIEW_DESKTOP="Позволить видеть рабочий стол (VNC-сервер)"
                VNC_MANAGE_DESKTOP="Позволить управлять рабочим столом"
                VNC_AUTORUN="Доступ к рабочему столу при загрузке (автозапуск)"
@@ -45,8 +47,6 @@ always - всегда отображаеть иконку"
                HELP="Данный скрипт позволяет настроить VNC-сервер"
                ;;
 esac
-}
-
 #####################################################################
 Help () #Помощь
 {
@@ -88,8 +88,6 @@ CheckState ()
 {
 if [ -x "/usr/lib/vino/vino-server" ]
  then 
-      ReadVar
-      
       STATE_VNC_MANAGE_DESKTOP=`dconf read /org/gnome/desktop/remote-access/view-only`
       if [[ $STATE_VNC_MANAGE_DESKTOP == "" ]]
          then STATE_VNC_MANAGE_DESKTOP="true"
@@ -180,7 +178,12 @@ if [ -x "/usr/lib/vino/vino-server" ]
       fi
       
  else
-      STATE_VNC_VIEW_DESKTOP="- vino not install"
+      $DIALOG --question --title="$ATTENTION" --text="$VNC_INSTALL_VINO"
+      if [ $? -eq "0" ]
+         then InstallVino
+              MainForm
+         else exit 1
+      fi
 fi
 }
 #####################################################################
@@ -193,8 +196,8 @@ ANSWER=$($DIALOG --width=450 --height=300 --list --cancel-label="Exit" --title="
         "$VNC_VIEW_DESKTOP $STATE_VNC_VIEW_DESKTOP" ""\
         "$VNC_MANAGE_DESKTOP $STATE_VNC_MANAGE_DESKTOP" ""\
         "$VNC_AUTORUN $STATE_VNC_AUTORUN" ""\
-        "$VNC_PASSWORD $STATE_VNC_PASSWORD" ""\
         "$VNC_PROMPT $STATE_VNC_PROMPT" ""\
+        "$VNC_PASSWORD $STATE_VNC_PASSWORD" ""\
         "$VNC_ICON $STATE_VNC_ICON" ""\
         "$VNC_PORT $STATE_VNC_PORT_TEXT" ""\
         "$VNC_ENCRYPTION $STATE_VNC_ENCRYPTION" ""\
@@ -212,8 +215,6 @@ then
                            ;;
                      "- OFF") nohup /usr/lib/vino/vino-server --sm-disable &
                            ;;
-                     "- vino not install") InstallVino
-                           ;; 
                            *) MainForm
                            ;;
                 esac

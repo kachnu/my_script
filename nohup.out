@@ -2396,3 +2396,204 @@ Gtk-Message: GtkDialog mapped without a transient parent. This is discouraged.
 26/09/2016 13:01:25 Clearing authTypes
 26/09/2016 13:01:25 Advertising security type: 'TLS' (18)
 26/09/2016 13:01:25 Advertising authentication type: 'No Authentication' (1)
+
+(vino-server:16725): EggSMClient-CRITICAL **: egg_sm_client_set_mode: assertion 'global_client == NULL || global_client_mode == EGG_SM_CLIENT_MODE_DISABLED' failed
+26/09/2016 15:24:39 WARNING: Width (1366) is not a multiple of 4. VncViewer has problems with that.
+26/09/2016 15:24:39 Autoprobing TCP port in (all) network interface
+26/09/2016 15:24:39 Listening IPv6://[::]:5900
+26/09/2016 15:24:39 Listening IPv4://0.0.0.0:5900
+26/09/2016 15:24:39 Autoprobing selected port 5900
+26/09/2016 15:24:39 Advertising security type: 'TLS' (18)
+26/09/2016 15:24:39 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+26/09/2016 15:24:39 Listening IPv6://[::]:5900
+26/09/2016 15:24:39 Listening IPv4://0.0.0.0:5900
+26/09/2016 15:24:39 Clearing securityTypes
+26/09/2016 15:24:39 Advertising security type: 'TLS' (18)
+26/09/2016 15:24:39 Clearing securityTypes
+26/09/2016 15:24:39 Advertising security type: 'TLS' (18)
+26/09/2016 15:24:39 Advertising authentication type: 'No Authentication' (1)
+26/09/2016 15:24:39 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+26/09/2016 15:24:39 Listening IPv6://[::]:5900
+26/09/2016 15:24:39 Listening IPv4://0.0.0.0:5900
+26/09/2016 15:24:52 Clearing securityTypes
+26/09/2016 15:24:52 Clearing authTypes
+26/09/2016 15:24:52 Advertising security type: 'TLS' (18)
+26/09/2016 15:24:52 Advertising authentication type: 'VNC Authentication' (2)
+26/09/2016 15:25:05 [IPv4] Got connection from client 10.99.3.222
+26/09/2016 15:25:05   other clients:
+26/09/2016 15:25:05 WARNING: New width (1366) is not a multiple of 4.
+26/09/2016 15:25:05 Client Protocol Version 3.7
+26/09/2016 15:25:05 Advertising security type 18
+26/09/2016 15:25:05 Client returned security type 18
+26/09/2016 15:25:05 Advertising authentication type 2
+26/09/2016 15:25:05 Client returned authentication type 2
+26/09/2016 15:25:12 Pixel format for client 10.99.3.222:
+26/09/2016 15:25:12   32 bpp, depth 32, little endian
+26/09/2016 15:25:12   true colour: max r 255 g 255 b 255, shift r 0 g 8 b 16
+26/09/2016 15:25:12 rfbProcessClientNormalMessage: ignoring unknown encoding type 9
+26/09/2016 15:25:12 rfbProcessClientNormalMessage: ignoring unknown encoding type -65527
+26/09/2016 15:25:12 Using compression level 3 for client 10.99.3.222
+26/09/2016 15:25:12 Using image quality level 5 for client 10.99.3.222
+26/09/2016 15:25:12 rfbProcessClientNormalMessage: ignoring unknown encoding type -131072
+26/09/2016 15:25:12 Enabling NewFBSize protocol extension for client 10.99.3.222
+26/09/2016 15:25:12 Enabling LastRect protocol extension for client 10.99.3.222
+26/09/2016 15:25:12 rfbProcessClientNormalMessage: ignoring unknown encoding type -131071
+26/09/2016 15:25:12 rfbProcessClientNormalMessage: ignoring unknown encoding type -131070
+26/09/2016 15:25:12 rfbProcessClientNormalMessage: ignoring unknown encoding type -131069
+26/09/2016 15:25:12 rfbProcessClientNormalMessage: ignoring unknown encoding type -309
+26/09/2016 15:25:47 rfbProcessClientNormalMessage: read: Ресурс временно недоступен
+26/09/2016 15:25:47 Client 10.99.3.222 gone
+26/09/2016 15:25:47 Statistics:
+26/09/2016 15:25:47   framebuffer updates 339, rectangles 1654, bytes 1107156
+26/09/2016 15:25:47     LastRect and NewFBSize markers 90, bytes 1080
+26/09/2016 15:25:47     tight rectangles 1564, bytes 1106076
+26/09/2016 15:25:47   raw bytes equivalent 28161648, compression ratio 25,460862
+26/09/2016 15:25:52 [IPv4] Got connection from client 10.99.3.222
+26/09/2016 15:25:52   other clients:
+26/09/2016 15:25:53 WARNING: New width (1366) is not a multiple of 4.
+26/09/2016 15:25:53 Client Protocol Version 3.7
+26/09/2016 15:25:53 Advertising security type 18
+26/09/2016 15:25:53 Client returned security type 18
+26/09/2016 15:25:53 Advertising authentication type 2
+26/09/2016 15:25:53 Client returned authentication type 2
+26/09/2016 15:25:56 Pixel format for client 10.99.3.222:
+26/09/2016 15:25:56   32 bpp, depth 32, little endian
+26/09/2016 15:25:56   true colour: max r 255 g 255 b 255, shift r 0 g 8 b 16
+26/09/2016 15:25:56 rfbProcessClientNormalMessage: ignoring unknown encoding type 9
+26/09/2016 15:25:56 rfbProcessClientNormalMessage: ignoring unknown encoding type -65527
+26/09/2016 15:25:56 Using compression level 3 for client 10.99.3.222
+26/09/2016 15:25:56 Using image quality level 5 for client 10.99.3.222
+26/09/2016 15:25:56 rfbProcessClientNormalMessage: ignoring unknown encoding type -131072
+26/09/2016 15:25:56 Enabling NewFBSize protocol extension for client 10.99.3.222
+26/09/2016 15:25:56 Enabling LastRect protocol extension for client 10.99.3.222
+26/09/2016 15:25:56 rfbProcessClientNormalMessage: ignoring unknown encoding type -131071
+26/09/2016 15:25:56 rfbProcessClientNormalMessage: ignoring unknown encoding type -131070
+26/09/2016 15:25:56 rfbProcessClientNormalMessage: ignoring unknown encoding type -131069
+26/09/2016 15:25:56 rfbProcessClientNormalMessage: ignoring unknown encoding type -309
+26/09/2016 15:28:37 rfbProcessClientNormalMessage: read: Ресурс временно недоступен
+26/09/2016 15:28:37 Client 10.99.3.222 gone
+26/09/2016 15:28:37 Statistics:
+26/09/2016 15:28:37   key events received 0, pointer events 2000
+26/09/2016 15:28:37   framebuffer updates 3198, rectangles 35255, bytes 31971735
+26/09/2016 15:28:37     LastRect and NewFBSize markers 2507, bytes 30084
+26/09/2016 15:28:37     tight rectangles 32748, bytes 31941651
+26/09/2016 15:28:37   raw bytes equivalent 1324613928, compression ratio 41,469802
+26/09/2016 15:28:51 Clearing securityTypes
+26/09/2016 15:28:51 Clearing authTypes
+26/09/2016 15:28:51 Advertising security type: 'TLS' (18)
+26/09/2016 15:28:51 Advertising authentication type: 'No Authentication' (1)
+26/09/2016 15:29:22 Clearing securityTypes
+26/09/2016 15:29:22 Clearing authTypes
+26/09/2016 15:29:22 Advertising security type: 'TLS' (18)
+26/09/2016 15:29:22 Advertising authentication type: 'VNC Authentication' (2)
+26/09/2016 15:29:27 [IPv4] Got connection from client 10.99.3.222
+26/09/2016 15:29:27   other clients:
+26/09/2016 15:29:27 WARNING: New width (1366) is not a multiple of 4.
+26/09/2016 15:29:27 Client Protocol Version 3.7
+26/09/2016 15:29:27 Advertising security type 18
+26/09/2016 15:29:27 Client returned security type 18
+26/09/2016 15:29:27 Advertising authentication type 2
+26/09/2016 15:29:27 Client returned authentication type 2
+26/09/2016 15:29:34 Pixel format for client 10.99.3.222:
+26/09/2016 15:29:34   32 bpp, depth 32, little endian
+26/09/2016 15:29:34   true colour: max r 255 g 255 b 255, shift r 0 g 8 b 16
+26/09/2016 15:29:34 rfbProcessClientNormalMessage: ignoring unknown encoding type 9
+26/09/2016 15:29:34 rfbProcessClientNormalMessage: ignoring unknown encoding type -65527
+26/09/2016 15:29:34 Using compression level 3 for client 10.99.3.222
+26/09/2016 15:29:34 Using image quality level 5 for client 10.99.3.222
+26/09/2016 15:29:34 rfbProcessClientNormalMessage: ignoring unknown encoding type -131072
+26/09/2016 15:29:34 Enabling NewFBSize protocol extension for client 10.99.3.222
+26/09/2016 15:29:34 Enabling LastRect protocol extension for client 10.99.3.222
+26/09/2016 15:29:34 rfbProcessClientNormalMessage: ignoring unknown encoding type -131071
+26/09/2016 15:29:34 rfbProcessClientNormalMessage: ignoring unknown encoding type -131070
+26/09/2016 15:29:34 rfbProcessClientNormalMessage: ignoring unknown encoding type -131069
+26/09/2016 15:29:34 rfbProcessClientNormalMessage: ignoring unknown encoding type -309
+26/09/2016 15:31:16 Listening for VNC connections on TCP port 5959 in (all) network interface
+26/09/2016 15:31:16 Listening IPv6://[::]:5959
+26/09/2016 15:31:16 Listening IPv4://0.0.0.0:5959
+26/09/2016 15:31:21 rfbProcessClientNormalMessage: read: Ресурс временно недоступен
+26/09/2016 15:31:21 Client 10.99.3.222 gone
+26/09/2016 15:31:21 Statistics:
+26/09/2016 15:31:21   key events received 4, pointer events 550
+26/09/2016 15:31:21   framebuffer updates 943, rectangles 4103, bytes 3061441
+26/09/2016 15:31:21     LastRect and NewFBSize markers 231, bytes 2772
+26/09/2016 15:31:21     tight rectangles 3872, bytes 3058669
+26/09/2016 15:31:21   raw bytes equivalent 117646820, compression ratio 38,463404
+26/09/2016 15:31:38 [IPv4] Got connection from client 10.99.3.222
+26/09/2016 15:31:38   other clients:
+26/09/2016 15:31:38 WARNING: New width (1366) is not a multiple of 4.
+26/09/2016 15:31:38 Client Protocol Version 3.7
+26/09/2016 15:31:38 Advertising security type 18
+26/09/2016 15:31:38 Client returned security type 18
+26/09/2016 15:31:38 Advertising authentication type 2
+26/09/2016 15:31:38 Client returned authentication type 2
+26/09/2016 15:31:43 Pixel format for client 10.99.3.222:
+26/09/2016 15:31:43   32 bpp, depth 32, little endian
+26/09/2016 15:31:43   true colour: max r 255 g 255 b 255, shift r 0 g 8 b 16
+26/09/2016 15:31:43 rfbProcessClientNormalMessage: ignoring unknown encoding type 9
+26/09/2016 15:31:43 rfbProcessClientNormalMessage: ignoring unknown encoding type -65527
+26/09/2016 15:31:43 Using compression level 3 for client 10.99.3.222
+26/09/2016 15:31:43 Using image quality level 5 for client 10.99.3.222
+26/09/2016 15:31:43 rfbProcessClientNormalMessage: ignoring unknown encoding type -131072
+26/09/2016 15:31:43 Enabling NewFBSize protocol extension for client 10.99.3.222
+26/09/2016 15:31:43 Enabling LastRect protocol extension for client 10.99.3.222
+26/09/2016 15:31:43 rfbProcessClientNormalMessage: ignoring unknown encoding type -131071
+26/09/2016 15:31:43 rfbProcessClientNormalMessage: ignoring unknown encoding type -131070
+26/09/2016 15:31:43 rfbProcessClientNormalMessage: ignoring unknown encoding type -131069
+26/09/2016 15:31:43 rfbProcessClientNormalMessage: ignoring unknown encoding type -309
+26/09/2016 15:32:22 [IPv4] Got connection from client 10.99.3.222
+26/09/2016 15:32:22   other clients:
+26/09/2016 15:32:22      10.99.3.222
+26/09/2016 15:32:25 [IPv4] Got connection from client 10.99.3.222
+26/09/2016 15:32:25   other clients:
+26/09/2016 15:32:25      10.99.3.222
+26/09/2016 15:32:25      10.99.3.222
+26/09/2016 15:32:25 Client Protocol Version 3.7
+26/09/2016 15:32:25 Advertising security type 18
+26/09/2016 15:33:21 [IPv4] Got connection from client 10.99.3.222
+26/09/2016 15:33:21   other clients:
+26/09/2016 15:33:21      10.99.3.222
+26/09/2016 15:33:21      10.99.3.222
+26/09/2016 15:33:21      10.99.3.222
+26/09/2016 15:33:21 rfbProcessClientNormalMessage: read: Соединение разорвано другой стороной
+26/09/2016 15:33:21 Client 10.99.3.222 gone
+26/09/2016 15:33:21 Statistics:
+26/09/2016 15:33:21   framebuffer updates 435, rectangles 3807, bytes 2901374
+26/09/2016 15:33:21     LastRect and NewFBSize markers 115, bytes 1380
+26/09/2016 15:33:21     tight rectangles 3692, bytes 2899994
+26/09/2016 15:33:21   raw bytes equivalent 109235064, compression ratio 37,667341
+26/09/2016 15:33:21 rfbAuthProcessSecurityTypeMessage: read: Соединение разорвано другой стороной
+26/09/2016 15:33:21 Client 10.99.3.222 gone
+26/09/2016 15:33:21 Statistics:
+26/09/2016 15:33:21   framebuffer updates 0, rectangles 0, bytes 0
+26/09/2016 15:33:21 rfbProcessClientProtocolVersion: read: Соединение разорвано другой стороной
+26/09/2016 15:33:21 Client 10.99.3.222 gone
+26/09/2016 15:33:21 Statistics:
+26/09/2016 15:33:21   framebuffer updates 0, rectangles 0, bytes 0
+26/09/2016 15:33:21 Client Protocol Version 3.7
+26/09/2016 15:33:21 Advertising security type 18
+26/09/2016 15:33:21 Client returned security type 18
+26/09/2016 15:33:21 Advertising authentication type 2
+26/09/2016 15:33:21 Client returned authentication type 2
+26/09/2016 15:33:26 Pixel format for client 10.99.3.222:
+26/09/2016 15:33:26   32 bpp, depth 32, little endian
+26/09/2016 15:33:26   true colour: max r 255 g 255 b 255, shift r 0 g 8 b 16
+26/09/2016 15:33:26 rfbProcessClientNormalMessage: ignoring unknown encoding type 9
+26/09/2016 15:33:26 rfbProcessClientNormalMessage: ignoring unknown encoding type -65527
+26/09/2016 15:33:26 Using compression level 3 for client 10.99.3.222
+26/09/2016 15:33:26 Using image quality level 5 for client 10.99.3.222
+26/09/2016 15:33:26 rfbProcessClientNormalMessage: ignoring unknown encoding type -131072
+26/09/2016 15:33:26 Enabling NewFBSize protocol extension for client 10.99.3.222
+26/09/2016 15:33:26 Enabling LastRect protocol extension for client 10.99.3.222
+26/09/2016 15:33:26 rfbProcessClientNormalMessage: ignoring unknown encoding type -131071
+26/09/2016 15:33:26 rfbProcessClientNormalMessage: ignoring unknown encoding type -131070
+26/09/2016 15:33:26 rfbProcessClientNormalMessage: ignoring unknown encoding type -131069
+26/09/2016 15:33:26 rfbProcessClientNormalMessage: ignoring unknown encoding type -309
+26/09/2016 15:34:01 rfbProcessClientNormalMessage: read: Ресурс временно недоступен
+26/09/2016 15:34:01 Client 10.99.3.222 gone
+26/09/2016 15:34:01 Statistics:
+26/09/2016 15:34:01   key events received 18, pointer events 126
+26/09/2016 15:34:01   framebuffer updates 241, rectangles 997, bytes 236263
+26/09/2016 15:34:01     LastRect and NewFBSize markers 14, bytes 168
+26/09/2016 15:34:01     tight rectangles 983, bytes 236095
+26/09/2016 15:34:01   raw bytes equivalent 15886380, compression ratio 67,288083
