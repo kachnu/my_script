@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Remote Desktop VNC
+Name[ru]=Удаленный рабочий стол VNC
+GenericName=Remote Desktop VNC
+GenericName[ru]=Удаленный рабочий стол VNC
+Comment=Settings Remote Desktop 
+Comment[ru]=Настройка удаленного рабочего стола
+Exec=/usr/local/bin/my_remote_desktop.sh
+Icon=preferences-desktop-remote-desktop
+Terminal=false
+Type=Application
+Categories=Settings;X-GNOME-NetworkSettings;
