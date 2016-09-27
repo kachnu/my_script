@@ -4,15 +4,14 @@
 # author: kachnu
 # email: ya.kachnu@yandex.ua
 
-DIALOG=zenity #Установка типа графического диалогового окна
-
-if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
+DIALOG=zenity
+if [ ! -x "`which "$DIALOG"`" ]
  then eсho "Not Install - $DIALOG!"
       exit 1
 fi
 
-case $LANG in
-  uk*|ru*|be*|*) #UA RU BE locales
+case $LANG in # language selection
+  uk*|ru*|be*) # UA RU BE locales
                MAIN_LABEL="Настройка удаленного рабочего стола VNC"
                MAIN_TEXT="Выберите действие:"
                
@@ -25,12 +24,10 @@ case $LANG in
                VNC_AUTORUN="Доступ к рабочему столу при загрузке (автозапуск)"
                VNC_PASSWORD="Требовать пароль"
                VNC_PROMPT="Требовать от Вас подтверждение на подключение"
-
                VNC_ICON="Значок в области уведомлений"
                VNC_PORT="Порт доступа"
                VNC_ENCRYPTION="Шифрование"
                VNC_ROUTE="Автоматически настраивать маршрутизатор"               
-               
                VNC_HELP="Справка"
                
                VNC_ENTER_PASSWORD="Внимание! Cлово 'keyring' - не считается паролем, 
@@ -40,35 +37,47 @@ case $LANG in
                VNC_ENTER_ICON="client - отображать иконку в трее, только при подключении к рабочему столу
 never - никогда не отображать иконку
 always - всегда отображать иконку"
-               
                ATTENTION="ВНИМАНИЕ!"
-               CHECK_PO="- не найдено!
-Установите пакеты для работы -"
-               HELP="Данный скрипт позволяет настроить VNC-сервер"
+               HELP="Данный скрипт позволяет настроить удаленный доступ к рабочему столу с использованием VNC"
+               ;;
+             *) # All locales
+               MAIN_LABEL="Configuring Remote Desktop"
+               MAIN_TEXT="Select an action:"
+               
+               VNC_INSTALL_VINO="To work, you must install vino.
+You need to connect to the Internet.
+
+Do you want to install this software?"
+               VNC_VIEW_DESKTOP="Let see the desktop (VNC-server)"
+               VNC_MANAGE_DESKTOP="Allow control desk"
+               VNC_AUTORUN="Access to the desktop at startup (autorun)"
+               VNC_PASSWORD="Require password"
+               VNC_PROMPT="Require you to confirm the connection"
+               VNC_ICON="Icon in the notification area"
+               VNC_PORT="Port access"
+               VNC_ENCRYPTION="Encryption"
+               VNC_ROUTE="Automatically configure the router"               
+               VNC_HELP="Help"
+               
+               VNC_ENTER_PASSWORD="Attention! The word 'keyring' - is not considered as a password,
+It will be used in the password keyring GNOME.
+Empty password = 'keyring'
+Enter the password for access to your desktop"
+               VNC_ENTER_ICON="client - to display the tray icon only when you connect to the desktop
+never - never display an icon
+always - always display the icon"
+               ATTENTION="ATTENTION!"
+               HELP="This script allows you to configure remote access to the desktop using VNC"
                ;;
 esac
 #####################################################################
-Help () #Помощь
+Help () # help window
 {
 echo -n "$HELP" | zenity --text-info --cancel-label="Back" --title="Help" \
  --width=400 --height=300
 }
-
 #####################################################################
-Check () #Функция проверки ПО
-{
-if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
- then echo Argument check error; exit 1
-fi
-if [ ! -x "`which "$1"`" ] #Проверка наличия ПО
- then echo $1 - not found!
- $DIALOG --info --title="$ATTENTION" \
-              --text="$1 $CHECK_PO $1"
- MainForm
-fi
-}
-#####################################################################
-InstallVino ()
+InstallVino () # window installing vino
 {
 (gksudo -- sh -c "
 echo '#apt-get update'
@@ -84,9 +93,9 @@ sleep 3"
 --title "Installing vino"
 }
 #####################################################################
-CheckState ()
+CheckState () # read vino values
 {
-if [ -x "/usr/lib/vino/vino-server" ]
+if [ -x "/usr/lib/vino/vino-server" ] # if vino is install then read values else install vino
  then 
       STATE_VNC_MANAGE_DESKTOP=`dconf read /org/gnome/desktop/remote-access/view-only`
       if [[ $STATE_VNC_MANAGE_DESKTOP == "" ]]
@@ -111,8 +120,8 @@ if [ -x "/usr/lib/vino/vino-server" ]
                then STATE_VNC_AUTORUN="OFF"
                else STATE_VNC_AUTORUN="ON"
             fi
-      fi     
-      
+      fi
+
       STATE_VNC_PASSWORD=`dconf read /org/gnome/desktop/remote-access/authentication-methods`
       if [[ $STATE_VNC_PASSWORD == "" ]]
          then STATE_VNC_PASSWORD="['none']"
@@ -134,7 +143,7 @@ if [ -x "/usr/lib/vino/vino-server" ]
         then STATE_VNC_PROMPT="ON"
         else STATE_VNC_PROMPT="OFF"
       fi
-      
+
       STATE_VNC_ICON=`dconf read /org/gnome/desktop/remote-access/icon-visibility | sed "s/'//g"`
       if [[ $STATE_VNC_ICON == "" ]]
          then STATE_VNC_ICON="client"
@@ -150,7 +159,7 @@ if [ -x "/usr/lib/vino/vino-server" ]
            "always") VNC_ICON_ALWAYS="TRUE"
                      ;;
       esac
-      
+
       STATE_VNC_PORT=`dconf read /org/gnome/desktop/remote-access/alternative-port`
       if [[ $STATE_VNC_PORT == "" ]]
          then STATE_VNC_PORT="uint16 5900"
@@ -165,7 +174,7 @@ if [ -x "/usr/lib/vino/vino-server" ]
         then STATE_VNC_ENCRYPTION="ON"
         else STATE_VNC_ENCRYPTION="OFF"
       fi
-      
+
       STATE_VNC_ROUTE=`dconf read /org/gnome/desktop/remote-access/use-upnp`
       if [[ $STATE_VNC_ROUTE == "" ]]
          then STATE_VNC_ROUTE="true"
@@ -174,7 +183,6 @@ if [ -x "/usr/lib/vino/vino-server" ]
         then STATE_VNC_ROUTE="ON"
         else STATE_VNC_ROUTE="OFF"
       fi
-      
  else
       $DIALOG --question --title="$ATTENTION" --text="$VNC_INSTALL_VINO"
       if [ $? -eq "0" ]
@@ -185,9 +193,11 @@ if [ -x "/usr/lib/vino/vino-server" ]
 fi
 }
 #####################################################################
-MainForm () #Функция главного окна
+MainForm () # main window
 {
+# start read vino values
 CheckState
+# open main window
 ANSWER=$($DIALOG --width=450 --height=300 --list --cancel-label="Exit" --title="$MAIN_LABEL" \
       --text="$MAIN_TEXT" \
       --column="" --column="" \
@@ -204,10 +214,7 @@ ANSWER=$($DIALOG --width=450 --height=300 --list --cancel-label="Exit" --title="
 if [ $? == 0 ]
 then
  case $ANSWER in
-               "")
-                MainForm
-                ;;
-    "$VNC_VIEW_DESKTOP"*) 
+    "$VNC_VIEW_DESKTOP"*) # start/stop vino-server
                 case $STATE_VNC_VIEW_DESKTOP in
                      "ON") killall vino-server
                            ;;
@@ -219,7 +226,7 @@ then
                 sleep 0.5
                 MainForm           
                 ;;
-    "$VNC_MANAGE_DESKTOP"*)
+    "$VNC_MANAGE_DESKTOP"*) # open manage desktop
                 case $STATE_VNC_MANAGE_DESKTOP in
                      "ON") dconf write /org/gnome/desktop/remote-access/view-only true
                            ;;
@@ -231,7 +238,7 @@ then
                 sleep 0.5
                 MainForm
                 ;;
-     "$VNC_AUTORUN"*)
+     "$VNC_AUTORUN"*) # add vino-server to autorun
                 case $STATE_VNC_AUTORUN in
                      "ON") rm $HOME/.config/autostart/vino-server.desktop
                            ;;
@@ -243,7 +250,7 @@ then
                 sleep 0.5
                 MainForm           
                 ;;
-    "$VNC_PASSWORD"*) 
+    "$VNC_PASSWORD"*) # on/off password autentification and enter password
                 case $STATE_VNC_PASSWORD in
                      "ON") dconf write /org/gnome/desktop/remote-access/authentication-methods "['none']"
                            ;;
@@ -267,7 +274,7 @@ then
                 sleep 0.5
                 MainForm
                 ;;
-    "$VNC_PROMPT"*)
+    "$VNC_PROMPT"*) # confirmation Desktop Connection
                 case $STATE_VNC_PROMPT in
                      "ON") dconf write /org/gnome/desktop/remote-access/prompt-enabled false
                            ;;
@@ -279,7 +286,7 @@ then
                 sleep 0.5
                 MainForm
                 ;;
-    "$VNC_PORT"*) 
+    "$VNC_PORT"*) # port selection for access
                 STATE_VNC_PORT=`zenity --entry --title="Enter access port" --text="Enter port" --entry-text="$STATE_VNC_PORT"`
                 if [ $? == 0 ]
                    then
@@ -296,7 +303,7 @@ then
                 sleep 0.5
                 MainForm
                 ;;
-    "$VNC_ICON"*) 
+    "$VNC_ICON"*) # choice of display icons in the system tray
                 STATE_VNC_ICON=`zenity --list --height=200 --title="Enter icon" --text="$VNC_ENTER_ICON" --radiolist --column "" --column "" \
 $VNC_ICON_CLIENT "client" \
 $VNC_ICON_NEVER "never" \
@@ -307,7 +314,7 @@ $VNC_ICON_ALWAYS "always"`
                 sleep 0.5
                 MainForm
                 ;;
-    "$VNC_ENCRYPTION"*)
+    "$VNC_ENCRYPTION"*) # on/off encryption
                 case $STATE_VNC_ENCRYPTION in
                      "ON") dconf write /org/gnome/desktop/remote-access/require-encryption false
                            ;;
@@ -319,7 +326,7 @@ $VNC_ICON_ALWAYS "always"`
                 sleep 0.5
                 MainForm
                 ;;
-    "$VNC_ROUTE"*) 
+    "$VNC_ROUTE"*) # enable automatic opening of the ports on the router
                case $STATE_VNC_ROUTE in
                      "ON") dconf write /org/gnome/desktop/remote-access/use-upnp false
                            ;;
@@ -331,7 +338,7 @@ $VNC_ICON_ALWAYS "always"`
                 sleep 0.5
                 MainForm
                 ;;
-    "$VNC_HELP"*)  
+    "$VNC_HELP"*)  # start help window
                 Help
                 MainForm
                 ;;
@@ -344,6 +351,7 @@ fi
 }
 #####################################################################
 
+# start Main window
 MainForm
 
 exit 0
