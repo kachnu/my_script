@@ -106,7 +106,7 @@ if [ -x "/usr/lib/vino/vino-server" ] # if vino is install then read values else
         else STATE_VNC_MANAGE_DESKTOP="ON"
       fi
 
-      if pidof vino-server > /dev/null
+      if [[ $(ps -ela | grep $UID | grep vino-server) != "" ]]
          then STATE_VNC_VIEW_DESKTOP="ON"
          else STATE_VNC_VIEW_DESKTOP="OFF"
               STATE_VNC_MANAGE_DESKTOP="OFF"
