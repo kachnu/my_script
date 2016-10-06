@@ -1,0 +1,126 @@
+
+(vino-server:11186): EggSMClient-CRITICAL **: egg_sm_client_set_mode: assertion 'global_client == NULL || global_client_mode == EGG_SM_CLIENT_MODE_DISABLED' failed
+06/10/2016 14:10:52 WARNING: Width (1366) is not a multiple of 4. VncViewer has problems with that.
+06/10/2016 14:10:53 Autoprobing TCP port in (all) network interface
+06/10/2016 14:10:53 Listening IPv6://[::]:5900
+06/10/2016 14:10:53 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:10:53 Autoprobing selected port 5900
+06/10/2016 14:10:53 Advertising security type: 'TLS' (18)
+06/10/2016 14:10:53 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+06/10/2016 14:10:53 Listening IPv6://[::]:5900
+06/10/2016 14:10:53 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:10:53 Clearing securityTypes
+06/10/2016 14:10:53 Advertising security type: 'TLS' (18)
+06/10/2016 14:10:53 Clearing securityTypes
+06/10/2016 14:10:53 Advertising security type: 'TLS' (18)
+06/10/2016 14:10:53 Advertising authentication type: 'No Authentication' (1)
+06/10/2016 14:10:53 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+06/10/2016 14:10:53 Listening IPv6://[::]:5900
+06/10/2016 14:10:53 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:10:53 Listening for VNC connections on TCP port 5900 in (all) network interface
+06/10/2016 14:10:53 Listening IPv6://[::]:5900
+06/10/2016 14:10:53 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:10:53 Listening for VNC connections on TCP port 5903 in (all) network interface
+06/10/2016 14:10:53 Listening IPv6://[::]:5903
+06/10/2016 14:10:53 Listening IPv4://0.0.0.0:5903
+
+(vino-server:14808): EggSMClient-CRITICAL **: egg_sm_client_set_mode: assertion 'global_client == NULL || global_client_mode == EGG_SM_CLIENT_MODE_DISABLED' failed
+06/10/2016 14:15:34 WARNING: Width (1366) is not a multiple of 4. VncViewer has problems with that.
+06/10/2016 14:15:34 Autoprobing TCP port in (all) network interface
+06/10/2016 14:15:34 Listening IPv6://[::]:5900
+06/10/2016 14:15:34 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:15:34 Autoprobing selected port 5900
+06/10/2016 14:15:34 Advertising security type: 'TLS' (18)
+06/10/2016 14:15:34 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+06/10/2016 14:15:34 Listening IPv6://[::]:5900
+06/10/2016 14:15:34 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:15:34 Clearing securityTypes
+06/10/2016 14:15:34 Advertising security type: 'TLS' (18)
+06/10/2016 14:15:34 Clearing securityTypes
+06/10/2016 14:15:34 Advertising security type: 'TLS' (18)
+06/10/2016 14:15:34 Advertising authentication type: 'No Authentication' (1)
+06/10/2016 14:15:34 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+06/10/2016 14:15:34 Listening IPv6://[::]:5900
+06/10/2016 14:15:34 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:15:34 Listening for VNC connections on TCP port 5900 in (all) network interface
+06/10/2016 14:15:34 Listening IPv6://[::]:5900
+06/10/2016 14:15:34 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:15:34 Listening for VNC connections on TCP port 5903 in (all) network interface
+06/10/2016 14:15:34 Listening IPv6://[::]:5903
+06/10/2016 14:15:34 Listening IPv4://0.0.0.0:5903
+
+(vino-server:15506): EggSMClient-CRITICAL **: egg_sm_client_set_mode: assertion 'global_client == NULL || global_client_mode == EGG_SM_CLIENT_MODE_DISABLED' failed
+06/10/2016 14:16:22 WARNING: Width (1366) is not a multiple of 4. VncViewer has problems with that.
+06/10/2016 14:16:22 Autoprobing TCP port in (all) network interface
+06/10/2016 14:16:22 Listening IPv6://[::]:5900
+06/10/2016 14:16:22 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:16:22 Autoprobing selected port 5900
+06/10/2016 14:16:22 Advertising security type: 'TLS' (18)
+06/10/2016 14:16:22 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+06/10/2016 14:16:22 Listening IPv6://[::]:5900
+06/10/2016 14:16:22 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:16:22 Clearing securityTypes
+06/10/2016 14:16:22 Advertising security type: 'TLS' (18)
+06/10/2016 14:16:22 Clearing securityTypes
+06/10/2016 14:16:22 Advertising security type: 'TLS' (18)
+06/10/2016 14:16:22 Advertising authentication type: 'No Authentication' (1)
+06/10/2016 14:16:22 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+06/10/2016 14:16:22 Listening IPv6://[::]:5900
+06/10/2016 14:16:22 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:16:22 Listening for VNC connections on TCP port 5900 in (all) network interface
+06/10/2016 14:16:22 Listening IPv6://[::]:5900
+06/10/2016 14:16:22 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:16:22 Listening for VNC connections on TCP port 5903 in (all) network interface
+06/10/2016 14:16:22 Listening IPv6://[::]:5903
+06/10/2016 14:16:22 Listening IPv4://0.0.0.0:5903
+
+(vino-server:22736): EggSMClient-CRITICAL **: egg_sm_client_set_mode: assertion 'global_client == NULL || global_client_mode == EGG_SM_CLIENT_MODE_DISABLED' failed
+06/10/2016 14:52:26 WARNING: Width (1366) is not a multiple of 4. VncViewer has problems with that.
+06/10/2016 14:52:26 Autoprobing TCP port in (all) network interface
+06/10/2016 14:52:26 Listening IPv6://[::]:5900
+06/10/2016 14:52:26 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:52:26 Autoprobing selected port 5900
+06/10/2016 14:52:26 Advertising security type: 'TLS' (18)
+06/10/2016 14:52:26 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+06/10/2016 14:52:26 Listening IPv6://[::]:5900
+06/10/2016 14:52:26 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:52:26 Clearing securityTypes
+06/10/2016 14:52:26 Advertising security type: 'TLS' (18)
+06/10/2016 14:52:26 Clearing securityTypes
+06/10/2016 14:52:26 Advertising security type: 'TLS' (18)
+06/10/2016 14:52:26 Advertising authentication type: 'No Authentication' (1)
+06/10/2016 14:52:26 Re-binding socket to listen for VNC connections on TCP port 5900 in (all) interface
+06/10/2016 14:52:26 Listening IPv6://[::]:5900
+06/10/2016 14:52:26 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:52:26 Listening for VNC connections on TCP port 5900 in (all) network interface
+06/10/2016 14:52:26 Listening IPv6://[::]:5900
+06/10/2016 14:52:26 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:52:26 Listening for VNC connections on TCP port 5901 in (all) network interface
+06/10/2016 14:52:26 Listening IPv6://[::]:5901
+06/10/2016 14:52:26 Listening IPv4://0.0.0.0:5901
+06/10/2016 14:52:30 [IPv4] Got connection from client localhost
+06/10/2016 14:52:30   other clients:
+06/10/2016 14:52:30 WARNING: New width (1366) is not a multiple of 4.
+06/10/2016 14:52:30 rfbProcessClientProtocolVersion: read: Соединение разорвано другой стороной
+06/10/2016 14:52:30 Client localhost gone
+06/10/2016 14:52:30 Statistics:
+06/10/2016 14:52:30   framebuffer updates 0, rectangles 0, bytes 0
+06/10/2016 14:52:36 [IPv4] Got connection from client localhost
+06/10/2016 14:52:36   other clients:
+06/10/2016 14:52:36 WARNING: New width (1366) is not a multiple of 4.
+06/10/2016 14:52:36 rfbProcessClientProtocolVersion: read: Соединение разорвано другой стороной
+06/10/2016 14:52:36 Client localhost gone
+06/10/2016 14:52:36 Statistics:
+06/10/2016 14:52:36   framebuffer updates 0, rectangles 0, bytes 0
+06/10/2016 14:52:36 Listening for VNC connections on TCP port 5900 in (all) network interface
+06/10/2016 14:52:36 Listening IPv6://[::]:5900
+06/10/2016 14:52:36 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:52:36 Autoprobing TCP port in (all) network interface
+06/10/2016 14:52:36 Listening IPv6://[::]:5900
+06/10/2016 14:52:36 Listening IPv4://0.0.0.0:5900
+06/10/2016 14:52:36 Autoprobing selected port 5900
+06/10/2016 14:54:57 Listening for VNC connections on TCP port 5901 in (all) network interface
+06/10/2016 14:54:57 Listening IPv6://[::]:5901
+06/10/2016 14:54:57 Listening IPv4://0.0.0.0:5901
+
+(vino-server:22736): GLib-GIO-CRITICAL **: g_app_info_launch: assertion 'G_IS_APP_INFO (appinfo)' failed

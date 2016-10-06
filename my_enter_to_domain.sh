@@ -574,8 +574,7 @@ passwd:         compat winbind
 group:          compat winbind
 shadow:         compat
 
-files:          dns mdns4_minimal[NotFoud=return] mdns4
-hosts:          files mdns4_minimal [NOTFOUND=return] dns
+hosts:          dns mdns4_minimal [NOTFOUND=return] mdns4 files
 networks:       files
 
 protocols:      db files

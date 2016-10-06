@@ -106,8 +106,9 @@ if [ -x "/usr/lib/vino/vino-server" ] # if vino is install then read values else
         else STATE_VNC_MANAGE_DESKTOP="ON"
       fi
 
-      if [[ $(ps -ela | grep $UID | grep vino-server) != "" ]]
-         then STATE_VNC_VIEW_DESKTOP="ON"
+      if [[ $(ps -ela | grep -w $UID | grep vino-server) != "" ]]
+         then 
+              STATE_VNC_VIEW_DESKTOP="ON"
          else STATE_VNC_VIEW_DESKTOP="OFF"
               STATE_VNC_MANAGE_DESKTOP="OFF"
       fi
@@ -293,11 +294,18 @@ then
                         if [[ $STATE_VNC_PORT == "" ]]
                            then STATE_VNC_PORT="5900"
                         fi
-                        if [[ $STATE_VNC_PORT == "5900" ]]
-                          then dconf write /org/gnome/desktop/remote-access/alternative-port "uint16 $STATE_VNC_PORT"
-                               dconf write /org/gnome/desktop/remote-access/use-alternative-port false
-                          else dconf write /org/gnome/desktop/remote-access/alternative-port "uint16 $STATE_VNC_PORT"
-                               dconf write /org/gnome/desktop/remote-access/use-alternative-port true
+                        CHEKPORT=$(ddnmap localhost | grep vnc | grep -w $STATE_VNC_PORT)||\
+                        CHEKPORT=$(netstat -anp | grep -w LISTEN | grep $STATE_VNC_PORT)
+                        echo $CHEKPORT
+                        if [[ $CHEKPORT != "" ]]
+                           then echo ddd
+                        else
+                            if [[ $STATE_VNC_PORT == "5900" ]]
+                               then dconf write /org/gnome/desktop/remote-access/alternative-port "uint16 $STATE_VNC_PORT"
+                                    dconf write /org/gnome/desktop/remote-access/use-alternative-port false
+                            else dconf write /org/gnome/desktop/remote-access/alternative-port "uint16 $STATE_VNC_PORT"
+                                 dconf write /org/gnome/desktop/remote-access/use-alternative-port true
+                            fi
                         fi
                 fi
                 sleep 0.5
