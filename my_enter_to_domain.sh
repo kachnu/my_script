@@ -825,7 +825,7 @@ case $ANSWER in
   3 ) echo "**********"
       net ads testjoin ;;   
   4 ) BackupForm ;;
-  5 ) pam-auth-update ;;
+  5 ) pam-auth-update --force;;
   6 ) Help;;
   * ) echo oops! - $ANSWER ;;
 esac
