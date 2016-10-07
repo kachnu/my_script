@@ -4,9 +4,9 @@
 # author: kachnu
 # email: ya.kachnu@yandex.ua
 
-DIALOG=zenity
-if [ ! -x "`which "$DIALOG"`" ]
- then eсho "Not Install - $DIALOG!"
+
+if [ ! -x "`which "zenity"`" ]
+ then eсho "Need Install - zenity!"
       exit 1
 fi
 
@@ -39,6 +39,9 @@ never - никогда не отображать иконку
 always - всегда отображать иконку"
                ATTENTION="ВНИМАНИЕ!"
                HELP="Данный скрипт позволяет настроить удаленный доступ к рабочему столу с использованием VNC"
+               PORT_ALLARM="- уже используется!
+               
+Выберите другой порт."
                ;;
              *) # All locales
                MAIN_LABEL="Configuring Remote Desktop"
@@ -68,6 +71,9 @@ never - never display an icon
 always - always display the icon"
                ATTENTION="ATTENTION!"
                HELP="This script allows you to configure remote access to the desktop using VNC"
+               PORT_ALLARM="- alredy used!
+               
+Enter another port"
                ;;
 esac
 #####################################################################
@@ -89,7 +95,7 @@ if [ $? = 0 ]
    else echo '#Some Error!'
 fi
 sleep 3"
-) | $DIALOG --progress --pulsate --auto-close \
+) | zenity --progress --pulsate --auto-close \
 --title "Installing vino"
 }
 #####################################################################
@@ -185,7 +191,7 @@ if [ -x "/usr/lib/vino/vino-server" ] # if vino is install then read values else
         else STATE_VNC_ROUTE="OFF"
       fi
  else
-      $DIALOG --question --title="$ATTENTION" --text="$VNC_INSTALL_VINO"
+      zenity --question --title="$ATTENTION" --text="$VNC_INSTALL_VINO"
       if [ $? -eq "0" ]
          then InstallVino
               MainForm
@@ -199,7 +205,7 @@ MainForm () # main window
 # start read vino values
 CheckState
 # open main window
-ANSWER=$($DIALOG --width=450 --height=300 --list --cancel-label="Exit" --title="$MAIN_LABEL" \
+ANSWER=$(zenity --width=450 --height=300 --list --cancel-label="Exit" --title="$MAIN_LABEL" \
       --text="$MAIN_TEXT" \
       --column="" --column="" \
         "$VNC_VIEW_DESKTOP" "$STATE_VNC_VIEW_DESKTOP"\
@@ -294,17 +300,16 @@ then
                         if [[ $STATE_VNC_PORT == "" ]]
                            then STATE_VNC_PORT="5900"
                         fi
-                        CHEKPORT=$(ddnmap localhost | grep vnc | grep -w $STATE_VNC_PORT)||\
+                        CHEKPORT=$(nmap localhost | grep vnc | grep -w $STATE_VNC_PORT)||\
                         CHEKPORT=$(netstat -anp | grep -w LISTEN | grep $STATE_VNC_PORT)
-                        echo $CHEKPORT
                         if [[ $CHEKPORT != "" ]]
-                           then echo ddd
-                        else
+                           then zenity --error --title="$ATTENTION" --text="$STATE_VNC_PORT $PORT_ALLARM"
+                           else
                             if [[ $STATE_VNC_PORT == "5900" ]]
                                then dconf write /org/gnome/desktop/remote-access/alternative-port "uint16 $STATE_VNC_PORT"
                                     dconf write /org/gnome/desktop/remote-access/use-alternative-port false
-                            else dconf write /org/gnome/desktop/remote-access/alternative-port "uint16 $STATE_VNC_PORT"
-                                 dconf write /org/gnome/desktop/remote-access/use-alternative-port true
+                               else dconf write /org/gnome/desktop/remote-access/alternative-port "uint16 $STATE_VNC_PORT"
+                                    dconf write /org/gnome/desktop/remote-access/use-alternative-port true
                             fi
                         fi
                 fi
