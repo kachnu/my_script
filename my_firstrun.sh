@@ -5,17 +5,17 @@
 # email: ya.kachnu@yandex.ua
 
 #Создание закладок в Thunar и окне проводника gtk-3
-if [ -f "/home/$USER/.gtk-bookmarks" ]; then
-   sed -i "s/REPLACEME/${USER}/g" /home/$USER/.gtk-bookmarks
+if [ -f "$HOME/.gtk-bookmarks" ]; then
+   sed -i "s/REPLACEME/${USER}/g" $HOME/.gtk-bookmarks
 fi
-if [ -f "/home/$USER/.config/gtk-3.0/bookmarks" ]; then
-   sed -i "s/REPLACEME/${USER}/g" /home/$USER/.config/gtk-3.0/bookmarks
+if [ -f "$HOME/.config/gtk-3.0/bookmarks" ]; then
+   sed -i "s/REPLACEME/${USER}/g" $HOME/.config/gtk-3.0/bookmarks
 fi
 
 #Создание ссылок на обои
-if [ ! -f /home/$USER/images/wallpapers/desktop-base ]; then
-   ln -s /usr/share/images/desktop-base /home/$USER/images/wallpapers/desktop-base
-   ln -s /usr/share/backgrounds /home/$USER/images/wallpapers/backgrounds
+if [ ! -f $HOME/images/wallpapers/desktop-base ]; then
+   ln -s /usr/share/images/desktop-base $HOME/images/wallpapers/desktop-base
+   ln -s /usr/share/backgrounds $HOME/images/wallpapers/backgrounds
 fi
 
 #Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
@@ -36,8 +36,8 @@ fi
 
 #Преднастройка ПО 
 #WPS-office (русский - при славянских локалях, бланк вместо инет шаблонов)
-if [ ! -f "/home/$USER/.config/Kingsoft/Office.conf" ] && [ -x "`which wps`" ] ; then
-  mkdir -p /home/$USER/.config/Kingsoft/
+if [ ! -f "$HOME/.config/Kingsoft/Office.conf" ] && [ -x "`which wps`" ] ; then
+  mkdir -p $HOME/.config/Kingsoft/
   case $LANG in
   uk*|ru*|be*) #UA RU BE locales
                echo "[General]
@@ -46,39 +46,39 @@ languages=ru_RU
 [6.0]
 common\wpshomeoptions\default=
 common\wpshomeoptions\StartWithHome=0
-common\wpshomeoptions\StartWithBlank=1" > /home/$USER/.config/Kingsoft/Office.conf
+common\wpshomeoptions\StartWithBlank=1" > $HOME/.config/Kingsoft/Office.conf
                ;;
             *) #All locales
 			echo "
 [6.0]
 common\wpshomeoptions\default=
 common\wpshomeoptions\StartWithHome=0
-common\wpshomeoptions\StartWithBlank=1" > /home/$USER/.config/Kingsoft/Office.conf
+common\wpshomeoptions\StartWithBlank=1" > $HOME/.config/Kingsoft/Office.conf
                ;;
   esac 
 fi
 #SMplayer (русский - при славянских локалях, монохромные ярлыки)
-if [ ! -f "/home/$USER/.config/smplayer/smplayer.ini" ] && [ -x "`which smplayer`" ] ; then
-  mkdir -p /home/$USER/.config/smplayer/
+if [ ! -f "$HOME/.config/smplayer/smplayer.ini" ] && [ -x "`which smplayer`" ] ; then
+  mkdir -p $HOME/.config/smplayer/
   case $LANG in
   uk*|ru*|be*) #UA RU BE locales
                echo "[gui]
 language=ru_RU
-iconset=Monochrome" > /home/$USER/.config/smplayer/smplayer.ini
+iconset=Monochrome" > $HOME/.config/smplayer/smplayer.ini
                ;;
             *) #All locales
 			echo "[gui]
-iconset=Monochrome" > /home/$USER/.config/smplayer/smplayer.ini
+iconset=Monochrome" > $HOME/.config/smplayer/smplayer.ini
                ;;
   esac 
 fi
 #ocenaudio (русский - при славянских локалях)
-if [ ! -f "/home/$USER/.local/share/data/OcenAudio/ocenaudio.cfg" ] && [ -x "`which ocenaudio`" ] ; then
-  mkdir -p /home/$USER/.local/share/data/OcenAudio/
+if [ ! -f "$HOME/.local/share/data/OcenAudio/ocenaudio.cfg" ] && [ -x "`which ocenaudio`" ] ; then
+  mkdir -p $HOME/.local/share/data/OcenAudio/
   case $LANG in
   uk*|ru*|be*) #UA RU BE locales
                echo "[ocenapp]
-language=ru_RU" > /home/$USER/.local/share/data/OcenAudio/ocenaudio.cfg
+language=ru_RU" > $HOME/.local/share/data/OcenAudio/ocenaudio.cfg
                ;;
             *) #All locales
 			   ;;
@@ -86,12 +86,12 @@ language=ru_RU" > /home/$USER/.local/share/data/OcenAudio/ocenaudio.cfg
 fi
 
 #masterpdfeditor3  (русский - при славянских локалях)
-if [ ! -f "/home/$USER/.config/Code Industry/Master PDF Editor.conf" ] && [ -x "`which masterpdfeditor3 `" ] ; then
-  mkdir -p "/home/$USER/.config/Code Industry/"
+if [ ! -f "$HOME/.config/Code Industry/Master PDF Editor.conf" ] && [ -x "`which masterpdfeditor3 `" ] ; then
+  mkdir -p "$HOME/.config/Code Industry/"
   case $LANG in
   uk*|ru*|be*) #UA RU BE locales
                echo "[General]
-lang=ru_ru" > "/home/$USER/.config/Code Industry/Master PDF Editor.conf"
+lang=ru_ru" > "$HOME/.config/Code Industry/Master PDF Editor.conf"
                ;;
             *) #All locales
 			   ;;
@@ -99,15 +99,15 @@ lang=ru_ru" > "/home/$USER/.config/Code Industry/Master PDF Editor.conf"
 fi
 
 #moc
-if [ -f "/home/$USER/.moc/config" ] && [ -x "/home/$USER/.moc/onsongchange.sh" ] ; then
-    sed -i "/^OnSongChange/s/^OnSongChange = \"\/\"/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" /home/$USER/.moc/config
+if [ -f "$HOME/.moc/config" ] && [ -x "$HOME/.moc/onsongchange.sh" ] ; then
+    sed -i "/^OnSongChange/s/^OnSongChange = \"\/\"/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" $HOME/.moc/config
 fi
 
 
 
 #Убираем данный скрипт из автозапуска
-if [ -f "/home/$USER/.config/autostart/firstrun.desktop" ]; then
-   sed -i "s/Hidden=false/Hidden=true/g" /home/$USER/.config/autostart/firstrun.desktop
+if [ -f "$HOME/.config/autostart/firstrun.desktop" ]; then
+   sed -i "s/Hidden=false/Hidden=true/g" $HOME/.config/autostart/firstrun.desktop
 fi
 
 exit 0

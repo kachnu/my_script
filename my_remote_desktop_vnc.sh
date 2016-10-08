@@ -294,7 +294,7 @@ then
                 MainForm
                 ;;
     "$VNC_PORT"*) # port selection for access
-                STATE_VNC_PORT=`zenity --entry --title="Enter access port" --text="Enter port" --entry-text="$STATE_VNC_PORT"`
+                STATE_VNC_PORT=`zenity --entry --title="Enter access port" --text="Enter port (valid values 5000-50000)" --entry-text="$STATE_VNC_PORT"`
                 if [ $? == 0 ]
                    then
                         if [[ $STATE_VNC_PORT == "" ]]
