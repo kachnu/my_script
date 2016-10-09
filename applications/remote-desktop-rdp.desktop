@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Remote Desktop RDP
+Name[ru]=Удаленный рабочий стол RDP
+GenericName=Remote Desktop RDP
+GenericName[ru]=Удаленный рабочий стол RPD
+Comment=Settings Remote Desktop 
+Comment[ru]=Настройка удаленного рабочего стола
+Exec=x-terminal-emulator -e /usr/local/bin/my_remote_desktop_rdp.sh
+Icon=preferences-desktop-remote-desktop
+Terminal=false
+Type=Application
+Categories=Settings;X-GNOME-NetworkSettings;
