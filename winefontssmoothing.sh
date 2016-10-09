@@ -11,9 +11,6 @@ WINEPREFIX=${WINEPREFIX:-$HOME/.wine}
 #DIALOG=whiptail #
 DIALOG=gdialog
 
-
-
-
 if [ ! -x "`which "$WINE"`" ]
 then
    case $LANG in

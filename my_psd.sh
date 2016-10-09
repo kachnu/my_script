@@ -7,7 +7,7 @@ DIALOG=whiptail #Установка типа графического диало
 TEXT_EDITOR="nano"
 TERMINAL="x-terminal-emulator"
 
-if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
+if [ ! -x "`which "$DIALOG"`" ]
  then eсho "Not Install - $DIALOG!"
 fi
 

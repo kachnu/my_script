@@ -5,11 +5,7 @@
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]
- then
-  DIALOG=whiptail
-  if [ ! -x "`which "$DIALOG"`" ]
-  then DIALOG=dialog
-  fi
+   then DIALOG=dialog
 fi
 
 case $LANG in
@@ -80,7 +76,7 @@ echo "$HELP"
 #########################################################
 RestartSkype () #Перезапуск скайпа
 {
-whiptail --title "$ATTENTION" --yesno "$RESTART_TEXT" 10 60
+$DIALOG --title "$ATTENTION" --yesno "$RESTART_TEXT" 10 60
 if [ $? == 0 ]
  then 
  killall skype.real

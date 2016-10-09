@@ -300,8 +300,8 @@ then
                         if [[ $STATE_VNC_PORT == "" ]]
                            then STATE_VNC_PORT="5900"
                         fi
-                        CHEKPORT=$(nmap localhost | grep vnc | grep -w $STATE_VNC_PORT)||\
-                        CHEKPORT=$(netstat -anp | grep -w LISTEN | grep $STATE_VNC_PORT)
+                        # CHEKPORT=$(nmap localhost | grep vnc | grep -w $STATE_VNC_PORT)||\
+                        CHEKPORT=$(netstat -anp | grep -w LISTEN | grep "$STATE_VNC_PORT ")
                         if [[ $CHEKPORT != "" ]]
                            then zenity --error --title="$ATTENTION" --text="$STATE_VNC_PORT $PORT_ALLARM"
                            else

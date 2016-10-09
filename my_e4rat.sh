@@ -5,11 +5,7 @@
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]
- then
-  DIALOG=whiptail
-  if [ ! -x "`which "$DIALOG"`" ]
-  then DIALOG=dialog
-  fi
+   then DIALOG=dialog
 fi
 
 case $LANG in

@@ -5,11 +5,7 @@
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]
- then
-  DIALOG=whiptail
-  if [ ! -x "`which "$DIALOG"`" ]
-  then DIALOG=dialog
-  fi
+   then DIALOG=dialog
 fi
 
 case $LANG in
@@ -100,7 +96,7 @@ PrelinkSystem () #Перезагрузка
 {
 if [ -x "`which "/usr/sbin/prelink"`" ]
  then
-  whiptail --title "$ATTENTION" --yesno "$PRELINK_TEXT" 10 60
+  $DIALOG --title "$ATTENTION" --yesno "$PRELINK_TEXT" 10 60
   if [ $? == 0 ]
      then echo "Start prelink"; sudo prelink -amvRf
    fi
