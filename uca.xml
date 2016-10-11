@@ -1,0 +1,368 @@
+<?xml encoding="UTF-8" version="1.0"?>
+<actions>
+<action>
+	<icon>catfish</icon>
+	<name>Найти файл</name>
+	<unique-id>1426920334780759-1</unique-id>
+	<command>catfish --hidden --path=%f</command>
+	<description>Search for files with Catfish</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>terminator</icon>
+	<name>Открыть терминал</name>
+	<unique-id>1437381327935892-1</unique-id>
+	<command>x-terminal-emulator --working-directory %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>terminator</icon>
+	<name>Открыть root-терминал</name>
+	<unique-id>1437381335600035-2</unique-id>
+	<command>gksudo &quot;x-terminal-emulator --working-directory %f&quot;</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>file-manager</icon>
+	<name>Открыть как root</name>
+	<unique-id>1426920334780834-4</unique-id>
+	<command>gksudo &quot;thunar %f&quot;</command>
+	<description>Open directory as root</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>system-users</icon>
+	<name>Сделать Вас владельцем</name>
+	<unique-id>1426920334780880-6</unique-id>
+	<command>gksudo &quot;chown -hR $USER %F&quot;</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>system-users</icon>
+	<name>Сделать root владельцем</name>
+	<unique-id>1426920334780903-7</unique-id>
+	<command>gksudo &quot;chown -hR root %F&quot;</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>avatar-default</icon>
+	<name>Открыть под root</name>
+	<unique-id>1454143890799404-3</unique-id>
+	<command>gksudo exo-open %f</command>
+	<description>Open as root</description>
+	<patterns>*</patterns>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>geany</icon>
+	<name>Редактировать под root</name>
+	<unique-id>1463332570656329-5</unique-id>
+	<command>gksudo geany %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<text-files/>
+</action>
+<action>
+	<icon>media-eject</icon>
+	<name>Монтировать iso</name>
+	<unique-id>1432888228985887-14</unique-id>
+	<command>fuseiso -n -p %f ~/Desktop/%n.mount &amp;&amp; echo file://$(echo ~/Desktop/%n.mount  | sed &apos;s| |\%%20|g&apos;) %n.mount &gt;&gt; $HOME/.gtk-bookmarks</command>
+	<description></description>
+	<patterns>*.iso;*.ISO;*.bin;*.BIN;*.nrg;*.NRG;*.mdf;*.MDF</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>media-eject</icon>
+	<name>Размонтировать iso</name>
+	<unique-id>1426920334780994-11</unique-id>
+	<command>fusermount -uz %f</command>
+	<description></description>
+	<patterns>*.mount</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>drive-removable-media</icon>
+	<name>Монтировать архив</name>
+	<unique-id>1468056223184357-3</unique-id>
+	<command>/usr/lib/gvfs/gvfsd-archive file=%f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>media-optical</icon>
+	<name>Конвертировать в iso</name>
+	<unique-id>1426920334781015-12</unique-id>
+	<command>nrg2iso %f %f.iso | mv %f.iso $(echo %f.iso | sed &apos;s|.nrg||g&apos;)</command>
+	<description></description>
+	<patterns>*.nrg;*.NRG</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>media-optical</icon>
+	<name>Конвертировать в iso</name>
+	<unique-id>1426920334781036-13</unique-id>
+	<command>ccd2iso %f %f.iso | mv %f.iso $(echo %f.iso | sed &apos;s|.img||g&apos;)</command>
+	<description></description>
+	<patterns>*.img;*.IMG</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>media-optical</icon>
+	<name>Конвертировать в iso</name>
+	<unique-id>1426920334781057-14</unique-id>
+	<command>mdf2iso %f</command>
+	<description></description>
+	<patterns>*.mdf;*.MDF</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>gnome-remote-desktop</icon>
+	<name>Запустить в KVM</name>
+	<unique-id>1463447577196860-6</unique-id>
+	<command>kvm --no-acpi -m 1024 %f || gksudo &apos;kvm --no-acpi -m 1024 %f&apos;</command>
+	<description></description>
+	<patterns>*.iso;*.ISO;sd?;cdrom;*.vdi;*.VDI;*.vhd;*.VHD;*.vmdk;*.VMDK;*.img;*.IMG;*.raw;*.RAW;*.qcow;*.QCOW</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>gtk-media-play-ltr</icon>
+	<name>Воспроизвести в audacious</name>
+	<unique-id>1426920334781116-17</unique-id>
+	<command>audacious %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<audio-files/>
+</action>
+<action>
+	<icon>music-library</icon>
+	<name>Добавить в плейлист audacious</name>
+	<unique-id>1426920334781137-18</unique-id>
+	<command>audacious -e %F</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+</action>
+<action>
+	<icon>document-print</icon>
+	<name>Печать...</name>
+	<unique-id>1426920334781300-26</unique-id>
+	<command>gtklp %F</command>
+	<description>Print PDF</description>
+	<patterns>*.pdf;*.PDF</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>document-print</icon>
+	<name>Печать...</name>
+	<unique-id>1426920334781321-27</unique-id>
+	<command>gtklp %F</command>
+	<description>Print image and text</description>
+	<patterns>*</patterns>
+	<image-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>folder-publicshare</icon>
+	<name>Открыть доступ по сети</name>
+	<unique-id>1435678070404378-1</unique-id>
+	<command>net usershare add %n %f &quot;&quot; Everyone:F guest_ok=y &amp;&amp; chmod 775 %f &amp;&amp; echo file://$(echo %f | sed &apos;s| |\%%20|g&apos;) %n.share &gt;&gt; $HOME/.gtk-bookmarks &amp;&amp; gvfs-set-attribute -t stringv %f metadata::emblems emblem-shared</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>folder</icon>
+	<name>Закрыть доступ по сети</name>
+	<unique-id>1435678094410979-2</unique-id>
+	<command>net usershare delete %n &amp;&amp; chmod 740 %f &amp;&amp; cat $HOME/.gtk-bookmarks | grep -v %n.share &gt; $HOME/.gtk-bookmarks.tmp &amp;&amp; mv $HOME/.gtk-bookmarks.tmp $HOME/.gtk-bookmarks &amp;&amp; gvfs-set-attribute -t stringv %f metadata::emblems &apos;&apos;</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>document-import</icon>
+	<name>Добавить в автозагрузку</name>
+	<unique-id>1432886017453511-11</unique-id>
+	<command>cp %f ~/.config/autostart/ &amp;&amp; gvfs-set-attribute -t stringv %f metadata::emblems emblem-default</command>
+	<description></description>
+	<patterns>*.desktop</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>document-export</icon>
+	<name>Убрать из автозагрузки</name>
+	<unique-id>1435678111158429-3</unique-id>
+	<command>rm ~/.config/autostart/%n &amp;&amp; gvfs-set-attribute -t stringv %f metadata::emblems &apos;&apos;</command>
+	<description></description>
+	<patterns>*.desktop</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>emblem-symbolic-link</icon>
+	<name>Создать ярлык</name>
+	<unique-id>1426920334781410-31</unique-id>
+	<command>ln -s %f %n.link</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>ghex</icon>
+	<name>Открыть в hex-editor</name>
+	<unique-id>1426920334781429-32</unique-id>
+	<command>ghex %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>zim</icon>
+	<name>Скопировать путь</name>
+	<unique-id>1426920334781451-33</unique-id>
+	<command>echo -n %f | xclip -selection &quot;clipboard&quot;</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>user-info</icon>
+	<name>Информация о файле</name>
+	<unique-id>1440076178984592-4</unique-id>
+	<command>file %F | zenity --text-info --title=&quot;File info&quot; --width=400 --height=200</command>
+	<description>determine file type</description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>application-x-rar</icon>
+	<name>Создать архив RARv4</name>
+	<unique-id>1440759191958654-2</unique-id>
+	<command>x-terminal-emulator -e rar a -hp -ma4 %n.rar %N</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>application-x-rar</icon>
+	<name>Создать архив RARv5</name>
+	<unique-id>1440759262390439-3</unique-id>
+	<command>x-terminal-emulator -e rar a -hp -ma5 %n.rar %N</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Выполнить в терминале</name>
+	<unique-id>1441968850113593-1</unique-id>
+	<command>chmod +x %f; x-terminal-emulator --command=&quot;./%n || exit&quot;</command>
+	<description></description>
+	<patterns>*.sh;*.py;*.pl</patterns>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>android</icon>
+	<name>Запустить Android приложение</name>
+	<unique-id>1452163447655600-8</unique-id>
+	<command>/usr/local/bin/my_start_android_apps.sh %f</command>
+	<description></description>
+	<patterns>*.apk</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>android</icon>
+	<name>Запустить Android приложение</name>
+	<unique-id>1452163457183658-9</unique-id>
+	<command>/usr/local/bin/my_start_android_apps.sh %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>drive-removable-media</icon>
+	<name>Монтировать torrent</name>
+	<unique-id>1453668468690132-4</unique-id>
+	<command>mkdir %n.mount &amp;&amp; btfs %f %n.mount</command>
+	<description></description>
+	<patterns>*.torrent</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>drive-removable-media</icon>
+	<name>Размонтировать torrent</name>
+	<unique-id>1453668267467988-2</unique-id>
+	<command>fusermount -uz %f; rmdir %f</command>
+	<description></description>
+	<patterns>*.torrent.mount</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>eiciel</icon>
+	<name>Редактировать атрибуты и права</name>
+	<unique-id>1454145920017306-5</unique-id>
+	<command>eiciel %f</command>
+	<description>eiciel</description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>package-remove</icon>
+	<name>Удалить программу</name>
+	<unique-id>1476190281928686-8</unique-id>
+	<command>x-terminal-emulator --command=&quot;/usr/local/bin/my_rm_package_desktop_files.sh %N&quot;</command>
+	<description>Purge package from *.desktop</description>
+	<patterns>*.desktop</patterns>
+	<other-files/>
+</action>
+</actions>
