@@ -20,7 +20,11 @@ case $LANG in
                NEW_KEY_RDP="* Новый ключ RSA"
                CRYPT_LEVEL_RDP="* Уровень шифрования"
                COLOR_RDP="* Глубина цвета"
+               FORK_RDP="* Новая сесcия для других ПК"
                HELP_RDP="Справка"
+               FORK_TEXT="Выберите хотите ли открывать новую сессию:
+  yes - при доступе с другого ПК будет начата новая сессия
+  no - при повторном доступе пользователя с другого ПК, пользователь попадет в ранее открытую сессию"
                CRYPT_TEXT="Выберите уровень шифрования подключения"
                COLOR_TEXT="Выберите глубину цвета"
                PORT_TEXT="Введите порт доступа (1024-49151)
@@ -49,7 +53,11 @@ ___________________________________"
                  NEW_KEY_RDP="* New RSA key"
                  CRYPT_LEVEL_RDP="* Crypt level"
                  COLOR_RDP="* Color depth"
+                 FORK_RDP="* New Session to other PCs"
                  HELP_RDP="Help"
+                 FORK_TEXT="Select whether you want to open a new session:
+  yes - the new session will be started when you access from another PC
+  no - during the second user access from another PC, the user will get in before an open session"
                  CRYPT_TEXT="Select the connection encryption level"
                  COLOR_TEXT="Select a color depth"
                  PORT_TEXT="Enter the access port (1024-49151)
@@ -83,6 +91,7 @@ if [ -f "/usr/sbin/xrdp" ] # if xrdp is install then read values else install xr
       STATE_PORT_RDP=$(cat /etc/xrdp/xrdp.ini | grep -m 1 port | sed "s/ //g" | sed "s/port=//g")
       STATE_CRYPT_LEVEL_RDP=$(cat /etc/xrdp/xrdp.ini | grep -m 1 crypt_level | sed "s/ //g" | sed "s/crypt_level=//g")
       STATE_COLOR_RDP=$(cat /etc/xrdp/xrdp.ini | grep -m 1 max_bpp | sed "s/ //g" | sed "s/max_bpp=//g")
+      STATE_FORK_RDP=$(cat /etc/xrdp/xrdp.ini | grep -m 1 fork | sed "s/ //g" | sed "s/fork=//g")
    else echo "Need install xrdp!"
       read input
 fi
@@ -112,13 +121,14 @@ MainForm () # Main form
 {
 CheckState
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
-    "$MAIN_TEXT" 15 50\
-    8\
+    "$MAIN_TEXT" 18 50\
+    10\
         "$START_STOP_RDP" "$STATE_XRDP"\
         "$AUTOSTART_RDP" "$STATE_AUTORUN_XRDP"\
         "$PORT_RDP" "$STATE_PORT_RDP"\
         "$CRYPT_LEVEL_RDP" "$STATE_CRYPT_LEVEL_RDP"\
         "$COLOR_RDP" "$STATE_COLOR_RDP"\
+        "$FORK_RDP" "$STATE_FORK_RDP"\
         "$NEW_KEY_RDP" ""\
         "$RESTART_RDP" ""\
         "$HELP_RDP" "" 3>&1 1>&2 2>&3)
@@ -213,6 +223,21 @@ case $ANSWER in
                         MainForm
                      fi
                      sudo sed -i "s/^max_bpp.*/max_bpp=${STATE_COLOR_RDP}/" /etc/xrdp/xrdp.ini
+        ;;
+        "$FORK_RDP")  state_y="OFF"
+                      state_n="OFF"
+                      case $STATE_FORK_RDP in
+                           "no"|0|"false") state_n="ON";;
+                           "yes"|1|"true") state_y="ON";;
+                      esac
+                      STATE_FORK_RDP=$($DIALOG --title "FORK STATE" --radiolist \
+                            "$FORK_TEXT" 15 50 2 \
+                            "yes" "" "$state_y"\
+                            "no" "" "$state_n" 3>&1 1>&2 2>&3)
+                     if [ $? != 0 ]; then
+                        MainForm
+                     fi
+                     sudo sed -i "s/^fork.*/fork=${STATE_FORK_RDP}/" /etc/xrdp/xrdp.ini
         ;;
         "$HELP_RDP") echo "$HELP"
                      echo "$EXIT_TEXT"
