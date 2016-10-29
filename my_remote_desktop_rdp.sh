@@ -139,7 +139,7 @@ case $ANSWER in
         "$START_STOP_RDP") if [[ "$STATE_XRDP" == "ON" ]]
                              then sudo systemctl stop xrdp-sesman.service
                                   sudo systemctl stop xrdp.service
-                             else sudo systemctl start xrdp.service
+                             else sudo systemctl start xrdp.service || (sudo dpkg-reconfigure xrdp && sudo systemctl start xrdp.service)
                                   sudo systemctl start xrdp-sesman.service
                            fi
                            sleep 2
