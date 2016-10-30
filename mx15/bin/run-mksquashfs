@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# This script is used to capture the return code from mksquashfs
+# and store it in a file, the name of which is passed as the
+# first command line parameter.  Could make it more general purpose
+# having the command name passed as the 2nd parameter.
+#
+# This script is used when launching mksquashfs inside a terminal.
+
+file="$1"
+shift
+
+mksquashfs "$@"
+ret="$?"
+echo $ret > $file

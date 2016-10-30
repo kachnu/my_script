@@ -1,0 +1,23 @@
+#!/bin/bash
+
+TEXTDOMAINDIR=/usr/share/locale 
+TEXTDOMAIN=mx-switchuser
+
+if [ ! -e ~/.switchuser ] ; then
+  CHECKBOX=$(yad --form --title=$"User Switching"  --text=$"This tool allows you to switch to a different user without closing down your current session.
+
+To return to the original user, simply press Ctrl-Alt-F7. Go back again with Ctrl-Alt-F8.
+
+Do you want to switch to another user?" --field=$"Do not show this screen again":chk)
+  if [ $? -eq 0 ] ; then
+    if [ $CHECKBOX == "TRUE|" ] ; then
+      touch ~/.switchuser
+    fi
+  else 
+    exit 1
+  fi
+fi
+
+dm-tool switch-to-greeter
+exit 0
+

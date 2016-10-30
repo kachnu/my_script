@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# This script is designed to be placed in /usr/local/bin in order to
+# run instead of the normal /usr/bin/xfce4-session-logout
+
+ME=$(basename $0)
+
+LOCKOUT_TIME=60
+last_ps_file=/live/config/last-persist-save
+last_as_file=/live/config/last-auto-save
+
+export TEXTDOMAIN=persist-config
+
+DO_IT="exec"
+case $1 in
+    -t|--test) DO_IT="echo TEST:"
+               shift ;;
+esac
+
+PERSIST_SAVE="persist-save"
+PERSIST_SAVE_CONF="/live/config/persist-save.conf"
+CONF_FILE=/etc/live/config/persist-config.conf
+
+try_paths="/sbin /bin /usr/sbin /usr/bin"
+
+main() {
+
+    local rpath
+    case $ME in
+        xfce4-session-logout) rpath=/usr/bin  ;;
+               halt|poweroff) rpath=/sbin     ;;
+                           *) rpath=$(find_path $ME) ;;
+    esac
+
+    [ -z "$rpath" ] && error "Command name \"$ME\" is not recognised"
+
+    # if the real path contains /sbin the we use sudo
+    local sudo
+    [ -z "${rpath##*/sbin*}" ] && sudo="sudo "
+
+    local real_cmd="$DO_IT $sudo$rpath/$ME"
+    [ -e $PERSIST_SAVE_CONF ] || $real_cmd "$@"
+
+    if ! which $PERSIST_SAVE &>/dev/null; then
+        echo "No $PERSIST_SAVE program was found"
+        $real_cmd "$@"
+    fi
+
+    antiX_lib=/usr/local/lib/antiX
+    source $antiX_lib/antiX-common.sh "$@"
+
+    TITLE="$(gt "MX Logout with Persist Save")"
+
+    #local _Automatic_="$(gt "Automatic")"
+    #local _Semi_Automatic_="$(gt "Semi-Automatic")"
+    #local _Manual_="$(gt "Manual")"
+
+    AUTOSAVE_MODE=$_Semi_Automatic_
+    [ -r $CONF_FILE ] && source $CONF_FILE
+
+    local persist_opts
+    case "$AUTOSAVE_MODE" in
+        1*) persist_opts=--quiet ;;
+        2*) ;;
+        3*) vmsg "Not auto-saving.  AUTOSAVE_MODE was set to $AUTOSAVE_MODE"
+            $real_cmd "$@"
+            ;;
+        *)  okay_box "$TITLE" "" \
+                    "$(pfgt "Unknown auto-save mode %s.  Defaulting to $s." \
+                    "[b]$AUTOSAVED_MODE[/]" "[b]$_Semi_Automatic_[/]")"
+            ;;
+    esac
+
+    local file prev diff now=$(date +%s)
+    for file in $last_as_file $last_ps_file; do
+        test -r $file || continue
+        read prev 2>/dev/null < $file
+        diff=$(($now - $prev))
+        if [ $diff -le $LOCKOUT_TIME ]; then
+            timeout_box 2 \
+                "$(pfgt "Already saved less than %s seconds ago" $diff)" \
+                "$(pfgt "Won't autosave within %s seconds of a previous save" $LOCKOUT_TIME)"
+
+            $real_cmd
+            exit 0
+        fi
+    done
+
+    rm -f $last_ps_file
+
+    sudo $PERSIST_SAVE $persist_opts 2>&1
+    ret=$?
+    if [ $ret -eq 0 ]; then
+        date +%s > $last_as_file
+        $real_cmd "$@"
+    fi
+
+    yes_no_box "Persist Save Error" ""                              \
+        "$(gt "There was an error saving your changes.")"           \
+        ""                                                          \
+        "$(pfgt "Do you still want to %s?" "[b]logout[/]")"         \
+        && $real_cmd "$@"
+}
+
+error() {
+    echo "$*" >&2
+    exit 2
+}
+
+find_path() {
+    local p  prog=$1
+    for p in $try_paths; do
+        test -e $p/$prog || continue
+        echo $p
+        return 0
+    done
+    return 1
+}
+
+main "$@"

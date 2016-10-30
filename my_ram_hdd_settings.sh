@@ -28,7 +28,7 @@ case $LANG in
                MENU_SWAP_FORM="Настройки Swap"
                MENU_OTHER_FORM="Дополнительные настройки"
                MENU_TMP_TO_RAM="Временные файлы /tmp в ОЗУ"
-               MENU_LOG_TO_RAM="Логи /var/* в ОЗУ"
+               MENU_LOG_TO_RAM="Переменные /var/* в ОЗУ"
                MENU_AUTOSETTINGS_SSD="Автонастройка для SSD"
                MENU_EDIT_FSTAB="Редактирование /etc/fstab"
                MENU_EDIT_SYSCTLCONF="Редактирование /etc/sysctl.conf"
@@ -293,7 +293,7 @@ ____________________________________
 Данная технология уже давно применяется в Solaris, Fedora и ArchLinux
 Не рекомендуется использовать на ПК с малым объемом ОЗУ 
 ____________________________________
-* $MENU_LOG_TO_RAM - Позволяет хранить логи в ОЗУ, уменьшает износ HDD и SSD, однако логи исчезают после перезагрузки ПК. 
+* $MENU_LOG_TO_RAM - Позволяет хранить некоторые логи и переменные в ОЗУ, уменьшает износ HDD и SSD, однако логи исчезают после перезагрузки ПК. 
 ____________________________________
 * $MENU_AUTOSETTINGS_SSD - Автоматическое конфигурирование системы (параметров монтирования, свопирования, пределов сброса страниц памяти и т.д.) на работу с SSD
 ____________________________________"
@@ -1087,7 +1087,7 @@ case $ANSWER in
                  then echo -e "#Mount /var/* to RAM 
 tmpfs /var/tmp tmpfs defaults 0 0
 tmpfs /var/lock tmpfs defaults 0 0
-tmpfs /var/log tmpfs defaults,size=20M 0 0
+#tmpfs /var/log tmpfs defaults,size=20M 0 0
 tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
                  else sudo sed -i '/\/var\//d' /etc/fstab
               fi
@@ -1124,7 +1124,7 @@ vm.dirty_background_ratio=5" | sudo tee -a /etc/sysctl.conf
                       echo -e "#Mount /var/* to RAM 
 tmpfs /var/tmp tmpfs defaults 0 0
 tmpfs /var/lock tmpfs defaults 0 0
-tmpfs /var/log tmpfs defaults,size=20M 0 0
+#tmpfs /var/log tmpfs defaults,size=20M 0 0
 tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
               
                       # setup preload sortstrategy
