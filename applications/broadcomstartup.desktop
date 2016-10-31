@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Activation drivers WiFi Broadcom
+Name[ru]=Активация драйверов WiFi Broadcom
+Comment=Activation drivers WiFi Broadcom
+Exec=x-terminal-emulator -e /usr/local/bin/BroadcomStartup
+Icon=notification-network-wireless-full
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=System;
