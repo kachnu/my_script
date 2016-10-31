@@ -111,7 +111,7 @@ else
   
   DEV_BC=""
   
-  touch /etc/bcm-ckd
+  # touch /etc/bcm-ckd
 
   #test to see if a broadcom wireless internet device is present
   lspci -n | grep -E -q '^[^[:space:]]+\.0[[:space:]]+(0280)+(:)+[[:space:]]+(14e4)'
