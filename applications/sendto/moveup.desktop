@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Name=Next Directory Up
+Name[ru]=На директурю вверх
+Exec=mv -t ../ %F
+Icon=system-file-manager
+Type=Application

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Move to ...
+Name[ru]=Переместить в ...
+Exec=mv -t `zenity --file-selection --directory` %F
+Icon=system-file-manager
+Type=Application
+StartupNotify=false
+Terminal=false
