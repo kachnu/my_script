@@ -3,7 +3,7 @@
 # It was changed by: kachnu
 # email: ya.kachnu@yandex.ua
 
-version="BroadcomStartup-1.4.1 (Jun. 28, 2016) - was changed by: kachnu "
+version="BroadcomStartup-1.4 (Jun. 28, 2016) - was changed by kachnu"
 
 show_help () {
 	echo "$help_text"
@@ -104,6 +104,23 @@ if [ -f /etc/modprobe.d/broadcom-sta-dkms.conf ]; then
 fi
 }
 
+wlUnblacklist()
+{
+if [ -f /etc/modprobe.d/broadcom-sta-dkms.conf ]; then
+  sed -i 's/blacklist wl$//;s/#blacklist ssb/blacklist ssb/;\
+s/#blacklist b44/blacklist b44/;s/#blacklist b43legacy/blacklist b43legacy/;\
+s/#blacklist bcma/blacklist bcma/;s/#blacklist b43/blacklist b43/' /etc/modprobe.d/broadcom-sta-dkms.conf
+
+  [ -x /etc/init.d/network-manager ] && service network-manager stop
+  modprobe -r b44 b43 b43legacy ssb brcmsmac bcma
+  modprobe wl cfg80211
+  [ -x /etc/init.d/network-manager ] && service network-manager start
+  sleep 2  #(small delay and the networks show up)
+  pkill wpa_supplicant
+
+fi
+}
+
 if [ -e /etc/bcm-ckd ]; then
   :
 
@@ -117,7 +134,7 @@ else
   lspci -n | grep -E -q '^[^[:space:]]+\.0[[:space:]]+(0280)+(:)+[[:space:]]+(14e4)'
   if [ "$?" -eq 0 ]; then
     DEV_BC=$(lspci -n | grep -E '^[^[:space:]]+\.0[[:space:]]+(0280)+(:)+[[:space:]]+(14e4)' | grep -Eio '[a-f0-9]{4}:[a-f0-9]{4}' | grep -Eio [a-f0-9]{4}$ | tr '[A-Z]' '[a-z]')
-    echo "Find broadcom wireless - $DEV_BC"
+    echo "Find broadcom wireless ID - $DEV_BC"
     case $DEV_BC in
 
       4307|4318|4319|4321|4322|4350|43a9|43aa|a8d6|a8db) b43Unblacklist
@@ -158,9 +175,8 @@ else
                                                            b43Unblacklist
                                                          fi
                                                          ;;
-
-                                                      *) #misc type of broadcom device that we don't know what to do with, so do nothing
-                                                         :
+                                                      *) #misc type of broadcom device, set default - wl
+                                                         wlUnblacklist
                                                          ;;
     esac
   else
@@ -172,14 +188,14 @@ else
   lspci -n | grep -E -q '^[^[:space:]]+\.0[[:space:]]+(0200)+(:)+[[:space:]]+(14e4)'
   if [ "$?" -eq 0 ]; then
     DEV_BC=$(lspci -n | grep -E '^[^[:space:]]+\.0[[:space:]]+(0200)+(:)+[[:space:]]+(14e4)' | grep -Eio '[a-f0-9]{4}:[a-f0-9]{4}' | grep -Eio [a-f0-9]{4}$ | tr '[A-Z]' '[a-z]')
-    echo "Find broadcom wireless - $DEV_BC"
+    echo "Find broadcom wireless ID - $DEV_BC"
     case $DEV_BC in
 
                                          170c|4401|4402) b44Unblacklist
                                                          ;;
 
-                                                      *) #misc type of broadcom wired internet device that we don't know what to do with, so do nothing
-                                                         :
+                                                      *) #misc type of broadcom device, set default - wl
+                                                         wlUnblacklist
                                                          ;;
     esac
   else
