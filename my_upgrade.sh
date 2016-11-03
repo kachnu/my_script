@@ -250,7 +250,16 @@ use_proxy = on" | sudo tee --append /etc/wgetrc > /dev/null
 		     sudo mv /etc/wgetrc.bak /etc/wgetrc
 		  fi
 		  if [ -x "`sudo which update-pepperflashplugin-nonfree-direct`" ]
-		     then sudo update-pepperflashplugin-nonfree-direct
+		     then 
+		     sudo cp /etc/wgetrc /etc/wgetrc.bak
+		     if [ "$ftp_proxy" != '' ] || [ "$http_proxy" != '' ] || [ "$https_proxy" != '' ]
+			    then echo "ftp_proxy = $ftp_proxy
+http_proxy = $http_proxy
+https_proxy = $https_proxy
+use_proxy = on" | sudo tee --append /etc/wgetrc > /dev/null
+		     fi
+		     sudo update-pepperflashplugin-nonfree-direct
+		     sudo mv /etc/wgetrc.bak /etc/wgetrc
 		  fi
 		  ;;
 	  h ) Help;;
