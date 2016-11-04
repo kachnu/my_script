@@ -59,11 +59,12 @@ fi
 b43Unblacklist()
 {
 if [ -f /etc/modprobe.d/broadcom-sta-dkms.conf ]; then
+  sed -i 's/blacklist wl$//;s/#blacklist ssb/blacklist ssb/;s/#blacklist b44/blacklist b44/;s/#blacklist b43legacy/blacklist b43legacy/;s/#blacklist bcma/blacklist bcma/;s/#blacklist b43/blacklist b43/' /etc/modprobe.d/broadcom-sta-dkms.conf
   sed -i 's/blacklist b43$/#blacklist b43/;s/blacklist bcma/#blacklist bcma/;s/blacklist ssb/#blacklist ssb/' /etc/modprobe.d/broadcom-sta-dkms.conf
   sed -i -e "\$ablacklist wl" /etc/modprobe.d/broadcom-sta-dkms.conf
 
   [ -x /etc/init.d/network-manager ] && service network-manager stop
-  modprobe -r wl cfg80211
+  modprobe -r wl cfg80211 b44 b43legacy brcmsmac
   modprobe b43
   [ -x /etc/init.d/network-manager ] && service network-manager start
   sleep 2  #(small delay and the networks show up)
@@ -75,11 +76,12 @@ fi
 b43legacyUnblacklist()
 {
 if [ -f /etc/modprobe.d/broadcom-sta-dkms.conf ]; then
+  sed -i 's/blacklist wl$//;s/#blacklist ssb/blacklist ssb/;s/#blacklist b44/blacklist b44/;s/#blacklist b43legacy/blacklist b43legacy/;s/#blacklist bcma/blacklist bcma/;s/#blacklist b43/blacklist b43/' /etc/modprobe.d/broadcom-sta-dkms.conf
   sed -i 's/blacklist b43legacy$/#blacklist b43legacy/;s/blacklist ssb/#blacklist ssb/' /etc/modprobe.d/broadcom-sta-dkms.conf
   sed -i -e "\$ablacklist wl" /etc/modprobe.d/broadcom-sta-dkms.conf
 
   [ -x /etc/init.d/network-manager ] && service network-manager stop
-  modprobe -r wl cfg80211
+  modprobe -r wl cfg80211 b44 b43 brcmsmac bcma
   modprobe b43legacy
   [ -x /etc/init.d/network-manager ] && service network-manager start
   sleep 2  #(small delay and the networks show up)
@@ -91,6 +93,7 @@ fi
 b44Unblacklist()
 {
 if [ -f /etc/modprobe.d/broadcom-sta-dkms.conf ]; then
+  sed -i 's/blacklist wl$//;s/#blacklist ssb/blacklist ssb/;s/#blacklist b44/blacklist b44/;s/#blacklist b43legacy/blacklist b43legacy/;s/#blacklist bcma/blacklist bcma/;s/#blacklist b43/blacklist b43/' /etc/modprobe.d/broadcom-sta-dkms.conf
   sed -i 's/blacklist b44$/#blacklist b44/;s/blacklist ssb/#blacklist ssb/' /etc/modprobe.d/broadcom-sta-dkms.conf
   sed -i -e "\$ablacklist wl" /etc/modprobe.d/broadcom-sta-dkms.conf
 
@@ -107,9 +110,7 @@ fi
 wlUnblacklist()
 {
 if [ -f /etc/modprobe.d/broadcom-sta-dkms.conf ]; then
-  sed -i 's/blacklist wl$//;s/#blacklist ssb/blacklist ssb/;\
-s/#blacklist b44/blacklist b44/;s/#blacklist b43legacy/blacklist b43legacy/;\
-s/#blacklist bcma/blacklist bcma/;s/#blacklist b43/blacklist b43/' /etc/modprobe.d/broadcom-sta-dkms.conf
+  sed -i 's/blacklist wl$//;s/#blacklist ssb/blacklist ssb/;s/#blacklist b44/blacklist b44/;s/#blacklist b43legacy/blacklist b43legacy/;s/#blacklist bcma/blacklist bcma/;s/#blacklist b43/blacklist b43/' /etc/modprobe.d/broadcom-sta-dkms.conf
 
   [ -x /etc/init.d/network-manager ] && service network-manager stop
   modprobe -r b44 b43 b43legacy ssb brcmsmac bcma
