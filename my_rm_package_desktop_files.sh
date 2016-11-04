@@ -6,6 +6,7 @@
 # объявляем пустой список пакетов на удаление
 DEL_PACKAGES=""
 
+echo "$@"
 # в качестве аргументов к скрипту прилагается список *.desktop, поочередно перебираем этот список
 for DESKTOP_FILE in $@
     do
@@ -40,7 +41,23 @@ echo "############"
 
 # если список пакетов на удаление не пустой - начинаем удаление пакетов, если список пустой выводим - No packages for uninstall!
 if [[ $(echo $DEL_PACKAGES | sed "s/ //g") != "" ]]
-     then sudo apt-get purge $DEL_PACKAGES && sudo apt-get autoremove
+     then sudo apt-get purge $DEL_PACKAGES && 
+          (
+          # перебираем папки пользователей
+          for DIR_USER in $(ls /home)
+              do 
+                 # определяем папку Рабочего стола
+                 DIR_DESKTOP=$(sudo cat "/home/$DIR_USER/.config/user-dirs.dirs"| grep DESKTOP|sed "s/\"//g"| awk -F "/" '{print $NF}')
+                 if [[ $DIR_DESKTOP == "" ]]
+                    then DIR_DESKTOP="Desktop"
+                 fi
+                 for DESKTOP_FILE in $@
+                 do
+                    # удаляем ярлык программы с Рабочего стола
+                    sudo rm -rf "/home/$DIR_USER/$DIR_DESKTOP/$DESKTOP_FILE"
+                 done
+          done
+          sudo apt-get autoremove)
           echo "Press Enter to EXIT"
           read x
      else echo No packages for uninstall!
