@@ -4,6 +4,24 @@
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
+#Создание закладок в Thunar и окне проводника gtk-3
+if [ ! -d "$HOME/.config/gtk-3.0" ]; then
+   mkdir -p "$HOME/.config/gtk-3.0"
+fi
+echo "file:///usr/share/applications" >> $HOME/.config/gtk-3.0/bookmarks
+if [ -f "$HOME/.config/user-dirs.dirs" ]; then
+   MARKS_LIST=`cat "$HOME/.config/user-dirs.dirs" | grep -v \# | grep -v "^XDG_DESKTOP_DIR"| awk -F"=" '{ print $2 }' | sed "s/\"//g"`
+   for MARK in $MARKS_LIST
+       do
+          echo "$MARK" | sed "s|\$HOME|file://${HOME}|g" >> $HOME/.config/gtk-3.0/bookmarks
+   done
+fi
+
+#Копируем ярлык установщика на Рабочий стол
+if [ -f "/usr/share/applications/debian-installer-launcher.desktop" ]; then
+   source $HOME/.config/user-dirs.dirs
+   cp /usr/share/applications/debian-installer-launcher.desktop "$XDG_DESKTOP_DIR"
+fi
 
 #Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
 #После установки данные строки не будут использоваться.
@@ -76,6 +94,22 @@ lang=ru_ru" > "$HOME/.config/Code Industry/Master PDF Editor.conf"
 			   ;;
   esac 
 fi
+
+#geany  (кириллица - при славянских локалях)
+if [ ! -f "$HOME/.config/geany/geany.conf" ] && [ -x "`which geany`" ] ; then
+  mkdir -p "$HOME/.config/geany/"
+  case $LANG in
+  uk*|ru*|be*) #UA RU BE locales
+               echo "[geany]
+pref_editor_default_open_encoding=WINDOWS-1251" > "$HOME/.config/geany/geany.conf"
+               ;;
+            *) #All locales
+			   ;;
+  esac 
+  echo "[tools]
+terminal_cmd=x-terminal-emulator -e /bin/sh %c" >> "$HOME/.config/geany/geany.conf"
+fi
+
 
 #moc
 if [ -f "$HOME/.moc/config" ] && [ -x "$HOME/.moc/onsongchange.sh" ] ; then
