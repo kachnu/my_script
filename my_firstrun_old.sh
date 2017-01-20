@@ -4,6 +4,19 @@
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
+#Создание закладок в Thunar и окне проводника gtk-3
+if [ -f "$HOME/.gtk-bookmarks" ]; then
+   sed -i "s/REPLACEME/${USER}/g" $HOME/.gtk-bookmarks
+fi
+if [ -f "$HOME/.config/gtk-3.0/bookmarks" ]; then
+   sed -i "s/REPLACEME/${USER}/g" $HOME/.config/gtk-3.0/bookmarks
+fi
+
+#Создание ссылок на обои
+if [ ! -f $HOME/images/wallpapers/desktop-base ]; then
+   ln -s /usr/share/images/desktop-base $HOME/images/wallpapers/desktop-base
+   ln -s /usr/share/backgrounds $HOME/images/wallpapers/backgrounds
+fi
 
 #Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
 #После установки данные строки не будут использоваться.
@@ -22,20 +35,28 @@ then
 fi
 
 #Преднастройка ПО 
-
-#WPS-office (русский - при славянских локалях)
+#WPS-office (русский - при славянских локалях, бланк вместо инет шаблонов)
 if [ ! -f "$HOME/.config/Kingsoft/Office.conf" ] && [ -x "`which wps`" ] ; then
   mkdir -p $HOME/.config/Kingsoft/
   case $LANG in
   uk*|ru*|be*) #UA RU BE locales
                echo "[General]
-languages=ru_RU" > $HOME/.config/Kingsoft/Office.conf
+languages=ru_RU
+
+[6.0]
+common\wpshomeoptions\default=
+common\wpshomeoptions\StartWithHome=0
+common\wpshomeoptions\StartWithBlank=1" > $HOME/.config/Kingsoft/Office.conf
                ;;
             *) #All locales
+			echo "
+[6.0]
+common\wpshomeoptions\default=
+common\wpshomeoptions\StartWithHome=0
+common\wpshomeoptions\StartWithBlank=1" > $HOME/.config/Kingsoft/Office.conf
                ;;
   esac 
 fi
-
 #SMplayer (русский - при славянских локалях, монохромные ярлыки)
 if [ ! -f "$HOME/.config/smplayer/smplayer.ini" ] && [ -x "`which smplayer`" ] ; then
   mkdir -p $HOME/.config/smplayer/
@@ -81,6 +102,8 @@ fi
 if [ -f "$HOME/.moc/config" ] && [ -x "$HOME/.moc/onsongchange.sh" ] ; then
     sed -i "/^OnSongChange/s/^OnSongChange = \"\/\"/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" $HOME/.moc/config
 fi
+
+
 
 #Убираем данный скрипт из автозапуска
 if [ -f "$HOME/.config/autostart/firstrun.desktop" ]; then
