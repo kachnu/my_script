@@ -1,5 +1,5 @@
 #!/bin/bash
-#Скрипт обновления системы c помощью apt-get
+#Скрипт обновления системы c помощью $APT
 #author: kachnu
 #email:  ya.kachnu@yandex.ua
 
@@ -7,6 +7,13 @@ DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]
    then DIALOG=dialog
 fi
+
+APT=apt-get
+
+if [ -x "`which apt`" ]
+   then APT=apt
+fi
+
 
 case $LANG in
   uk*|ru*|be*) #UA RU BE locales
@@ -40,8 +47,8 @@ case $LANG in
                HELP="
 ____________________________________
    Справка
-Пункт Запуск обновления - выполняет команду sudo apt-get upgrade
-Пункт Запуск полного обновления - выполняет команду sudo apt-get dist-upgrade
+Пункт Запуск обновления - выполняет команду sudo $APT upgrade
+Пункт Запуск полного обновления - выполняет команду sudo $APT dist-upgrade
 После обновления пользователю предлагается выполнить предварительное связывание динамических библиотек, команда sudo prelink -amvRf
 ___________________________________"
              
@@ -67,8 +74,8 @@ Press Enter to go to the main menu"
                HELP="
 ____________________________________
 Help
-Item Start update - executes the command sudo apt-get upgrade
-Item Running a full update - executes the command sudo apt-get dist-upgrade
+Item Start update - executes the command sudo $APT upgrade
+Item Running a full update - executes the command sudo $APT dist-upgrade
 After the upgrade, the user is prompted to perform a preliminary binding dynamic libraries, the command sudo prelink -amvRf
 ___________________________________"
 
@@ -230,8 +237,8 @@ if [ $? != 0 ]
  then echo Exit ; exit 0
 fi
 case $ANSWER in
-	  1 ) sudo apt-get update; sudo apt-get upgrade && echo "$MENU1 - $ALLOK"; PrelinkSystem ;; 
-	  2 ) sudo apt-get update; sudo apt-get dist-upgrade && echo "$MENU2 - $ALLOK"; PrelinkSystem ;;
+	  1 ) sudo $APT update; sudo $APT upgrade && echo "$MENU1 - $ALLOK"; PrelinkSystem ;; 
+	  2 ) sudo $APT update; sudo $APT dist-upgrade && echo "$MENU2 - $ALLOK"; PrelinkSystem ;;
 	  3 ) Check nano; sudo nano /etc/apt/sources.list ;;
 	  4 ) sudo rm -r /var/cache/apt/archives && echo "remove /var/cache/apt/archive"
 		  sudo rm -r /var/cache/apt-xapian-index && echo "remove /var/cache/apt-xapian-index";;
@@ -273,8 +280,8 @@ MainForm
 
 
 case $1 in
-     "-u"  ) sudo apt-get update; sudo apt-get -y dist-upgrade;;
-     "-uv" ) sudo apt-get update; sudo apt-get dist-upgrade && echo "$MENU2 - $ALLOK"
+     "-u"  ) sudo $APT update; sudo $APT -y dist-upgrade;;
+     "-uv" ) sudo $APT update; sudo $APT dist-upgrade && echo "$MENU2 - $ALLOK"
              echo "$EXIT_TEXT"
              read input;;
         *  ) MainForm ;;

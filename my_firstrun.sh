@@ -19,8 +19,9 @@ fi
 
 #Копируем ярлык установщика на Рабочий стол
 if [ -f "/usr/share/applications/debian-installer-launcher.desktop" ]; then
-   source $HOME/.config/user-dirs.dirs
-   cp /usr/share/applications/debian-installer-launcher.desktop "$XDG_DESKTOP_DIR"
+   DESK_FOLDER=$(cat "$HOME/.config/user-dirs.dirs" | grep "^XDG_DESKTOP_DIR"| awk -F"=" '{ print $2 }' | sed "s/\"//g"| sed "s|\$HOME||g")
+   cp /usr/share/applications/debian-installer-launcher.desktop "$HOME/$DESK_FOLDER"
+   chmod +x "$HOME/$DESK_FOLDER/debian-installer-launcher.desktop"
 fi
 
 #Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
@@ -69,21 +70,21 @@ iconset=Monochrome" > $HOME/.config/smplayer/smplayer.ini
                ;;
   esac 
 fi
-#ocenaudio (русский - при славянских локалях)
-if [ ! -f "$HOME/.local/share/data/OcenAudio/ocenaudio.cfg" ] && [ -x "`which ocenaudio`" ] ; then
-  mkdir -p $HOME/.local/share/data/OcenAudio/
-  case $LANG in
-  uk*|ru*|be*) #UA RU BE locales
-               echo "[ocenapp]
-language=ru_RU" > $HOME/.local/share/data/OcenAudio/ocenaudio.cfg
-               ;;
-            *) #All locales
-			   ;;
-  esac 
-fi
+##ocenaudio (русский - при славянских локалях)
+#if [ ! -f "$HOME/.local/share/data/OcenAudio/ocenaudio.cfg" ] && [ -x "`which ocenaudio`" ] ; then
+  #mkdir -p $HOME/.local/share/data/OcenAudio/
+  #case $LANG in
+  #uk*|ru*|be*) #UA RU BE locales
+               #echo "[ocenapp]
+#language=ru_RU" > $HOME/.local/share/data/OcenAudio/ocenaudio.cfg
+               #;;
+            #*) #All locales
+			   #;;
+  #esac 
+#fi
 
-#masterpdfeditor3  (русский - при славянских локалях)
-if [ ! -f "$HOME/.config/Code Industry/Master PDF Editor.conf" ] && [ -x "`which masterpdfeditor3 `" ] ; then
+#masterpdfeditor4  (русский - при славянских локалях)
+if [ ! -f "$HOME/.config/Code Industry/Master PDF Editor.conf" ] && [ -x "`which masterpdfeditor4 `" ] ; then
   mkdir -p "$HOME/.config/Code Industry/"
   case $LANG in
   uk*|ru*|be*) #UA RU BE locales
