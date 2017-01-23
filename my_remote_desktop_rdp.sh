@@ -80,20 +80,31 @@ CheckState () # read values
 {
 if [ -f "/usr/sbin/xrdp" ] # if xrdp is install then read values else install xrdp
    then 
-      if [[ $(pidof xrdp) != "" ]]
+      #if [[ $(pidof xrdp) != "" ]]
+         #then STATE_XRDP="ON"
+         #else STATE_XRDP="OFF"
+      #fi
+     
+      #if [ -f "/etc/init.d/xrdp" ]
+         #then STATE_AUTORUN_XRDP="ON"
+         #else 
+             #if [[ $(cat /etc/init.d/.depend.start| grep xrdp) != "" ]]
+                #then STATE_AUTORUN_XRDP="ON"
+                #else STATE_AUTORUN_XRDP="OFF"
+             #fi
+      #fi
+      
+      if [[ $(systemctl status xrdp | grep running) != '' ]]
          then STATE_XRDP="ON"
          else STATE_XRDP="OFF"
       fi
-     
-      if [ -f "/etc/init.d/xrdp" ]
+      
+            
+      if [[ $(systemctl is-enabled xrdp) == 'enabled' ]]
          then STATE_AUTORUN_XRDP="ON"
-         else 
-             if [[ $(cat /etc/init.d/.depend.start| grep xrdp) != "" ]]
-                then STATE_AUTORUN_XRDP="ON"
-                else STATE_AUTORUN_XRDP="OFF"
-             fi
+         else STATE_AUTORUN_XRDP="OFF"
       fi
-     
+          
       STATE_PORT_RDP=$(cat /etc/xrdp/xrdp.ini | grep -m 1 port= | sed "s/ //g" | sed "s/port=//g")
       STATE_CRYPT_LEVEL_RDP=$(cat /etc/xrdp/xrdp.ini | grep -m 1 crypt_level= | sed "s/ //g" | sed "s/crypt_level=//g")
       STATE_COLOR_RDP=$(cat /etc/xrdp/xrdp.ini | grep -m 1 max_bpp= | sed "s/ //g" | sed "s/max_bpp=//g")
@@ -175,7 +186,7 @@ case $ANSWER in
                                    fi
                            fi
                      done
-                     IZMENA=$(cat /etc/xrdp/xrdp.ini | grep -m 1 port)
+                     IZMENA=$(cat /etc/xrdp/xrdp.ini | grep -m 1 port=)
                      sudo sed -i "s/${IZMENA}/port=${STATE_PORT_RDP}/" /etc/xrdp/xrdp.ini
                      # sudo sed -i "s/^ListenPort.*/ListenPort=${STATE_PORT_RDP}/" /etc/xrdp/sesman.ini
         ;;
