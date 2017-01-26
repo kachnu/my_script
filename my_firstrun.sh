@@ -40,6 +40,11 @@ then
     fi
 fi
 
+
+#Убираем блокировку экрана при работе скрин-сейвера
+dconf write /apps/light-locker/lock-after-screensaver 'uint32 0'
+
+
 #Преднастройка ПО 
 
 #WPS-office (русский - при славянских локалях)
