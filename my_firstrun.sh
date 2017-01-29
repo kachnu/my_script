@@ -101,6 +101,16 @@ lang=ru_ru" > "$HOME/.config/Code Industry/Master PDF Editor.conf"
   esac 
 fi
 
+# VLC (запуск 1-й копии, не подгонять размеры под видео, не задавать вопрос о мета-инфо по сети)
+if [ ! -f "$HOME/.config/vlc/vlcrc" ] && [ -x "`which vlc`" ] ; then
+  mkdir -p "$HOME/.config/vlc"
+  echo "[qt4] # Qt interface
+qt-video-autoresize=0
+qt-privacy-ask=0
+[core] # core program
+one-instance=1" > "$HOME/.config/vlc/vlcrc"
+fi
+
 #geany  (кириллица - при славянских локалях)
 if [ ! -f "$HOME/.config/geany/geany.conf" ] && [ -x "`which geany`" ] ; then
   mkdir -p "$HOME/.config/geany/"

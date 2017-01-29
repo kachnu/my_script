@@ -3,10 +3,16 @@ FOLDER_LIST=""
 for FOLDER in "$@"
     do
        if [ -d "$FOLDER/DEBIAN" ]
-          then echo need enter root password
-               sudo chown -R root:root "$FOLDER"
-               sudo dpkg -b "$FOLDER"
-               sudo chown -R $USER:$USER "$FOLDER"
+          then cd "$FOLDER"
+               md5sum `find . -type f | grep -v '^[.]/DEBIAN/'` > DEBIAN/md5sums 
+               cd ..         
+               if [ `which fakeroot` ]
+                 then fakeroot dpkg -b "$FOLDER"
+                 else echo need enter root password
+                      sudo chown -R root:root "$FOLDER"
+                      sudo dpkg -b "$FOLDER"
+                      sudo chown -R $USER:$USER "$FOLDER"
+               fi       
           else echo "-----------------------"
                echo "$FOLDER - is not debian folder!"
                echo "-----------------------"
