@@ -7,10 +7,10 @@ for FOLDER in "$@"
                md5sum `find . -type f | grep -v '^[.]/DEBIAN/'` > DEBIAN/md5sums 
                cd ..         
                if [ `which fakeroot` ]
-                 then fakeroot dpkg -b "$FOLDER"
+                 then fakeroot dpkg -b "$FOLDER" || read x
                  else echo need enter root password
                       sudo chown -R root:root "$FOLDER"
-                      sudo dpkg -b "$FOLDER"
+                      sudo dpkg -b "$FOLDER" || read x
                       sudo chown -R $USER:$USER "$FOLDER"
                fi       
           else echo "-----------------------"
