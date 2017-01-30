@@ -3,6 +3,12 @@
 # author: kachnu
 # email:  ya.kachnu@yandex.ua
 
+APT=apt-get
+
+if [ -x "`which apt`" ]
+   then APT=apt
+fi
+
 # объявляем пустой список пакетов на удаление
 DEL_PACKAGES=""
 
@@ -40,7 +46,7 @@ echo "############"
 
 # если список пакетов на удаление не пустой - начинаем удаление пакетов, если список пустой выводим - No packages for uninstall!
 if [[ $(echo $DEL_PACKAGES | sed "s/ //g") != "" ]]
-     then sudo apt-get purge $DEL_PACKAGES && 
+     then sudo $APT purge $DEL_PACKAGES && 
           (
           # перебираем папки пользователей
           for DIR_USER in $(ls /home)
@@ -56,7 +62,7 @@ if [[ $(echo $DEL_PACKAGES | sed "s/ //g") != "" ]]
                     sudo rm -rf "/home/$DIR_USER/$DIR_DESKTOP/$DESKTOP_FILE"
                  done
           done
-          sudo apt-get autoremove)
+          sudo $APT autoremove)
           echo "Press Enter to EXIT"
           read x
      else echo No packages for uninstall!
