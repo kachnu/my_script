@@ -17,12 +17,20 @@ if [ -f "$HOME/.config/user-dirs.dirs" ]; then
    done
 fi
 
+#Помещаем шаблоны в папку Шаблонов
+if [ -f "$HOME/.config/user-dirs.dirs" ] && [ -d "$HOME/templates" ]; then
+   TEMPLATES_FOLDER=$(cat "$HOME/.config/user-dirs.dirs" | grep "^XDG_TEMPLATES_DIR"| awk -F"=" '{ print $2 }' | sed "s/\"//g"| sed "s|\$HOME||g")
+   mv $HOME/templates/* $HOME/$TEMPLATES_FOLDER
+   rm -r "$HOME/templates"
+fi
+
 #Копируем ярлык установщика на Рабочий стол
 if [ -f "/usr/share/applications/debian-installer-launcher.desktop" ]; then
    DESK_FOLDER=$(cat "$HOME/.config/user-dirs.dirs" | grep "^XDG_DESKTOP_DIR"| awk -F"=" '{ print $2 }' | sed "s/\"//g"| sed "s|\$HOME||g")
    cp /usr/share/applications/debian-installer-launcher.desktop "$HOME/$DESK_FOLDER"
    chmod +x "$HOME/$DESK_FOLDER/debian-installer-launcher.desktop"
 fi
+
 
 #Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
 #После установки данные строки не будут использоваться.
