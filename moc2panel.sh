@@ -54,26 +54,20 @@ $songtitle\
 $separ2\
 $timeleft"
 
-
-## цвета шрифтов
+## раскомментируте если нужно выводить теги другим цветом 
+## цвет шрифта
 ## указывается название цвета - green, red и т.д. или hex-код цвета - #0000FF
-#FONT_COLOR_ARTIST="red"
-#FONT_COLOR_SONG="#008000"
-#FONT_COLOR_TIME="#0000FF"
+#FONT_COLOR="#FF0000"
 
-## цвет фона
-#BG_COLOR="#E8E8E7"
-
-## Тип шрифта можно настроить в апплете xfce4-genmon-plugin
-## а можно добавить к echo параметр weight=\"$WEIGTH\"
-## при этом раскоментировать переменную WEIGTH и дать ей значения: regular - нормальный, bold - полужирный
-## WEIGTH="bold"
-
-#echo "<txt>\
-#<span bgcolor=\"$BG_COLOR\" foreground=\"$FONT_COLOR_ARTIST\">"$artist"</span>""\
-#<span bgcolor=\"$BG_COLOR\" foreground=\"$FONT_COLOR_SONG\">"$songtitle"</span>""\
-#<span bgcolor=\"$BG_COLOR\" foreground=\"$FONT_COLOR_TIME\">"$timeleft"</span>""\
-#</txt>"
+## вывод цветного тега
+#echo "<txt><span foreground=\"$FONT_COLOR\">\
+#"$state\
+#$artist\
+#$separ1\
+#$songtitle\
+#$separ2\
+#$timeleft"\
+#</span></txt>"
 }
 
 # проверяем запущен ли mocp и если запущен выполняем функцию вывода тегов
