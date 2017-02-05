@@ -3,8 +3,9 @@
 # функция отображения тегов
 tagi ()
 {
-# разделитель при выводе информации
-separ=" -"
+# разделители при выводе информации
+separ1=" -"
+separ2=" -"
 
 # перебираем вывод команды mocp -i и раскладываем все по переменным
 IFS="
@@ -17,13 +18,14 @@ for line in `mocp -i`
                    *PLAY*) state='▶';;
                    *PAUSE*) state='❚❚';;
                    *STOP*) state='■ moc'
-                           separ='';;
+                           separ1=''
+                           separ2='';;
               esac  ;;
       File*) file=`echo $line|cut -d : -f2`;;
       Title*) title=`echo $line|cut -d : -f2`;;
       Artist*) artist=`echo $line|cut -d : -f2`;;
       SongTitle*) songtitle=`echo $line|cut -d : -f2`;;
-      Album*) albom=`echo $line|cut -d : -f2`;;
+      Album*) album=`echo $line|cut -d : -f2`;;
       TotalTime*) totaltime=`echo $line|cut -d : -f2-`;;
       TimeLeft*) timeleft=`echo $line|cut -d : -f2-`;;
       CurrentTime*) currenttime=`echo $line|cut -d : -f2-`;;
@@ -32,13 +34,24 @@ for line in `mocp -i`
     esac
 done
 
+# если теги пусты - делаем подмену полей, на крайний случай вставляем имя файла
+if [ -z ${artist// /} ] 
+ then separ1=''
+fi
+if [ -z ${songtitle// /} ]
+ then songtitle=${title}
+      if [ -z ${songtitle// /} ]
+       then songtitle=${file##*/} 
+      fi
+fi
+
 
 # выводим тег
 echo "$state\
 $artist\
-$separ\
+$separ1\
 $songtitle\
-$separ\
+$separ2\
 $timeleft"
 
 
