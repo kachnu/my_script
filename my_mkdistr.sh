@@ -145,6 +145,7 @@ ${NORMAL} ${BLUE}
 cd $WORK_DIR/mydistr
 sudo -s
 
+cp /etc/apt/apt.conf.d/proxy mydistr_root/etc/apt/apt.conf.d/
 cp /etc/hosts mydistr_root/etc/
 cp /etc/resolv.conf mydistr_root/etc/
 mount --bind /dev/ mydistr_root/dev
@@ -168,6 +169,7 @@ exit
 umount mydistr_root/dev
 rm mydistr_root/etc/hosts
 rm mydistr_root/etc/resolv.conf
+rm mydistr_root/etc/apt/apt.conf.d/proxy
 ${NORMAL}____________
 Удачного изменения дистрибутива! " 
 beep
