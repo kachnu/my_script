@@ -1,23 +1,23 @@
 #!/bin/bash
-case $1 in
-       --up) LEVEL_VOL=$(amixer set Master 5%+ | grep -m1 -o '...%' | sed 's/\[//' | sed 's/ //')
-             notify-send Volume $LEVEL_VOL -i audio-volume-high -t 1
-             ;;
-     --down) LEVEL_VOL=$(amixer set Master 5%- | grep -m1 -o '...%' | sed 's/\[//' | sed 's/ //')
-             notify-send Volume $LEVEL_VOL -i audio-volume-high -t 1
-             ;;
-     --mute) #LEVEL_VOL=$(amixer set Master toggle | grep -m1 '%' | sed 's/\[/oo/g' | sed 's/\]/oo/g' | sed 's/[ :%]//g' )
-             LEVEL_VOL=$(amixer set Master toggle | grep -m1 '%')
-             case "$LEVEL_VOL" in
-                  *\[off\]*) notify-send Volume OFF -i audio-volume-high -t 1
-                            ;;
-                   *\[on\]*) notify-send Volume ON -i audio-volume-high -t 1
-                           ;;
-             esac
-             ;;
-     --help) echo read help
-             ;;     
-          *) echo read help
-              ;;
-esac  
+# изменение громкости
+# author: kachnu
+# email: ya.kachnu@yandex.ua
+
+HELP="$0 - script to change the volume. 
+Usage:
+  $0 [KEY]
+
+Keys:
+  -u, --up		volume up
+  -d, --down		volume down
+  -m, --mute		mute"
+
+for i in `pactl list short sinks | awk '{print $1}'`; do 
+  case $1 in
+       --up|-u) pactl set-sink-mute $i false; pactl set-sink-volume $i +3%;;
+     --down|-d) pactl set-sink-mute $i false; pactl set-sink-volume $i -3%;;
+     --mute|-m) pactl set-sink-mute $i toggle;;
+             *) echo "$HELP"; exit;;
+  esac 
+done 
 exit 0
