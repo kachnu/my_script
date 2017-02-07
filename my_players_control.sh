@@ -6,7 +6,76 @@
 # в системе должен быть установлен zenity
 
 # список плееров
-players_list="audacious mocp deadbeef"
+players_list="audacious mocp deadbeef clementine banshee rhythmbox amarok"
+
+# функция обработки audacious
+func_amarok ()
+{
+case $1 in
+     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+                  if [ $? == 0 ]; then                 
+                     amarok -a "$folder"
+                  fi;;
+     -r|--previous) amarok -r;;
+     -f|--next) amarok -f;;
+     -t|--play-pause) amarok -t;;
+     -p|--play) amarok -p;;
+     -s|--stop) amarok -s;;
+     -q|--quit) killall amarok;;
+      *) echo "$HELP"; exit;;
+esac
+}
+
+# функция обработки rhythmbox
+func_rhythmbox ()
+{
+case $1 in
+     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+                  if [ $? == 0 ]; then
+                      rhythmbox-client --enqueue "$folder"
+                  fi;;
+     -r|--previous) rhythmbox-client --previous;;
+     -f|--next) rhythmbox-client --next;;
+     -t|--play-pause) rhythmbox-client --play-pause;;
+     -p|--play) rhythmbox-client --play;;
+     -s|--stop) rhythmbox-client--stop;;
+     -q|--quit) killall rhythmbox;;
+      *) echo "$HELP"; exit;;
+esac
+}
+
+# функция обработки banshee
+func_banshee ()
+{
+case $1 in
+     -a|--append) zenity --info --title="Attention" --text="Not supported add files";;
+     -r|--previous) banshee --previous;;
+     -f|--next) banshee --next;;
+     -t|--play-pause) banshee --toggle-playing;;
+     -p|--play) banshee --play;;
+     -s|--stop) banshee --stop;;
+     -q|--quit) killall banshee;;
+      *) echo "$HELP"; exit;;
+esac
+}
+
+# функция обработки clementine
+func_clementine ()
+{
+case $1 in
+     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+                  if [ $? == 0 ]; then
+                       clementine -a "$folder"
+                  fi;;
+     -r|--previous) clementine -r;;
+     -f|--next) clementine -f;;
+     -t|--play-pause) clementine -t;;
+     -p|--play) clementine -p;;
+     -s|--stop) clementine -s;;
+     -q|--quit) killall clementine;;
+      *) echo "$HELP"; exit;;
+esac
+}
 
 # функция обработки moc
 func_deadbeef ()
@@ -22,7 +91,7 @@ case $1 in
                       $deadbeef --queue "$folder"
                   fi;;
      -r|--previous) $deadbeef --prev;;
-     -n|--next) $deadbeef --next;;
+     -f|--next) $deadbeef --next;;
      -t|--play-pause) $deadbeef --toggle-pause;;
      -p|--play) $deadbeef --play;;
      -s|--stop) $deadbeef --stop;;
@@ -40,7 +109,7 @@ case $1 in
                       mocp -a "$folder"
                   fi;;
      -r|--previous) mocp -r;;
-     -n|--next) mocp -f;;
+     -f|--next) mocp -f;;
      -t|--play-pause) mocp -G;;
      -p|--play) mocp -p;;
      -s|--stop) mocp -s;;
@@ -58,7 +127,7 @@ case $1 in
                      audacious -e "$folder"
                   fi;;
      -r|--previous) audacious -r;;
-     -n|--next) audacious -f;;
+     -f|--next) audacious -f;;
      -t|--play-pause) audacious -t;;
      -p|--play) audacious -p;;
      -s|--stop) audacious -s;;
@@ -67,21 +136,25 @@ case $1 in
 esac
 }
 
-HELP="$0 - script to manage players. 
+HELP="$0 - script to manage players.
+
+Work whith players:
+  $players_list
+
 Usage:
   $0 [KEY]
 
 Keys:
-  -a, --append 			Append the files/directories/playlists
-  -r, --previous 		Play the pRevious song
-  -n, --next 			Play the Next song
-  -t, --play-pause 		Toggle between playing and paused
-  -p, --play 			Start Playing from the first item on the playlist
-  -s, --stop 			Stop playing
-  -q, --quit			Quit player (kill)
+  -a, --append 		Append the files/directories/playlists
+  -r, --previous 	Play the previous song
+  -f, --next 		Play the next song
+  -t, --play-pause 	Toggle between playing and paused
+  -p, --play 		Start playing from the first item on the playlist
+  -s, --stop 		Stop playing
+  -q, --quit		Quit player (kill)
 "
 
-# формирование запущенных плееров
+# формирование списка запущенных плееров
 run_players=""
 for pl in $players_list; do
    if [[ `pidof $pl` ]]; then
@@ -96,7 +169,7 @@ case `echo $run_players | awk '{print NF}'` in
   *) case $1 in
          -a|--append) ACT="ADD FOLDER";;
          -r|--previous) ACT="PREVIOUS";;
-         -n|--next) ACT="NEXT";;
+         -f|--next) ACT="NEXT";;
          -t|--play-pause) ACT="PAUSE";;
          -p|--play) ACT="PLAY";;
          -s|--stop) ACT="STOP";;
