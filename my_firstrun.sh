@@ -31,7 +31,6 @@ if [ -f "/usr/share/applications/debian-installer-launcher.desktop" ]; then
    chmod +x "$HOME/$DESK_FOLDER/debian-installer-launcher.desktop"
 fi
 
-
 #Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
 #После установки данные строки не будут использоваться.
 if [ -f "/etc/pointlinux-installer/install.conf" ]
@@ -47,7 +46,6 @@ then
       echo "Путь к файлу filesystem.squashfs - $OLD_WAY верен. Никаких изменений не требуется"
     fi
 fi
-
 
 #Убираем блокировку экрана при работе скрин-сейвера
 dconf write /apps/light-locker/lock-after-screensaver 'uint32 0'
@@ -83,18 +81,6 @@ iconset=Monochrome" > $HOME/.config/smplayer/smplayer.ini
                ;;
   esac 
 fi
-##ocenaudio (русский - при славянских локалях)
-#if [ ! -f "$HOME/.local/share/data/OcenAudio/ocenaudio.cfg" ] && [ -x "`which ocenaudio`" ] ; then
-  #mkdir -p $HOME/.local/share/data/OcenAudio/
-  #case $LANG in
-  #uk*|ru*|be*) #UA RU BE locales
-               #echo "[ocenapp]
-#language=ru_RU" > $HOME/.local/share/data/OcenAudio/ocenaudio.cfg
-               #;;
-            #*) #All locales
-			   #;;
-  #esac 
-#fi
 
 #masterpdfeditor4  (русский - при славянских локалях)
 if [ ! -f "$HOME/.config/Code Industry/Master PDF Editor.conf" ] && [ -x "`which masterpdfeditor4 `" ] ; then
@@ -134,11 +120,36 @@ pref_editor_default_open_encoding=WINDOWS-1251" > "$HOME/.config/geany/geany.con
 terminal_cmd=x-terminal-emulator -e /bin/sh %c" >> "$HOME/.config/geany/geany.conf"
 fi
 
-
-#moc
-if [ -f "$HOME/.moc/config" ] && [ -x "$HOME/.moc/onsongchange.sh" ] ; then
-    sed -i "/^OnSongChange/s/^OnSongChange = \"\/\"/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" $HOME/.moc/config
+#audacious (подбор славянской кодировки)
+if [ ! -f "$HOME/.config/audacious/config" ] && [ -x "`which audacious`" ] ; then
+  mkdir -p "$HOME/.config/audacious/"
+  case $LANG in
+  uk*|ru*|be*) #UA RU BE locales
+               echo "[audacious]
+chardet_detector=russian" > "$HOME/.config/audacious/config"
+               ;;
+            *) #All locales
+			   ;;
+  esac 
 fi
+
+##ocenaudio (русский - при славянских локалях)
+#if [ ! -f "$HOME/.local/share/data/OcenAudio/ocenaudio.cfg" ] && [ -x "`which ocenaudio`" ] ; then
+  #mkdir -p $HOME/.local/share/data/OcenAudio/
+  #case $LANG in
+  #uk*|ru*|be*) #UA RU BE locales
+               #echo "[ocenapp]
+#language=ru_RU" > $HOME/.local/share/data/OcenAudio/ocenaudio.cfg
+               #;;
+            #*) #All locales
+			   #;;
+  #esac 
+#fi
+
+##moc
+#if [ -f "$HOME/.moc/config" ] && [ -x "$HOME/.moc/onsongchange.sh" ] ; then
+    #sed -i "/^OnSongChange/s/^OnSongChange = \"\/\"/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" $HOME/.moc/config
+#fi
 
 #Убираем данный скрипт из автозапуска
 if [ -f "$HOME/.config/autostart/firstrun.desktop" ]; then
