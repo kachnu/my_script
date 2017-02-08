@@ -133,12 +133,9 @@ if [[ $(gconftool-2 --get /apps/metacity/general/button_layout ) == '' ]]
 fi
 if [[ $(gconftool-2 --get /apps/metacity/general/titlebar_font ) == '' ]]
  then gconftool-2 --set --type string /apps/metacity/general/titlebar_font "Sans Bold 9"
-fi
+fi	
 if [[ -x /usr/bin/gtk-window-decorator ]]
- then gconftool-2 --set --type string /apps/compiz/plugins/decoration/allscreens/options/command "/usr/bin/gtk-window-decorator --replace"
-fi
-if [[ $(dconf read /org/gnome/desktop/wm/preferences/button-layout) == '' ]]
- then dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
+then gconftool-2 --set --type string /apps/compiz/plugins/decoration/allscreens/options/command "/usr/bin/gtk-window-decorator --replace"
 fi
 }
 #####################################################################
@@ -160,7 +157,6 @@ AddAutostart () #Функция добавления в автозагрузку
 if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
  then echo Argument autostart error; exit 1
 fi
-rm -r "$HOME/.cache/sessions"
 sed -i "s/${1}/${1}/g" $CONFIG_FILE
 sed -i "s/compiz/${1}/g" $CONFIG_FILE
 sed -i "s/metacity/${1}/g" $CONFIG_FILE
@@ -179,19 +175,19 @@ $DIALOG --info --title="$ATTENTION" \
 ThemeMetacity () #Выбор оформления окон для metacity и compiz
 {
 if [[ -d ~/.local/share/themes && ! -d ~/.themes ]]
-  then ln -s ~/.local/share/themes ~/.themes
+ then ln -s ~/.local/share/themes ~/.themes
 fi
 if [[ -d ~/.themes && ! -d ~/.local/share/themes ]]
-  then ln -s ~/.themes ~/.local/share/themes
+ then ln -s ~/.themes ~/.local/share/themes
 fi
 THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
 #echo Сейчас установлена тема - "$THEME_NOW"
 THEME_LIST=$(find /usr/share/themes/ -name metacity-1 | sed "s/\/usr\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g")
 if [[ -d ~/.local/share/themes ]]
-  then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
+ then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
 fi
 if [[ -d ~/.themes ]]
-  then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.themes\//FALSE /g" | sed "s/\/metacity-1//g")
+ then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.themes\//FALSE /g" | sed "s/\/metacity-1//g")
 fi
 THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
 THEME_LIST=$(echo "$THEME_LIST" | sort)
@@ -205,7 +201,6 @@ if [ $? == 0 ]
  then
   #echo Выбрана тема - $THEME_METACITY
   dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME_METACITY'"
-  dconf write /org/gnome/metacity/theme/name "'$THEME_METACITY'"
   #gsettings set org.gnome.desktop.wm.preferences theme $THEME_METACITY
   gconftool-2 --set --type string /apps/metacity/general/theme $THEME_METACITY
   gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME_METACITY
@@ -371,7 +366,6 @@ then
         echo Run $WM
         Check $WM
         CheckState
-        dconf write /org/gnome/metacity/theme/type "'metacity'"
         $WM --replace &
         xfce4-panel -r
         dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE        
@@ -415,7 +409,6 @@ then
         echo Add $WM to autostart
         Check $WM
         AddAutostart $WM
-        dconf write /org/gnome/metacity/theme/type "'metacity'"
         MainForm
         ;;
     8) # Add to autostart xfwm4

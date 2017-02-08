@@ -12,7 +12,7 @@ players_list="audacious mocp deadbeef clementine banshee rhythmbox amarok"
 func_amarok ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then                 
                      amarok -a "$folder"
                   fi;;
@@ -30,7 +30,7 @@ esac
 func_rhythmbox ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then
                       rhythmbox-client --enqueue "$folder"
                   fi;;
@@ -63,7 +63,7 @@ esac
 func_clementine ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then
                        clementine -a "$folder"
                   fi;;
@@ -86,7 +86,7 @@ if [[ `which deadbeef` ]]; then
 fi
 
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then
                       $deadbeef --queue "$folder"
                   fi;;
@@ -104,7 +104,7 @@ esac
 func_mocp ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then
                       mocp -a "$folder"
                   fi;;
@@ -122,7 +122,7 @@ esac
 func_audacious ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Select folder"`
+     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then                 
                      audacious -e "$folder"
                   fi;;
