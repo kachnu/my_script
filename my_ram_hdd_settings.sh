@@ -26,13 +26,12 @@ case $LANG in
                MENU_PARTITION_FORM="Настройки монтирования"
                MENU_SYSCTL_FORM="Настройки Sysctl"
                MENU_SWAP_FORM="Настройки Swap"
+               MENU_SCHEDULER_FORM="Настройки планировщика ввода/вывода"
                MENU_OTHER_FORM="Дополнительные настройки"
                MENU_TMP_TO_RAM="Временные файлы /tmp в ОЗУ"
                MENU_LOG_TO_RAM="Переменные /var/* в ОЗУ"
                MENU_AUTOSETTINGS_SSD="Автонастройка для SSD"
-               MENU_EDIT_FSTAB="Редактирование /etc/fstab"
-               MENU_EDIT_SYSCTLCONF="Редактирование /etc/sysctl.conf"
-               MENU_EDIT_GRUB="Редактирование /etc/default/grub"
+               MENU_EDIT_CONF="Редактирование конф. файлов"
                MENU_HELP="Справка"
                
                MAIN_PART="Выберите раздел:"
@@ -86,6 +85,18 @@ m - включать fstrim каждый месяц"
 Снижает кол-во операций ввода/вывода, чем вариант - 3.
 3 - Сортировка ввода/вывода на основе дискового блока. Самый сложный алгоритм.
 Подходит для большинства файловых систем Linux."
+               
+               MENU_EDIT_FSTAB="Редактирование /etc/fstab"
+               MENU_EDIT_SYSCTLCONF="Редактирование /etc/sysctl.conf"
+               MENU_EDIT_GRUB="Редактирование /etc/default/grub"  
+               
+               MENU_MAKE_RULE="Установить правило выбора планировщика"
+               MENU_DEL_RULE="Удалить правило"
+               MENU_CHOOSE_SCHEDULE="Выбор планировщика"
+               MAIN_DEV="Выберите устройство:"
+               MAIN_SCHE="Выберите планировщик:"
+               
+               
                
                HELP_EXIT="
 Нажмите Enter для перехода в главное меню"
@@ -166,13 +177,12 @@ ____________________________________"
                MENU_PARTITION_FORM="Mount options"
                MENU_SYSCTL_FORM="Settings Sysctl"
                MENU_SWAP_FORM="Settings Swap"
+               MENU_SCHEDULER_FORM="Scheduler settings"
                MENU_OTHER_FORM="Additional settings"
                MENU_TMP_TO_RAM="Temporary files / tmp on RAM"
                MENU_LOG_TO_RAM="Logs /var/* to RAM"
                MENU_AUTOSETTINGS_SSD="Auto-tuning for the SSD"
-               MENU_EDIT_FSTAB="Edit /etc/fstab"
-               MENU_EDIT_SYSCTLCONF="Edit /etc/sysctl.conf"
-               MENU_EDIT_GRUB="Edit /etc/default/grub"
+               MENU_EDIT_CONF="Edit config files"
                MENU_HELP="Help"
                
                MAIN_PART="Choose partition:"
@@ -226,6 +236,10 @@ Useful for network filesystems.
 Does less house-keeping I/O than the next option.
 3 - Sort I/O based on disk block.  Most sophisticated.
 And useful for most Linux filesystems."
+
+               MENU_EDIT_FSTAB="Edit /etc/fstab"
+               MENU_EDIT_SYSCTLCONF="Edit /etc/sysctl.conf"
+               MENU_EDIT_GRUB="Edit /etc/default/grub"
                
                HELP_EXIT="
 Press Enter to go to the main menu"
@@ -298,12 +312,8 @@ ____________________________________
 * $MENU_AUTOSETTINGS_SSD - Автоматическое конфигурирование системы (параметров монтирования, свопирования, пределов сброса страниц памяти и т.д.) на работу с SSD
 ____________________________________"
                ;;
-            
+          
 esac
-
-
-
-
 
 #########################################################
 
@@ -320,7 +330,7 @@ fi
 #########################################################
 PowerOffPC ()
 {
- $DIALOG --title "$ATTENTION" --yesno "$POWER_OFF_TEXT" 10 60
+$DIALOG --title "$ATTENTION" --yesno "$POWER_OFF_TEXT" 10 60
 if [ $? == 0 ]
    then sudo shutdown now
 fi   
@@ -328,7 +338,7 @@ fi
 #########################################################
 UpdateGrub ()
 {
- $DIALOG --title "$ATTENTION" --yesno "$GRUB_TEXT" 10 60
+$DIALOG --title "$ATTENTION" --yesno "$GRUB_TEXT" 10 60
 if [ $? == 0 ]
    then sudo update-grub
 fi   
@@ -352,7 +362,6 @@ if [ "$STATE_STATUS_TMP" != '' ]
    then STATE_STATUS_TMP="ON"
    else STATE_STATUS_TMP="OFF"
 fi
-
 
 STATE_AUTOMOUNT_LOG=$(cat /etc/fstab | grep "^tmpfs /var/")
 if [ "$STATE_AUTOMOUNT_LOG" != '' ]
@@ -413,7 +422,6 @@ if [ "$STATE_ZRAM" != '' ]
    else STATE_ZRAM="OFF"
         VALUE_ZRAMP_TEXT=""
 fi
-
 
 STATE_ZSWAP=`dmesg | grep zswap`
 if [ "$STATE_ZSWAP" != '' ]
@@ -1041,6 +1049,115 @@ fi
 PartitionForm
 }
 #########################################################
+RuleScheForm ()
+{
+if ! [ -f /etc/udev/rules.d/60-schedulers.rules ]; then
+echo -e "# установка планировщика cfq для HDD
+ACTION==\"add|change\", KERNEL==\"sd[a-z]\", ATTR{queue/rotational}==\"1\", ATTR{queue/scheduler}=\"cfq\"
+
+# установка планировщика deadline для SSD
+ACTION==\"add|change\", KERNEL==\"sd[a-z]\", ATTR{queue/rotational}==\"0\", ATTR{queue/scheduler}=\"deadline\"
+
+# установка планировщика deadline для USB
+SUBSYSTEMS==\"usb\", ACTION==\"add|change\", KERNEL==\"sd?\", RUN+=\"/bin/sh -c 'echo noop > /sys/block/%k/queue/scheduler'\"" | sudo tee -a /etc/udev/rules.d/60-schedulers.rules
+fi
+
+HDD_SCHE=`cat /etc/udev/rules.d/60-schedulers.rules | grep ATTR\{queue\/rotational\}==\"1\"| sed 's/\"//g' | awk -F= '{print $NF}'`
+SSD_SCHE=`cat /etc/udev/rules.d/60-schedulers.rules | grep ATTR\{queue\/rotational\}==\"0\"| sed 's/\"//g' | awk -F= '{print $NF}'`
+USB_SCHE=`cat /etc/udev/rules.d/60-schedulers.rules | grep usb | grep RUN | awk -F">" '{print $1}'| awk '{print $NF}'`
+
+RULE_LIST="HDD "$HDD_SCHE" SSD "$SSD_SCHE" USB "$USB_SCHE
+RULE=$($DIALOG  --cancel-button "Back" --title "$MENU_MAKE_RULE" --menu \
+    "$MAIN_DEV" 16 60 8 $RULE_LIST 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+   then SchedulerForm
+fi
+
+}
+#########################################################
+DevForm ()
+{
+DEV_LIST=""
+for i in $(lsblk -d | grep sd. | awk '{print $1"_"$3"_"$4"_"$6 }'); do
+   SCHEDULER_DEV=`cat /sys/block/$(echo $i | awk -F"_" '{ print $1 }')/queue/scheduler | cut -d"[" -f2 | cut -d"]" -f1`           
+   DEV_LIST=$DEV_LIST" "$i" "$SCHEDULER_DEV
+done
+
+DEV=$($DIALOG  --cancel-button "Back" --title "$MENU_CHOOSE_SCHEDULE" --menu \
+    "$MAIN_DEV" 16 60 8 $DEV_LIST 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+   then SchedulerForm
+fi
+
+SCHEDULERS=`cat /sys/block/$(echo $DEV | awk -F"_" '{ print $1 }')/queue/scheduler | sed 's/\[//g' | sed 's/\]//g' | sed "s/ / ' /g"`
+
+SCHEDULER=$($DIALOG  --cancel-button "Back" --title "$DEV" --menu \
+    "$MAIN_SCHE" 16 60 8 $SCHEDULERS 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+   then DevForm
+fi
+
+echo -e "$SCHEDULER" | sudo tee -a /sys/block/$(echo $DEV | awk -F"_" '{ print $1 }')/queue/scheduler 
+
+DevForm
+}
+#########################################################
+SchedulerForm ()
+{
+ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_SCHEDULER_FORM" --menu \
+    "$MAIN_TEXT" 20 60\
+    4\
+       "$MENU_MAKE_RULE" ""\
+       "$MENU_DEL_RULE" ""\
+       "$MENU_CHOOSE_SCHEDULE" "" 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+   then MainForm
+fi
+case $ANSWER in
+   "$MENU_MAKE_RULE" ) 
+              RuleScheForm 
+              ;;
+   "$MENU_DEL_RULE" ) 
+              sudo rm /etc/udev/rules.d/60-schedulers.rules
+              ;;
+   "$MENU_CHOOSE_SCHEDULE" ) 
+              DevForm
+              ;;
+esac
+
+SchedulerForm 
+}
+#########################################################
+EditForm ()
+{
+ANSWER=$($DIALOG  --cancel-button "Back" --title "$MENU_EDIT_CONF" --menu \
+    "$MAIN_TEXT" 20 60\
+    4\
+       "$MENU_EDIT_FSTAB" ""\
+       "$MENU_EDIT_SYSCTLCONF" ""\
+       "$MENU_EDIT_GRUB" "" 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+   then MainForm
+fi
+case $ANSWER in
+   "$MENU_EDIT_CONF" ) 
+              EditForm 
+              ;;
+   "$MENU_EDIT_FSTAB" ) 
+              sudo $EDITOR /etc/fstab
+              ;;
+   "$MENU_EDIT_SYSCTLCONF" ) 
+              sudo $EDITOR /etc/sysctl.conf
+              ;;
+   "$MENU_EDIT_GRUB")
+              sudo $EDITOR /etc/default/grub
+              UpdateGrub
+              ;;
+esac
+
+EditForm
+}
+#########################################################
 MainForm ()
 {
 CheckStateMain
@@ -1051,13 +1168,12 @@ ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
        "$MENU_PARTITION_FORM" ""\
        "$MENU_SYSCTL_FORM" ""\
        "$MENU_SWAP_FORM" ""\
+       "$MENU_SCHEDULER_FORM" ""\
        "$MENU_OTHER_FORM" ""\
        "$MENU_TMP_TO_RAM (automount-$STATE_AUTOMOUNT_TMP, status-$STATE_STATUS_TMP)" ""\
        "$MENU_LOG_TO_RAM (automount-$STATE_AUTOMOUNT_LOG, status-$STATE_STATUS_LOG)" ""\
        "$MENU_AUTOSETTINGS_SSD" ""\
-       "$MENU_EDIT_FSTAB" ""\
-       "$MENU_EDIT_SYSCTLCONF" ""\
-       "$MENU_EDIT_GRUB" ""\
+       "$MENU_EDIT_CONF" ""\
        "$MENU_HELP" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then echo Exit ; exit 0
@@ -1071,6 +1187,9 @@ case $ANSWER in
               ;;
    "$MENU_SWAP_FORM" ) 
               SwapForm
+              ;;
+   "$MENU_SCHEDULER_FORM" )           
+              SchedulerForm
               ;;
    "$MENU_OTHER_FORM" ) 
               OtherForm
@@ -1161,15 +1280,8 @@ tmpfs /var/spool/postfix tmpfs defaults 0 0" | sudo tee -a /etc/fstab
                       RestartPC
               fi
               ;;
-   "$MENU_EDIT_FSTAB" ) 
-              sudo $EDITOR /etc/fstab
-              ;;
-   "$MENU_EDIT_SYSCTLCONF" ) 
-              sudo $EDITOR /etc/sysctl.conf
-              ;;
-   "$MENU_EDIT_GRUB")
-              sudo $EDITOR /etc/default/grub
-              UpdateGrub
+   "$MENU_EDIT_CONF" ) 
+              EditForm 
               ;;
    "$MENU_HELP" ) 
               echo "$HELP"
