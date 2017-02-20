@@ -1052,13 +1052,13 @@ PartitionForm
 RuleScheForm ()
 {
 if ! [ -f /etc/udev/rules.d/60-schedulers.rules ]; then
-echo -e "# установка планировщика cfq для HDD
+echo -e "# HDD
 ACTION==\"add|change\", KERNEL==\"sd[a-z]\", ATTR{queue/rotational}==\"1\", ATTR{queue/scheduler}=\"cfq\"
 
-# установка планировщика deadline для SSD
+# SSD
 ACTION==\"add|change\", KERNEL==\"sd[a-z]\", ATTR{queue/rotational}==\"0\", ATTR{queue/scheduler}=\"deadline\"
 
-# установка планировщика deadline для USB
+# USB
 SUBSYSTEMS==\"usb\", ACTION==\"add|change\", KERNEL==\"sd?\", RUN+=\"/bin/sh -c 'echo noop > /sys/block/%k/queue/scheduler'\"" | sudo tee -a /etc/udev/rules.d/60-schedulers.rules
 fi
 
@@ -1072,6 +1072,23 @@ RULE=$($DIALOG  --cancel-button "Back" --title "$MENU_MAKE_RULE" --menu \
 if [ $? != 0 ]
    then SchedulerForm
 fi
+
+SCHEDULERS="cfq . deadline . noop ."
+
+SCHEDULER=$($DIALOG  --cancel-button "Back" --title "$DEV" --menu \
+    "$MAIN_SCHE" 16 60 8 $SCHEDULERS 3>&1 1>&2 2>&3)
+if [ $? != 0 ]
+   then RuleScheForm
+fi
+
+case $RULE in
+   HDD) sudo sed -i '/HDD/d' /etc/udev/rules.d/60-schedulers.rules 
+        sudo sed -i '/ATTR\{queue\/rotational\}==\"1\"/d' /etc/udev/rules.d/60-schedulers.rules ;;
+   SSD) sudo sed -i '/SSD/d' /etc/udev/rules.d/60-schedulers.rules 
+        sudo sed -i '/ATTR\{queue\/rotational\}==\"0\"/d' /etc/udev/rules.d/60-schedulers.rules ;;
+   USB) sudo sed -i '/USB/d' /etc/udev/rules.d/60-schedulers.rules 
+        sudo sed -i '/RUN/d' /etc/udev/rules.d/60-schedulers.rules ;;
+esac
 
 }
 #########################################################
