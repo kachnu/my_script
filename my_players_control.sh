@@ -8,7 +8,7 @@
 # список плееров
 players_list="audacious mocp deadbeef clementine banshee rhythmbox amarok"
 
-# функция обработки audacious
+# функция обработки amarok
 func_amarok ()
 {
 case $1 in
@@ -77,7 +77,7 @@ case $1 in
 esac
 }
 
-# функция обработки moc
+# функция обработки deadbeef 
 func_deadbeef ()
 {
 if [[ `which deadbeef` ]]; then

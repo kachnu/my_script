@@ -1054,17 +1054,26 @@ RuleScheForm ()
 if ! [ -f /etc/udev/rules.d/60-schedulers.rules ]; then
 echo -e "# HDD
 ACTION==\"add|change\", KERNEL==\"sd[a-z]\", ATTR{queue/rotational}==\"1\", ATTR{queue/scheduler}=\"cfq\"
-
 # SSD
 ACTION==\"add|change\", KERNEL==\"sd[a-z]\", ATTR{queue/rotational}==\"0\", ATTR{queue/scheduler}=\"deadline\"
-
 # USB
 SUBSYSTEMS==\"usb\", ACTION==\"add|change\", KERNEL==\"sd?\", RUN+=\"/bin/sh -c 'echo noop > /sys/block/%k/queue/scheduler'\"" | sudo tee -a /etc/udev/rules.d/60-schedulers.rules
 fi
 
 HDD_SCHE=`cat /etc/udev/rules.d/60-schedulers.rules | grep ATTR\{queue\/rotational\}==\"1\"| sed 's/\"//g' | awk -F= '{print $NF}'`
+if [ -z ${HDD_SCHE// /} ] 
+ then HDD_SCHE='-'
+fi
+
 SSD_SCHE=`cat /etc/udev/rules.d/60-schedulers.rules | grep ATTR\{queue\/rotational\}==\"0\"| sed 's/\"//g' | awk -F= '{print $NF}'`
+if [ -z ${SSD_SCHE// /} ] 
+ then SSD_SCHE='-'
+fi
+
 USB_SCHE=`cat /etc/udev/rules.d/60-schedulers.rules | grep usb | grep RUN | awk -F">" '{print $1}'| awk '{print $NF}'`
+if [ -z ${USB_SCHE/ /} ] 
+ then USB_SCHE='-'
+fi
 
 RULE_LIST="HDD "$HDD_SCHE" SSD "$SSD_SCHE" USB "$USB_SCHE
 RULE=$($DIALOG  --cancel-button "Back" --title "$MENU_MAKE_RULE" --menu \
@@ -1083,13 +1092,21 @@ fi
 
 case $RULE in
    HDD) sudo sed -i '/HDD/d' /etc/udev/rules.d/60-schedulers.rules 
-        sudo sed -i '/ATTR\{queue\/rotational\}==\"1\"/d' /etc/udev/rules.d/60-schedulers.rules ;;
+        sudo sed -i '/rotational\}=="1"/d' /etc/udev/rules.d/60-schedulers.rules 
+        echo -e "# HDD
+ACTION==\"add|change\", KERNEL==\"sd[a-z]\", ATTR{queue/rotational}==\"1\", ATTR{queue/scheduler}=\"$SCHEDULER\"" | sudo tee -a /etc/udev/rules.d/60-schedulers.rules
+        ;;
    SSD) sudo sed -i '/SSD/d' /etc/udev/rules.d/60-schedulers.rules 
-        sudo sed -i '/ATTR\{queue\/rotational\}==\"0\"/d' /etc/udev/rules.d/60-schedulers.rules ;;
+        sudo sed -i '/rotational\}=="0"/d' /etc/udev/rules.d/60-schedulers.rules 
+        echo -e "# SSD
+ACTION==\"add|change\", KERNEL==\"sd[a-z]\", ATTR{queue/rotational}==\"0\", ATTR{queue/scheduler}=\"$SCHEDULER\"" | sudo tee -a /etc/udev/rules.d/60-schedulers.rules
+        ;;
    USB) sudo sed -i '/USB/d' /etc/udev/rules.d/60-schedulers.rules 
-        sudo sed -i '/RUN/d' /etc/udev/rules.d/60-schedulers.rules ;;
+        sudo sed -i '/RUN/d' /etc/udev/rules.d/60-schedulers.rules
+        echo -e "# USB
+SUBSYSTEMS==\"usb\", ACTION==\"add|change\", KERNEL==\"sd?\", RUN+=\"/bin/sh -c 'echo $SCHEDULER > /sys/block/%k/queue/scheduler'\"" | sudo tee -a /etc/udev/rules.d/60-schedulers.rules
+        ;;
 esac
-
 }
 #########################################################
 DevForm ()
