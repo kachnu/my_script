@@ -80,7 +80,7 @@ RebootSystem () #Перезагрузка
 {
 whiptail --title "$ATTENTION" --yesno "$REBOOT_TEXT" 10 60
 if [ $? == 0 ]
- then reboot
+ then sudo reboot
  else exit 0
 fi
 }
