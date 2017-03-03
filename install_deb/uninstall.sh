@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
+
 DEB_LIST=`ls *.deb`
 UNINSTALL_LIST=""
 

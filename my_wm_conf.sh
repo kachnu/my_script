@@ -140,6 +140,8 @@ fi
 if [[ $(dconf read /org/gnome/desktop/wm/preferences/button-layout) == '' ]]
  then dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
 fi
+
+gconftool-2 --set --type boolen /apps/gwd/use_metacity_theme True
 }
 #####################################################################
 Check () #Функция проверки ПО
