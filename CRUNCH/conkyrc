@@ -1,0 +1,104 @@
+# conky configuration
+#
+# The list of variables has been removed from this file in favour
+# of keeping the documentation more maintainable.
+# Check http://conky.sf.net for an up-to-date-list.
+#
+# For ideas about how to modify conky, please see:
+# http://crunchbanglinux.org/forums/topic/59/my-conky-config/
+#
+# For help with conky, please see:
+# http://crunchbanglinux.org/forums/topic/2047/conky-help/
+#
+# Enjoy! :)
+##############################################
+# Settings
+##############################################
+background yes
+use_xft yes
+xftfont Sans:size=9
+xftalpha 1
+update_interval 1.0
+total_run_times 0
+own_window yes
+own_window_transparent yes
+own_window_type normal
+own_window_argb_visual yes
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+double_buffer yes
+minimum_size 300 300
+maximum_width 300
+draw_shades yes
+draw_outline no
+draw_borders no
+draw_graph_borders no
+default_color efefef
+default_shade_color 3c3c3c
+default_outline_color 828282
+alignment top_right
+gap_x 12
+gap_y 56
+no_buffers yes
+uppercase no
+cpu_avg_samples 2
+override_utf8_locale yes
+##############################################
+#  Output
+##############################################
+TEXT
+S Y S T E M    I N F O
+${hr}
+Host:$alignr$nodename
+Uptime:$alignr$uptime
+RAM:$alignr$mem/ $memmax
+Swap usage:$alignr$swap/ $swapmax
+Disk usage:$alignr${fs_used /}/ ${fs_size /}
+CPU usage:$alignr${cpu cpu0}%
+
+N E T    I N F O
+${hr}
+${execi 1 /home/good/bin/my_script/my_net_stat.sh}
+#${if_up enp2s0}Net info for enp2s0 ${hr}
+#IP eth0:$alignr${addr enp2s0}
+#GW IP:$alignr$gw_ip
+#DOWN:$alignr${downspeedf enp2s0} KiBs/ ${totaldown enp2s0}
+#UP:$alignr${upspeedf enp2s0} KiBs/ ${totalup enp2s0}$endif
+#${if_up wlp3s0}Net info for $WLAN0 ${hr}
+#IP wlan0:$alignr${addr wlan0}
+#GW IP:$alignr$gw_ip
+#DOWN:$alignr${downspeedf wlan0} KiBs/ ${totaldown wlan0}
+#UP:$alignr${upspeedf wlan0} KiBs/ ${totalup wlan0}$endif
+#${if_up ppp0}Net info for PPP0 ${hr}
+#IP ppp0:$alignr${addr ppp0}
+#GW IP:$alignr$gw_ip
+#DOWN:$alignr${downspeedf ppp0} KiBs/ ${totaldown ppp0}
+#UP:$alignr${upspeedf ppp0} KiBs/ ${totalup ppp0}$endif
+${if_running mocp}
+Moc play ${hr}
+${scroll 46 46		 ${exec basename "`my_moc_info.sh`"}} 
+$endif
+#${execi 6000 	cat /proc/net/dev | grep : | grep -v "lo" | cut -d : -f1 | awk '(NR == 2)'}
+S H O R T C U T    K E Y S
+${hr}
+#${execi 6000 ./shotcat.sh}
+Alt+F1  Main Menu $alignr Alt+F3  Appfinder
+Alt+F2  Run program $alignr Alt+F4  Close Window
+Ctrl+Alt+BackSpace  Killall User process
+Ctrl+Alt+Del  Taskmanager
+Ctrl+Shift+Escape  Taskmanager
+Ctrl+Alt+L  Lock Screen
+PrtSc  Screenshot
+Super+t  Terminal $alignr Super+a  Audio Player
+Super+e  Editor $alignr Super+v  Volume Control
+Super+f  File Manager $alignr Super+0  Mute
+Super+m  Media Player $alignr Super+-  Volume-
+Super+k  Kill Window $alignr Super+=  Volume+
+Super+w  Web Browser $alignr Super+Left  Prev
+Super+h  Task Manager $alignr Super+Right  Next
+Super+c  Calculator $alignr Super+Up  Add to playlist
+Super+s  Search $alignr Super+Down  Play/pause
+Super+p  Monitor $alignr Super+i  Settings manager
+Super+l  Lock Screen $alignr Super+q  Logout
+
+
+
