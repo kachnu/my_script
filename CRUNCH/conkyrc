@@ -18,7 +18,7 @@ background yes
 use_xft yes
 xftfont Sans:size=9
 xftalpha 1
-update_interval 1.0
+update_interval 2.0
 total_run_times 0
 own_window yes
 own_window_transparent yes
@@ -26,8 +26,8 @@ own_window_type normal
 own_window_argb_visual yes
 own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
 double_buffer yes
-minimum_size 300 300
-maximum_width 300
+minimum_size 200 200
+maximum_width 200
 draw_shades yes
 draw_outline no
 draw_borders no
@@ -57,17 +57,17 @@ CPU usage:$alignr${cpu cpu0}%
 
 N E T    I N F O
 ${hr}
-${execi 1 /home/good/bin/my_script/my_net_stat.sh}
+${exec /home/good/bin/my_script/my_net_stat.sh}
 #${if_up enp2s0}Net info for enp2s0 ${hr}
 #IP eth0:$alignr${addr enp2s0}
 #GW IP:$alignr$gw_ip
 #DOWN:$alignr${downspeedf enp2s0} KiBs/ ${totaldown enp2s0}
 #UP:$alignr${upspeedf enp2s0} KiBs/ ${totalup enp2s0}$endif
-#${if_up wlp3s0}Net info for $WLAN0 ${hr}
-#IP wlan0:$alignr${addr wlan0}
+#${if_up wlp3s0}Net info for wlp3s0 ${hr}
+#IP wlan0:$alignr${addr wlp3s0}
 #GW IP:$alignr$gw_ip
-#DOWN:$alignr${downspeedf wlan0} KiBs/ ${totaldown wlan0}
-#UP:$alignr${upspeedf wlan0} KiBs/ ${totalup wlan0}$endif
+#DOWN:$alignr${downspeedf wlp3s0} KiBs/ ${totaldown wlp3s0}
+#UP:$alignr${upspeedf wlp3s0} KiBs/ ${totalup wlp3s0}$endif
 #${if_up ppp0}Net info for PPP0 ${hr}
 #IP ppp0:$alignr${addr ppp0}
 #GW IP:$alignr$gw_ip
@@ -75,30 +75,27 @@ ${execi 1 /home/good/bin/my_script/my_net_stat.sh}
 #UP:$alignr${upspeedf ppp0} KiBs/ ${totalup ppp0}$endif
 ${if_running mocp}
 Moc play ${hr}
-${scroll 46 46		 ${exec basename "`my_moc_info.sh`"}} 
+${scroll 32 32	${exec basename "`my_moc_info.sh`"}} 
 $endif
-#${execi 6000 	cat /proc/net/dev | grep : | grep -v "lo" | cut -d : -f1 | awk '(NR == 2)'}
 S H O R T C U T    K E Y S
 ${hr}
-#${execi 6000 ./shotcat.sh}
-Alt+F1  Main Menu $alignr Alt+F3  Appfinder
-Alt+F2  Run program $alignr Alt+F4  Close Window
-Ctrl+Alt+BackSpace  Killall User process
-Ctrl+Alt+Del  Taskmanager
-Ctrl+Shift+Escape  Taskmanager
-Ctrl+Alt+L  Lock Screen
-PrtSc  Screenshot
-Super+t  Terminal $alignr Super+a  Audio Player
-Super+e  Editor $alignr Super+v  Volume Control
-Super+f  File Manager $alignr Super+0  Mute
-Super+m  Media Player $alignr Super+-  Volume-
-Super+k  Kill Window $alignr Super+=  Volume+
-Super+w  Web Browser $alignr Super+Left  Prev
-Super+h  Task Manager $alignr Super+Right  Next
-Super+c  Calculator $alignr Super+Up  Add to playlist
-Super+s  Search $alignr Super+Down  Play/pause
-Super+p  Monitor $alignr Super+i  Settings manager
-Super+l  Lock Screen $alignr Super+q  Logout
-
+Ctrl+Alt+Back $alignr Killall process
+Ctrl+Alt+Del $alignr Taskmanager
+Super+t $alignr Terminal 
+Super+e $alignr Editor 
+Super+f $alignr File Manager
+Super+w $alignr Web Browser
+Super+k $alignr Kill Window 
+Super+h $alignr Task Manager 
+Super+c $alignr Calculator 
+Super+s $alignr Search 
+Super+p $alignr Monitor
+Super+i $alignr Settings manager
+Super+m $alignr Media Player 
+Super+a $alignr Audio Player
+Super+[↑,↓,←,→] $alignr Player Control
+Super+[v,0,-,+] $alignr Volume Control
+Super+l $alignr Lock Screen 
+Super+q $alignr Logout
 
 
