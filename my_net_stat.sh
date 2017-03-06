@@ -11,18 +11,15 @@ OLD_TIME=`cat /dev/shm/uptimeold | awk '{print $1}'`
 netstat -i -e > /dev/shm/netstatold
 cat /proc/uptime > /dev/shm/uptimeold
 
-
-GW=`ip r|grep default|awk '{print $3}'`
-echo -e "GW:			$GW
-"
+for GW in `ip r|grep default|awk '{print $3}'`; do
+    echo -e "GW:			$GW"
+done
 
 NUM=0
 for DNS in `cat /etc/resolv.conf | grep nameserver | awk '{print $2}'`; do
     NUM=$(($NUM+1))
     echo -e "DNS $NUM: 		$DNS"
 done
-
-
 
 NET_DEV=`echo -e "$OLD_INFO" | grep UP | grep RUNNING | grep -v lo | awk -F: '{print $1}'`
 for DEV in $NET_DEV; do

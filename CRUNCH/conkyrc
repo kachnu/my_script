@@ -79,18 +79,18 @@ ${scroll 32 32	${exec basename "`my_moc_info.sh`"}}
 $endif
 S H O R T C U T    K E Y S
 ${hr}
-Ctrl+Alt+Back $alignr Killall process
-Ctrl+Alt+Del $alignr Taskmanager
+Ctrl+Alt+Back $alignr Killall Process
+Ctrl+Alt+Del $alignr Task Manager
 Super+t $alignr Terminal 
 Super+e $alignr Editor 
 Super+f $alignr File Manager
 Super+w $alignr Web Browser
 Super+k $alignr Kill Window 
-Super+h $alignr Task Manager 
+Super+h $alignr Htop 
 Super+c $alignr Calculator 
 Super+s $alignr Search 
 Super+p $alignr Monitor
-Super+i $alignr Settings manager
+Super+i $alignr Settings Manager
 Super+m $alignr Media Player 
 Super+a $alignr Audio Player
 Super+[↑,↓,←,→] $alignr Player Control
