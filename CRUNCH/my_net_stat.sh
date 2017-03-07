@@ -6,20 +6,21 @@ OLD_TIME=`cat /dev/shm/uptimeold | awk '{print $1}' || cat /proc/uptime | awk '{
 netstat -i -e > /dev/shm/netstatold
 cat /proc/uptime > /dev/shm/uptimeold
 
-for GW in `ip r|grep default|awk '{print $3}'`; do
-    echo -e "GW:			$GW"
-done
+#for GW in `ip r|grep default|awk '{print $3}'`; do
+    #echo -e "GW:			$GW"
+#done
 
-NUM=0
-for DNS in `cat /etc/resolv.conf | grep -v \# | grep nameserver | awk '{print $2}'`; do
-    NUM=$(($NUM+1))
-    echo -e "DNS $NUM: 		$DNS"
-done
+#NUM=0
+#for DNS in `cat /etc/resolv.conf | grep -v \# | grep nameserver | awk '{print $2}'`; do
+    #NUM=$(($NUM+1))
+    #echo -e "DNS $NUM: 		$DNS"
+#done
 
 NET_DEV=`echo -e "$OLD_INFO" | grep UP | grep RUNNING | grep -v lo | awk -F: '{print $1}'`
 for DEV in $NET_DEV; do
      IP_DEV=`echo -e "$OLD_INFO" | grep -A8 $DEV | grep "inet " | awk '{print $2}'`
-     # Speed test    
+     GW=`ip r|grep default| grep $DEV| awk '{print $3}'`
+     # Speed test
      OLD_BIT_RX=`echo -e "$OLD_INFO" | grep -A8 $DEV | grep "RX packets" | awk '{print $5}'`
      OLD_BIT_TX=`echo -e "$OLD_INFO" | grep -A8 $DEV | grep "TX packets" | awk '{print $5}'`     
      NEW_INFO=`netstat -i -e`
@@ -32,10 +33,11 @@ for DEV in $NET_DEV; do
      RX_DEV=`echo -e "$NEW_INFO" | grep -A8 $DEV | grep "RX packets" | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
      TX_DEV=`echo -e "$NEW_INFO" | grep -A8 $DEV | grep "TX packets" | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
      # Print net info
-     echo -e "
-IP $DEV: 		$IP_DEV
+     echo -e "IP $DEV: 		$IP_DEV
+GW: 			$GW
 RX: 			$SPEED_RX kBps/ $RX_DEV
-TX: 			$SPEED_TX kBps/ $TX_DEV"
+TX: 			 $SPEED_TX kBps/ $TX_DEV
+"
 done
 
 exit 0
