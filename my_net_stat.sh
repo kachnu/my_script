@@ -16,7 +16,7 @@ for GW in `ip r|grep default|awk '{print $3}'`; do
 done
 
 NUM=0
-for DNS in `cat /etc/resolv.conf | grep nameserver | awk '{print $2}'`; do
+for DNS in `cat /etc/resolv.conf | grep -v \# | grep nameserver | awk '{print $2}'`; do
     NUM=$(($NUM+1))
     echo -e "DNS $NUM: 		$DNS"
 done
