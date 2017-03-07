@@ -1,12 +1,7 @@
 #!/bin/bash
-#OLD_INFO=`cat /tmp/netstatold`
-#OLD_TIME=`cat /tmp/uptimeold | awk '{print $1}'`
 
-#netstat -i -e > /tmp/netstatold
-#cat /proc/uptime > /tmp/uptimeold
-
-OLD_INFO=`cat /dev/shm/netstatold`
-OLD_TIME=`cat /dev/shm/uptimeold | awk '{print $1}'`
+OLD_INFO=`cat /dev/shm/netstatold || netstat -i -e`
+OLD_TIME=`cat /dev/shm/uptimeold | awk '{print $1}' || cat /proc/uptime | awk '{print $1}'`
 
 netstat -i -e > /dev/shm/netstatold
 cat /proc/uptime > /dev/shm/uptimeold
