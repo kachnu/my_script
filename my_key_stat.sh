@@ -1,4 +1,6 @@
 #!/bin/bash
+# author: kachnu
+# email:  ya.kachnu@yandex.ua
 
 KEY_INFO=`xset -q | grep -m1 "00:" | sed "s/ //g"`
 
@@ -15,8 +17,8 @@ case $1 in
 echo -e "Script `basename $0` designed to display key NumLock, CapsLock, ScrollLock
 
 Options
-    -s 		to display shot value, like Num, Caps, Scr
-    -S 		to display shot value, like NUM, CAPS, SCR
+    -s 		to display short value, like Num, Caps, Scr
+    -S 		to display short value, like NUM, CAPS, SCR
     -h, --help 	to help ";;
     *)  NL="NumLock"
         CL="CapsLock"
