@@ -2,9 +2,53 @@
 # author: kachnu
 # email:  ya.kachnu@yandex.ua
 
+OPT=$1
 KEY_INFO=`xset -q | grep -m1 "00:" | sed "s/ //g"`
 
-case $1 in
+MakePlugin ()
+{
+# find panel
+PANEL=`xfconf-query -c xfce4-panel -p /panels -lv | grep -m1 panel- | awk -F/ '{print $3}'`
+
+# make plugin ids-list
+PLUGIN_IDS=`xfconf-query -c xfce4-panel -p /panels/$PANEL/plugin-ids| grep -v "Value is an\|^$" | grep -v :`
+
+#find max id
+max_id=0
+for id in $PLUGIN_IDS; do
+  if [ "$id" -gt "$max_id" ]; then
+     max_id=$id
+  fi
+done
+
+# new id for plugin
+let new_id=$max_id+1
+
+#create file-plugin
+echo -e "Command=my_key_stat.sh -S
+UseLabel=0
+Text=(genmon)
+UpdatePeriod=1000
+Font=(default)" > ~/.config/xfce4/panel/genmon-$new_id.rc
+
+# add to xfconf
+xfconf-query -c xfce4-panel -p /plugins/plugin-$new_id -t string -s "genmon" --create
+
+# add new id to plugin-ids
+new_id_list=""
+for id in $PLUGIN_IDS; do
+    new_id_list=$new_id_list" -t int -s "$id
+done
+new_id_list=$new_id_list" -t int -s "$new_id
+
+xfconf-query -c xfce4-panel -p /panels/$PANEL/plugin-ids -rR
+xfconf-query -c xfce4-panel -p /panels/$PANEL/plugin-ids $new_id_list --create
+
+# restart panel
+xfce4-panel -r
+}
+
+case $OPT in
     -s) NL="Num"
         CL="Caps"
         SL="Scr"
@@ -13,12 +57,15 @@ case $1 in
         CL="CAPS"
         SL="SCR"
         SPASE=" ";;
+    -p)  
+         MakePlugin;;
     -h|--help) clear
 echo -e "Script `basename $0` designed to display key NumLock, CapsLock, ScrollLock
 
 Options
     -s 		to display short value, like Num, Caps, Scr
     -S 		to display short value, like NUM, CAPS, SCR
+    -p 		make plugin in xfce4-panel 
     -h, --help 	to help ";;
     *)  NL="NumLock"
         CL="CapsLock"
