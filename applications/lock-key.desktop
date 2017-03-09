@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Display Lock-key
+GenericName[ru]=Апплет отображения Lock-key
+Name=Display Lock-key
+Name[ru]=Апплет отображения Lock-key
+Comment=Display Lock-key NumLock, CapsLock, ScrollLock
+Comment[ru]=Апплет отображения состояния NumLock, CapsLock, ScrollLock
+Exec=/usr/local/bin/my_lockkey_stat.sh -p
+Icon=blueman-keyboard
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=false
+Categories=Utility;

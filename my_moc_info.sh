@@ -1,6 +1,12 @@
 #!/bin/bash
+# xfce 4.12
+# Display moc info
+# author: kachnu
+# email:  ya.kachnu@yandex.ua
 
-# функция отображения тегов
+OPT=$1
+
+# display moc info
 tagi ()
 {
 # разделители при выводе информации
@@ -70,10 +76,72 @@ $timeleft"
 #</span></txt>"
 }
 
-# проверяем запущен ли mocp и если запущен выполняем функцию вывода тегов
-if [[ `pidof mocp` ]]
-  then tagi
-  else echo ""
+# make plugin moc info in panel
+MakePlugin ()
+{
+# find panel
+PANEL=`xfconf-query -c xfce4-panel -p /panels -lv | grep "position " | awk -F/ '{print $3}'`
+
+# select panel
+PANEL=`echo "$PANEL" | sed "s/^ //g" | sed "s/ /\\\n/g" | zenity --list --title="Add moc info plugin" \
+                --text="select panel" --column="" --separator="\n"`
+
+if [ $? != 0 ]; then
+   exit 0
 fi
+
+#find max id
+max_id=0
+for id in `xfconf-query -c xfce4-panel -p /plugins -l -v | awk '{print $1}'| awk -F/ '{print $3}'| awk -F- '{print $2}'`; do
+  if [ "$id" -gt "$max_id" ]; then
+     max_id=$id
+  fi
+done
+
+# new id for plugin
+let new_id=$max_id+1
+
+#create file-plugin
+echo -e "Command=my_moc_info.sh
+UseLabel=0
+Text=(genmon)
+UpdatePeriod=1000
+Font=(default)" > ~/.config/xfce4/panel/genmon-$new_id.rc
+
+# add plugin to xfconf
+xfconf-query -c xfce4-panel -p /plugins/plugin-$new_id -t string -s "genmon" --create
+
+# add new id to plugin-ids
+new_id_list=""
+
+if [[ `xfconf-query -c xfce4-panel -p /panels/$PANEL/plugin-ids` ]]; then
+      for id in `xfconf-query -c xfce4-panel -p /panels/$PANEL/plugin-ids| grep -v "Value is an\|^$" | grep -v :`; do
+          new_id_list=$new_id_list" -t int -s "$id
+      done
+      new_id_list=$new_id_list" -t int -s "$new_id
+      echo $new_id_list
+      xfconf-query -c xfce4-panel -p /panels/$PANEL/plugin-ids -rR
+      xfconf-query -c xfce4-panel -p /panels/$PANEL/plugin-ids $new_id_list --create
+else  xfconf-query -c xfce4-panel -p /panels/$PANEL/plugin-ids --force-array -t int -s $new_id --create
+fi
+
+# restart panel
+xfce4-panel -r
+}
+
+case $OPT in
+    -p) MakePlugin;;
+    -h|--help) clear
+echo -e "Script `basename $0` designed to display info moc player
+
+Options
+    -p 		make plugin in xfce4-panel 
+    -h, --help 	to help ";;
+    *) # проверяем запущен ли mocp и если запущен выполняем функцию вывода тегов
+       if [[ `pidof mocp` ]]
+          then tagi
+       else echo ""
+       fi;;
+esac
 
 exit 0
