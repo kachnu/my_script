@@ -15,7 +15,6 @@ echo -n "Do you wont reboot now?
 (y, yes - to reboot, * - to exit)"
 read x
 case $x in 
-  y| yes) echo 11111 
-     sudo reboot;;
+  y*) sudo reboot;;
 esac
 exit 0
