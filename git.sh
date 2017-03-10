@@ -1,6 +1,6 @@
 #!/bin/bash
-git add .
-git commit -m `date|sed "s/ /_/g"`
+git add .&&\
+git commit -m `date|sed "s/ /_/g"`&&\
 git push
 echo "
 Push Enter to exit!"
