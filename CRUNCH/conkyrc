@@ -79,7 +79,7 @@ ${scroll 32 32	${exec basename "`my_moc_info.sh`"}}
 $endif
 L E D
 ${hr}
-${exec ./my_key_stat.sh}
+#${exec ./my_key_stat.sh}
 
 S H O R T C U T    K E Y S
 ${hr}
