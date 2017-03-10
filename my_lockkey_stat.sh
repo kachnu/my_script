@@ -32,7 +32,7 @@ done
 let new_id=$max_id+1
 
 #create file-plugin
-echo -e "Command=my_key_stat.sh -S
+echo -e "Command=my_lockkey_stat.sh -S
 UseLabel=0
 Text=(genmon)
 UpdatePeriod=1000
