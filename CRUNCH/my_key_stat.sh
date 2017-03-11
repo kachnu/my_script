@@ -1,1 +1,0 @@
-/home/good/bin/my_script/my_key_stat.sh

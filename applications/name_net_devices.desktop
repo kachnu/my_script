@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Change names net devices
+Name[ru]=Изменить имена сетевых устройств
+Comment=Change names net devices (enp2s0, wlp3s0 -> eth0, wlan0; eth0, wlan0  -> enp2s0, wlp3s0)
+Comment[ru]=Изменить имена сетевых устройств (enp2s0, wlp3s0 -> eth0, wlan0; eth0, wlan0  -> enp2s0, wlp3s0)
+Exec=x-terminal-emulator -e /usr/local/bin/my_name_netdev.sh
+Icon=network-wired
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=System;

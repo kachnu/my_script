@@ -1,18 +1,29 @@
 #!/bin/bash
+
+case $LANG in
+    ru*|ua*|be*) NEW_ND_NAME="Использовать НОВЫЕ имена сетевых устройств - enp2s0, wlp3s0"
+                 OLD_ND_NAME="Использовать СТАРЫЕ имена сетевых устройств - eth0, wlan0"
+                 REBOOT="Чтобы изменения вступили в силу, необходима перезагрузка.
+Хотите выполнить перезагрузку сейчас?
+(y, yes - перезагрузить; * - выйти)";;
+              *) NEW_ND_NAME="Provide NEW network device names - enp2s0, wlp3s0"
+                 OLD_ND_NAME="Provide OLD network device names - eth0, wlan0"
+                 REBOOT="For the changes to take effect, you need reboot.
+Do you want reboot now?
+(y, yes - reload; * - quit)";;
+esac
+
 if [ -f /etc/systemd/network/99-default.link ] || [ -h /etc/systemd/network/99-default.link ] ; then
-     echo "Enter password to provide New network device name - enp2s0, wlp3s0 "
+     #provide new name
+     echo "$NEW_ND_NAME"
      sudo rm /etc/systemd/network/99-default.link
-     echo "New network name (enp2s0, wlp3s0 ) - ACTIVE!"
-     echo "Need REBOOT!"
-else   
-     echo "Enter password to provide Old network device name - eth0, wlan0"
+else #provide old name  
+     echo "$OLD_ND_NAME"
      sudo ln -s /dev/null /etc/systemd/network/99-default.link
-     echo "Old network name (eth0, wlan0) - ACTIVE!"
-     echo "Need REBOOT!"
 fi
 
-echo -n "Do you wont reboot now? 
-(y, yes - to reboot, * - to exit)"
+echo -n "$REBOOT"
+
 read x
 case $x in 
   y*) sudo reboot;;
