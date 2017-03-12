@@ -57,7 +57,7 @@ CPU usage:$alignr${cpu cpu0}%
 
 N E T    I N F O
 ${hr}
-${exec ./my_net_stat.sh || my_net_stat.sh}
+${exec ../my_net_stat.sh || my_net_stat.sh}
 #${if_up enp2s0}Net info for enp2s0 ${hr}
 #IP eth0:$alignr${addr enp2s0}
 #GW IP:$alignr$gw_ip
@@ -79,7 +79,7 @@ ${scroll 32 32	${exec basename "`my_moc_info.sh`"}}
 $endif
 L E D
 ${hr}
-${exec ./my_lockkey_stat.sh || my_lockkey_stat.sh}
+${exec ../my_lockkey_stat.sh || my_lockkey_stat.sh}
 
 S H O R T C U T    K E Y S
 ${hr}
