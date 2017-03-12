@@ -1,0 +1,1 @@
+/home/r2d2/bin/my_script/my_moc_info.sh

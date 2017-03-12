@@ -105,7 +105,7 @@ let new_id=$max_id+1
 echo -e "Command=my_moc_info.sh
 UseLabel=0
 Text=(genmon)
-UpdatePeriod=1000
+UpdatePeriod=2000
 Font=(default)" > ~/.config/xfce4/panel/genmon-$new_id.rc
 
 # add plugin to xfconf
