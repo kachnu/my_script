@@ -1,4 +1,7 @@
 #!/bin/bash
+#author: kachnu
+# email: ya.kachnu@yandex.ua
+
 
 case $LANG in
     ru*|ua*|be*) NEW_ND_NAME="Введите пароль, чтобы использовать НОВЫЕ имена сетевых устройств - enp2s0, wlp3s0"
