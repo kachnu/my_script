@@ -1,6 +1,6 @@
 #!/bin/bash
 #Скрипт выбора WM, управление compiz metacity xfwm4
-#Xfce 4.10
+#Xfce 4.10, 4.12
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
@@ -8,6 +8,7 @@ DIALOG=zenity #Установка типа графического диалог
 
 if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
  then eсho "Not Install - $DIALOG!"
+      exit 1
 fi
 
 case $LANG in
@@ -107,41 +108,36 @@ One of the conditions for the proper formation of the list is the lack of spaces
                ;;
 esac
 
-CONFIG_FILE=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml
-if [ -f $CONFIG_FILE ] #проверяем существование файла xfce4-session.xml, если не существует - создаем новый
- then sed -i 's/<property name="Client0_Command" type="empty"\/>/<property name="Client0_Command" type="array"> <value type="string" value="xfwm4"\/> <\/property>/g' $CONFIG_FILE
- else cp /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml $CONFIG_FILE
-fi
-
-#####################################################################
-Help () #Помощь
-{
-echo -n "$HELP" | zenity --text-info --cancel-label="Back" --title="Help" \
- --width=400 --height=300
-}
 #####################################################################
 DefaultSettings ()
 {
 if [[ $(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g" ) == '' ]]
  then dconf write /org/gnome/desktop/wm/preferences/theme "'Default'"
 fi
+
 if [[ $(gconftool-2 --get /apps/metacity/general/theme ) == '' ]]
  then gconftool-2 --set --type string /apps/metacity/general/theme  "Default"
 fi
+
 if [[ $(gconftool-2 --get /apps/metacity/general/button_layout ) == '' ]]
  then gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close"
 fi
+
 if [[ $(gconftool-2 --get /apps/metacity/general/titlebar_font ) == '' ]]
  then gconftool-2 --set --type string /apps/metacity/general/titlebar_font "Sans Bold 9"
 fi
+
 if [[ -x /usr/bin/gtk-window-decorator ]]
  then gconftool-2 --set --type string /apps/compiz/plugins/decoration/allscreens/options/command "/usr/bin/gtk-window-decorator --replace"
 fi
+
 if [[ $(dconf read /org/gnome/desktop/wm/preferences/button-layout) == '' ]]
  then dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
 fi
 
 gconftool-2 --set --type boolen /apps/gwd/use_metacity_theme True
+
+dconf write /org/gnome/metacity/theme/type "'metacity'"
 }
 #####################################################################
 Check () #Функция проверки ПО
@@ -149,11 +145,11 @@ Check () #Функция проверки ПО
 if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
  then echo Argument check error; exit 1
 fi
+
 if [ ! -x "`which "$1"`" ] #Проверка наличия ПО
  then echo $1 - not found!
- $DIALOG --info --title="$ATTENTION" \
-              --text="$1 $CHECK_PO $1"
- MainForm
+      $DIALOG --info --title="$ATTENTION" --text="$1 $CHECK_PO $1"
+      MainForm
 fi
 }
 #####################################################################
@@ -161,21 +157,12 @@ AddAutostart () #Функция добавления в автозагрузку
 {
 if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
  then echo Argument autostart error; exit 1
+ else WM=$1
 fi
-rm -r "$HOME/.cache/sessions"
-sed -i "s/${1}/${1}/g" $CONFIG_FILE
-sed -i "s/compiz/${1}/g" $CONFIG_FILE
-sed -i "s/metacity/${1}/g" $CONFIG_FILE
-sed -i "s/xfwm4/${1}/g" $CONFIG_FILE
-sed -i "s|<value type=\"string\" value=\"ccp\"/>||g" $CONFIG_FILE
-if [[ $1 = "compiz" ]]
- then
-   if [[ $(compiz --version) = "compiz 0.8.4" ]]
-   then sed -i "s|value=\"compiz\"/>|value=\"compiz\"/><value type=\"string\" value=\"ccp\"/>|g" $CONFIG_FILE
- fi
-fi
-$DIALOG --info --title="$ATTENTION" \
-              --text="$1 $ADDAUTOSTART"
+Check $WM
+echo Add $WM to autostart
+xfconf-query -c xfce4-session -p /sessions/Failsafe/Client0_Command --force-array -t string -s $WM --create
+#$DIALOG --info --title="$ATTENTION" --text="$WM_CELECT $ADDAUTOSTART"
 }
 #####################################################################
 ThemeMetacity () #Выбор оформления окон для metacity и compiz
@@ -186,8 +173,10 @@ fi
 if [[ -d ~/.themes && ! -d ~/.local/share/themes ]]
   then ln -s ~/.themes ~/.local/share/themes
 fi
+
 THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
 #echo Сейчас установлена тема - "$THEME_NOW"
+
 THEME_LIST=$(find /usr/share/themes/ -name metacity-1 | sed "s/\/usr\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g")
 if [[ -d ~/.local/share/themes ]]
   then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
@@ -199,20 +188,20 @@ THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOM
 THEME_LIST=$(echo "$THEME_LIST" | sort)
 THEME_LIST=$(echo "$THEME_LIST" | sed "/^$/d" | sed "s/FALSE ${THEME_NOW}$/TRUE ${THEME_NOW}/g")
 #echo -e "Общий список тем - $THEME_LIST"
+
 THEME_METACITY=$(echo "$THEME_LIST" | sed "s/FALSE /FALSE\n/g" | sed "s/TRUE /TRUE\n/g" | $DIALOG --width=400 --height=300 --list --cancel-label="Back" --radiolist \
        --title="$THEME_LABEL" \
        --text="$THEME_TEXT" \
        --column="" --column="Name")
 if [ $? == 0 ]
- then
-  #echo Выбрана тема - $THEME_METACITY
-  dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME_METACITY'"
-  dconf write /org/gnome/metacity/theme/name "'$THEME_METACITY'"
-  #gsettings set org.gnome.desktop.wm.preferences theme $THEME_METACITY
-  gconftool-2 --set --type string /apps/metacity/general/theme $THEME_METACITY
-  gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME_METACITY
-  ThemeMetacity
- else SetMetacity
+ then  #echo Выбрана тема - $THEME_METACITY
+       dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME_METACITY'"
+       #gsettings set org.gnome.desktop.wm.preferences theme $THEME_METACITY  
+       dconf write /org/gnome/metacity/theme/name "'$THEME_METACITY'"
+       gconftool-2 --set --type string /apps/metacity/general/theme $THEME_METACITY
+       gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME_METACITY
+       ThemeMetacity
+ else  SetMetacity
 fi
 }
 #####################################################################
@@ -258,40 +247,12 @@ then
         fi 
         SetMetacity
         ;; 
-    *)  echo "ooops! - $ANSWER"
-        exit 1
-        ;;
  esac
 else MainForm
 fi
 }
 #####################################################################
-SyncWP ()
-{
- if [[ $STATE_COMPIZ != '' ]]
-         then 
-             FILE_CONF_COMPIZ=$(cat ~/.config/compiz/compizconfig/config | grep profile | sed "s/profile = //")
-             if [[ $FILE_CONF_COMPIZ == '' ]]
-             then FILE_CONF_COMPIZ="Default"
-             fi
-             WP_VERT=$(cat ~/.config/compiz/compizconfig/$FILE_CONF_COMPIZ.ini | grep s0_vsize | sed "s/s0_vsize =//" | sed "s/ //g")
-             if [[ $WP_VERT == '' ]]
-              then WP_VERT='1'
-             fi
-             WP_HOR=$(cat ~/.config/compiz/compizconfig/$FILE_CONF_COMPIZ.ini | grep s0_hsize | sed "s/s0_hsize =//" | sed "s/ //g")
-             if [[ $WP_HOR == '' ]]
-              then WP_HOR='1'
-             fi             
-             WP_ALL=$[$WP_VERT*$WP_HOR]
-             echo "*****************
-             RABSTOLOV - $WP_ALL"
-             WP_DEF=$(cat ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml | grep workspace_count)
-             WP_NEW="    <property name=\"workspace_count\" type=\"int\" value=\"$WP_ALL\"/>"
-             sed -i "s|${WP_DEF}|${WP_NEW}|g" ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
-fi	
-}
-#####################################################################
-CheckState ()
+CheckState () #Проверяет какой WM запущен и какой добавлен в автозагрузку
 {
 STATE_COMPIZ=''
 STATE_METACITY=''
@@ -301,40 +262,76 @@ AUTO_METACITY=''
 AUTO_XFWM4=''
 NUMBER_WORKSPACE=''
 
-if pidof compiz > /dev/null
- then STATE_COMPIZ="- ON"
-      s0_hsize=2
-      s0_vsize=1
-      export $(cat $HOME/.config/compiz/compizconfig/config | sed "s/ //g") 2>/dev/null
-      if [[ $profile = '' ]]
-         then profile='Default'
-      fi
-      export $(cat $HOME/.config/compiz/compizconfig/$profile.ini | sed "s/ //g") 2>/dev/null
-      echo $s0_hsize $s0_vsize
+if pidof compiz > /dev/null; then 
+      STATE_COMPIZ="- ON"
+      if [ -f "$HOME/.config/compiz/compizconfig/config" ]; then
+         profile=$(cat $HOME/.config/compiz/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
+         if [[ $profile = '' ]]; then profile='Default'; fi
+         s0_hsize=$(cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_hsize | awk -F= '{print $2}'| sed "s/ //g")
+         s0_vsize=$(cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_vsize | awk -F= '{print $2}'| sed "s/ //g")
+      fi 
+      if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
+         profile=$(cat $HOME/.config/compiz-1/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
+         if [[ $profile = '' ]]; then profile='Default'; fi
+         s0_hsize=$(cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_hsize | awk -F= '{print $2}'| sed "s/ //g")
+         s0_vsize=$(cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_vsize | awk -F= '{print $2}'| sed "s/ //g")
+      fi 
+      if [[ $s0_hsize = '' ]]; then s0_hsize=2; fi
+      if [[ $s0_vsize = '' ]]; then s0_vsize=1; fi
+
       let NUMBER_WORKSPACE=$s0_hsize*$s0_vsize
 fi
+
 if pidof metacity > /dev/null
  then STATE_METACITY="- ON"
       NUMBER_WORKSPACE=`dconf read /org/gnome/desktop/wm/preferences/num-workspaces`
 fi
+
 if pidof xfwm4 > /dev/null
  then STATE_XFWM4="- ON"
       NUMBER_WORKSPACE=`xfconf-query -c xfwm4 -p /general/workspace_count`
-fi	
-if [[ $(cat "$CONFIG_FILE" | grep compiz) != '' ]]
- then AUTO_COMPIZ="- ON"
 fi
-if [[ $(cat "$CONFIG_FILE" | grep metacity) != '' ]]
- then AUTO_METACITY="- ON"
+
+WM_CHOSE=`xfconf-query -c xfce4-session -p /sessions/Failsafe/Client0_Command`
+case $WM_CHOSE in
+ *compiz*) AUTO_COMPIZ="- ON";;
+ *metacity*) AUTO_METACITY="- ON";;
+ *xfwm4*) AUTO_XFWM4="- ON";;
+esac
+}
+#####################################################################
+StartWm () #Запуск WM
+{
+if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
+ then echo Argument autostart error; exit 1
+ else WM=$1
 fi
-if [[ $(cat "$CONFIG_FILE" | grep xfwm4) != '' ]]
- then AUTO_XFWM4="- ON"
-fi
+Check $WM
+CheckState
+echo Run $WM
+case $WM in
+ compiz)   sed -i "/^s0_hsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
+           sed -i "/^s0_vsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
+           sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz/compizconfig/$profile.ini
+        
+           sed -i "/^s0_hsize/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
+           sed -i "/^s0_vsize/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
+           sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz-1/compizconfig/$profile.ini
+           ;;
+ metacity) dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE 
+           ;;
+ xfwm4)    xfconf-query -c xfwm4 -p /general/workspace_count -s $NUMBER_WORKSPACE
+           ;;
+esac
+$WM --replace &
+sleep 1
+xfce4-panel -r
+#notify-send -i dialog-information $WM
 }
 #####################################################################
 MainForm () #Функция главного окна
 {
-CheckState	
+CheckState
 ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="$MAIN_LABEL" \
       --text="$MAIN_TEXT" \
       --column="" --column="" \
@@ -350,90 +347,23 @@ ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="
 if [ $? == 0 ]
 then
  case $ANSWER in
-    1) # Run compiz
-        WM=compiz
-        echo Run $WM
-        Check $WM
-        CheckState
-        export $(cat $HOME/.config/compiz/compizconfig/config | sed "s/ //g") 2>/dev/null
-        if [[ $profile = '' ]]
-         then profile='Default'
-        fi
-        sed -i "/^s0_hsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
-        sed -i "/^s0_vsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
-        sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz/compizconfig/$profile.ini   
-        $WM --replace &
-        xfce4-panel -r                   
-        notify-send -i dialog-information $WM
-        sleep 1
-        MainForm
-        ;;
-    2) # Run metacity
-        WM=metacity
-        echo Run $WM
-        Check $WM
-        CheckState
-        dconf write /org/gnome/metacity/theme/type "'metacity'"
-        $WM --replace &
-        xfce4-panel -r
-        dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE        
-        notify-send -i dialog-information $WM
-        sleep 1
-        MainForm
-        ;;
-    3) # Run xfwm4
-        WM=xfwm4
-        echo Run $WM
-        Check $WM 
-        CheckState                       
-        $WM --replace &
-        xfce4-panel -r
-        xfconf-query -c xfwm4 -p /general/workspace_count -s $NUMBER_WORKSPACE
-        notify-send -i dialog-information $WM
-        sleep 1
-        MainForm
-        ;;
-    4) # Settings compiz
-        echo Settings compiz
+    1)  StartWm compiz;;
+    2)  StartWm metacity;;
+    3)  StartWm xfwm4;;
+    4)  echo Settings compiz
         Check ccsm
-        ccsm 1>/dev/null
-        MainForm
-        ;;
-    5) # Settings metacity
-        echo Settings metacity
+        ccsm 1>/dev/null;;
+    5)  echo Settings metacity
         Check dconf-editor
         #Check gconftool-2
-        SetMetacity
-        ;;
-    6) # Add to autostart compiz
-        WM=compiz
-        echo Add $WM to autostart
-        Check $WM
-        AddAutostart $WM
-        MainForm
-        ;;
-    7) # Add to autostart metacity
-        WM=metacity
-        echo Add $WM to autostart
-        Check $WM
-        AddAutostart $WM
-        dconf write /org/gnome/metacity/theme/type "'metacity'"
-        MainForm
-        ;;
-    8) # Add to autostart xfwm4
-        WM=xfwm4
-        echo Add $WM to autostart
-        Check $WM
-        AddAutostart $WM
-        MainForm
-        ;;
-    9) # Help
-        Help
-        MainForm
-        ;;
-    *)  MainForm 
-        ;; 
+        SetMetacity;;
+    6)  AddAutostart compiz;;
+    7)  AddAutostart metacity;;
+    8)  AddAutostart xfwm4;;
+    9)  echo -n "$HELP" | zenity --text-info --cancel-label="Back" --title="Help" \
+        --width=400 --height=300;;
  esac
+ MainForm
 else echo Exit; exit 0
 fi
 }
