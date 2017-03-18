@@ -111,33 +111,36 @@ esac
 #####################################################################
 DefaultSettings ()
 {
-if [[ $(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g" ) == '' ]]
- then dconf write /org/gnome/desktop/wm/preferences/theme "'Default'"
-fi
-
-if [[ $(gconftool-2 --get /apps/metacity/general/theme ) == '' ]]
- then gconftool-2 --set --type string /apps/metacity/general/theme  "Default"
-fi
-
-if [[ $(gconftool-2 --get /apps/metacity/general/button_layout ) == '' ]]
- then gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close"
-fi
-
-if [[ $(gconftool-2 --get /apps/metacity/general/titlebar_font ) == '' ]]
- then gconftool-2 --set --type string /apps/metacity/general/titlebar_font "Sans Bold 9"
-fi
-
+#set window decor
+dconf write /org/gnome/metacity/theme/type "'metacity'"
+gconftool-2 --set --type boolen /apps/gwd/use_metacity_theme True
 if [[ -x /usr/bin/gtk-window-decorator ]]
  then gconftool-2 --set --type string /apps/compiz/plugins/decoration/allscreens/options/command "/usr/bin/gtk-window-decorator --replace"
 fi
-
+#set Default theme matacity
+DEFAULT_THEME="Default"
+if [[ -d /usr/share/themes/$DEFAULT_THEME/metacity-1 ]]; then
+    if [[ $(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g" ) == '' ]]
+     then dconf write /org/gnome/desktop/wm/preferences/theme "'$DEFAULT_THEME'"
+    fi
+    if [[ $(dconf read /org/gnome/metacity/theme/name | sed "s/'//g" | sed "s|/|\\\/|g" ) == '' ]]
+     then dconf write /org/gnome/metacity/theme/name "'$DEFAULT_THEME'"
+    fi
+    if [[ $(gconftool-2 --get /apps/metacity/general/theme ) == '' ]]
+     then gconftool-2 --set --type string /apps/metacity/general/theme  "$DEFAULT_THEME"
+    fi
+fi
+#set button-layout
+if [[ $(gconftool-2 --get /apps/metacity/general/button_layout ) == '' ]]
+ then gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close"
+fi
 if [[ $(dconf read /org/gnome/desktop/wm/preferences/button-layout) == '' ]]
  then dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
 fi
-
-gconftool-2 --set --type boolen /apps/gwd/use_metacity_theme True
-
-dconf write /org/gnome/metacity/theme/type "'metacity'"
+#set font
+if [[ $(gconftool-2 --get /apps/metacity/general/titlebar_font ) == '' ]]
+ then gconftool-2 --set --type string /apps/metacity/general/titlebar_font "Sans Bold 9"
+fi
 }
 #####################################################################
 Check () #Функция проверки ПО
@@ -196,7 +199,7 @@ THEME_METACITY=$(echo "$THEME_LIST" | sed "s/FALSE /FALSE\n/g" | sed "s/TRUE /TR
 if [ $? == 0 ]
  then  #echo Выбрана тема - $THEME_METACITY
        dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME_METACITY'"
-       #gsettings set org.gnome.desktop.wm.preferences theme $THEME_METACITY  
+       #gsettings set org.gnome.desktop.wm.preferences theme $THEME_METACITY
        dconf write /org/gnome/metacity/theme/name "'$THEME_METACITY'"
        gconftool-2 --set --type string /apps/metacity/general/theme $THEME_METACITY
        gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME_METACITY
@@ -232,21 +235,23 @@ then
         gconftool-2 --set --type string /apps/metacity/general/button_layout "close,maximize,minimize:menu"
         SetMetacity
         ;;
-    4)  echo "Settings dconf"
+    4)  Check dconf-editor
+        echo "Settings dconf"
         dconf-editor
         ;;
-    5)  echo "Settings gconf"
+    5)  Check gconf-editor
+        echo "Settings gconf"
         gconf-editor
-        ;;  
+        ;;
     6)  echo "Set font xfwm4"
         if [[ -f $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml ]]
          then THEME_FONT=$(grep -i "title_font" $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/<property name="title_font" type="string" value="//g' | sed 's/"\/>//g')
               gconftool-2 --set --type string /apps/metacity/general/titlebar_font "$THEME_FONT"
               dconf write /org/gnome/desktop/wm/preferences/titlebar-uses-system-font "false"
               dconf write /org/gnome/desktop/wm/preferences/titlebar-font "'$THEME_FONT'"
-        fi 
+        fi
         SetMetacity
-        ;; 
+        ;;
  esac
 else MainForm
 fi
@@ -262,32 +267,32 @@ AUTO_METACITY=''
 AUTO_XFWM4=''
 NUMBER_WORKSPACE=''
 
-if pidof compiz > /dev/null; then 
-      STATE_COMPIZ="- ON"
+if [[ `pgrep -u $USER compiz` ]]
+ then STATE_COMPIZ="- ON"
       if [ -f "$HOME/.config/compiz/compizconfig/config" ]; then
          profile=$(cat $HOME/.config/compiz/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
          if [[ $profile = '' ]]; then profile='Default'; fi
          s0_hsize=$(cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_hsize | awk -F= '{print $2}'| sed "s/ //g")
          s0_vsize=$(cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_vsize | awk -F= '{print $2}'| sed "s/ //g")
-      fi 
+      fi
       if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
          profile=$(cat $HOME/.config/compiz-1/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
          if [[ $profile = '' ]]; then profile='Default'; fi
          s0_hsize=$(cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_hsize | awk -F= '{print $2}'| sed "s/ //g")
          s0_vsize=$(cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_vsize | awk -F= '{print $2}'| sed "s/ //g")
-      fi 
+      fi
       if [[ $s0_hsize = '' ]]; then s0_hsize=2; fi
       if [[ $s0_vsize = '' ]]; then s0_vsize=1; fi
 
       let NUMBER_WORKSPACE=$s0_hsize*$s0_vsize
 fi
 
-if pidof metacity > /dev/null
+if [[ `pgrep -u $USER metacity` ]]
  then STATE_METACITY="- ON"
       NUMBER_WORKSPACE=`dconf read /org/gnome/desktop/wm/preferences/num-workspaces`
 fi
 
-if pidof xfwm4 > /dev/null
+if [[ `pgrep -u $USER xfwm4` ]]
  then STATE_XFWM4="- ON"
       NUMBER_WORKSPACE=`xfconf-query -c xfwm4 -p /general/workspace_count`
 fi
@@ -313,12 +318,12 @@ case $WM in
  compiz)   sed -i "/^s0_hsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
            sed -i "/^s0_vsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
            sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz/compizconfig/$profile.ini
-        
+
            sed -i "/^s0_hsize/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
            sed -i "/^s0_vsize/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
            sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz-1/compizconfig/$profile.ini
            ;;
- metacity) dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE 
+ metacity) dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE
            ;;
  xfwm4)    xfconf-query -c xfwm4 -p /general/workspace_count -s $NUMBER_WORKSPACE
            ;;
@@ -356,8 +361,6 @@ then
         Check ccsm
         ccsm 1>/dev/null;;
     5)  echo Settings metacity
-        Check dconf-editor
-        #Check gconftool-2
         SetMetacity;;
     6)  AddAutostart compiz;;
     7)  AddAutostart metacity;;
