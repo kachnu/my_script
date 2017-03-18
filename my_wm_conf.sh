@@ -323,9 +323,11 @@ case $WM in
  xfwm4)    xfconf-query -c xfwm4 -p /general/workspace_count -s $NUMBER_WORKSPACE
            ;;
 esac
+
+
 $WM --replace &
-sleep 1
 xfce4-panel -r
+sleep 1
 #notify-send -i dialog-information $WM
 }
 #####################################################################
