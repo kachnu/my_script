@@ -80,7 +80,7 @@ $timeleft"
 MakePlugin ()
 {
 # find panel
-PANEL=`xfconf-query -c xfce4-panel -p /panels -lv | grep "position " | awk -F/ '{print $3}'`
+PANEL=`xfconf-query -c xfce4-panel -p /panels -v | awk '{print $1}' | grep [0-9]`
 
 # select panel
 PANEL=`echo "$PANEL" | sed "s/^ //g" | sed "s/ /\\\n/g" | zenity --list --title="Add moc info plugin" \
