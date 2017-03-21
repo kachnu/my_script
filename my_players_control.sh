@@ -157,7 +157,7 @@ Keys:
 # формирование списка запущенных плееров
 run_players=""
 for pl in $players_list; do
-   if [[ `pidof $pl` ]]; then
+   if [[ `pgrep -u $USER  $pl` ]]; then
      run_players="$run_players $pl"
    fi
 done

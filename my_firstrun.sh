@@ -31,18 +31,18 @@ if [ -f "/usr/share/applications/debian-installer-launcher.desktop" ]; then
    chmod +x "$HOME/$DESK_FOLDER/debian-installer-launcher.desktop"
 fi
 
-#Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы. 
+#Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы.
 #После установки данные строки не будут использоваться.
 if [ -f "/etc/pointlinux-installer/install.conf" ]
 then
     OLD_WAY=$(cat /etc/pointlinux-installer/install.conf | grep LIVE_MEDIA_SOURCE | sed "s/LIVE_MEDIA_SOURCE = //g")
     if [ ! -f "$OLD_WAY" ]
-     then 
+     then
       echo "Путь к файлу filesystem.squashfs - $OLD_WAY не верен! Будем искать другой путь к файлу"
       NEW_WAY=$(find /lib/ -name filesystem.squashfs -type f 2>/dev/null)
-      echo "Найден путь $NEW_WAY, редактируем /etc/pointlinux-installer/install.conf" 
+      echo "Найден путь $NEW_WAY, редактируем /etc/pointlinux-installer/install.conf"
       sudo sed -i "s|${OLD_WAY}|${NEW_WAY}|g" /etc/pointlinux-installer/install.conf
-     else 
+     else
       echo "Путь к файлу filesystem.squashfs - $OLD_WAY верен. Никаких изменений не требуется"
     fi
 fi
@@ -51,7 +51,7 @@ fi
 dconf write /apps/light-locker/lock-after-screensaver 'uint32 0'
 
 
-#Преднастройка ПО 
+#Преднастройка ПО
 
 #WPS-office (русский - при славянских локалях)
 if [ ! -f "$HOME/.config/Kingsoft/Office.conf" ] && [ -x "`which wps`" ] ; then
@@ -63,7 +63,7 @@ languages=ru_RU" > $HOME/.config/Kingsoft/Office.conf
                ;;
             *) #All locales
                ;;
-  esac 
+  esac
 fi
 
 #SMplayer (русский - при славянских локалях, монохромные ярлыки)
@@ -76,10 +76,10 @@ language=ru_RU
 iconset=Monochrome" > $HOME/.config/smplayer/smplayer.ini
                ;;
             *) #All locales
-			echo "[gui]
+            echo "[gui]
 iconset=Monochrome" > $HOME/.config/smplayer/smplayer.ini
                ;;
-  esac 
+  esac
 fi
 
 #masterpdfeditor4  (русский - при славянских локалях)
@@ -91,8 +91,8 @@ if [ ! -f "$HOME/.config/Code Industry/Master PDF Editor.conf" ] && [ -x "`which
 lang=ru_ru" > "$HOME/.config/Code Industry/Master PDF Editor.conf"
                ;;
             *) #All locales
-			   ;;
-  esac 
+               ;;
+  esac
 fi
 
 # VLC (запуск 1-й копии, не подгонять размеры под видео, не задавать вопрос о мета-инфо по сети)
@@ -114,8 +114,8 @@ if [ ! -f "$HOME/.config/geany/geany.conf" ] && [ -x "`which geany`" ] ; then
 pref_editor_default_open_encoding=WINDOWS-1251" > "$HOME/.config/geany/geany.conf"
                ;;
             *) #All locales
-			   ;;
-  esac 
+               ;;
+  esac
   echo "[tools]
 terminal_cmd=x-terminal-emulator -e /bin/sh %c" >> "$HOME/.config/geany/geany.conf"
 fi
@@ -129,8 +129,8 @@ if [ ! -f "$HOME/.config/audacious/config" ] && [ -x "`which audacious`" ] ; the
 chardet_detector=russian" > "$HOME/.config/audacious/config"
                ;;
             *) #All locales
-			   ;;
-  esac 
+               ;;
+  esac
 fi
 
 ##ocenaudio (русский - при славянских локалях)
@@ -142,14 +142,14 @@ fi
 #language=ru_RU" > $HOME/.local/share/data/OcenAudio/ocenaudio.cfg
                #;;
             #*) #All locales
-			   #;;
-  #esac 
+               #;;
+  #esac
 #fi
 
-##moc
-#if [ -f "$HOME/.moc/config" ] && [ -x "$HOME/.moc/onsongchange.sh" ] ; then
-    #sed -i "/^OnSongChange/s/^OnSongChange = \"\/\"/OnSongChange = \"\/home\/${USER}\/.moc\/onsongchange.sh %a %t %r\"/g" $HOME/.moc/config
-#fi
+#moc
+if [ -f "$HOME/.moc/config" ] && [ -x "/usr/local/bin/my_moc_info.sh" ] ; then
+    echo "OnSongChange = \"/usr/local/bin/my_moc_info.sh -n\"" >> $HOME/.moc/config
+fi
 
 #Убираем данный скрипт из автозапуска
 if [ -f "$HOME/.config/autostart/firstrun.desktop" ]; then

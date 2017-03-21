@@ -145,7 +145,7 @@ case $OPT in
                ReadTag
                old_tag=`cat /dev/shm/moc_tag.txt`
                if [[ "$tag_deamon" !=  "$old_tag" ]]
-                 then notify-send $tag_deamon
+                 then notify-send -i audio-speakers "MOC" "$tag_deamon"
                       echo "$tag_deamon" > /dev/shm/moc_tag.txt
                fi
           fi
@@ -157,7 +157,7 @@ case $OPT in
         fi
         if [[ `pgrep -u $USER mocp` ]]; then
             ReadTag
-            notify-send $tag_deamon
+            notify-send -i audio-speakers "MOC" "$tag_deamon"
         fi;;
     -t) if [[ `pgrep -u $USER mocp` ]]; then
             ReadTag
