@@ -6,14 +6,16 @@
 
 OPT=$1
 
+SCRIPT_WAY=`readlink -e "$0"`
+
 # display moc info
-tagi ()
+ReadTag ()
 {
-# разделители при выводе информации
+# separators in the output of information
 separ1=" "
 separ2=" "
 
-# перебираем вывод команды mocp -i и раскладываем все по переменным
+# we sort out the output of the mocp -i command and lay out all the variables
 IFS="
 "
 for line in `mocp -i`
@@ -40,40 +42,44 @@ for line in `mocp -i`
     esac
 done
 
-# если теги пусты - делаем подмену полей, на крайний случай вставляем имя файла
-if [ -z ${artist// /} ] 
+# if the tags are empty - we do the substitution of fields, in extreme cases we insert the name of the file
+if [ -z ${artist// /} ]
  then separ1=''
 fi
 if [ -z ${songtitle// /} ]
  then songtitle=${title}
       if [ -z ${songtitle// /} ]
-       then songtitle=${file##*/} 
+       then songtitle=${file##*/}
       fi
 fi
 
-
-# выводим тег
-echo "$state\
+# generate a tag for output
+tag=`echo "$state\
 $artist\
 $separ1\
 $songtitle\
 $separ2\
-$timeleft"
+$timeleft"`
 
-## раскомментируте если нужно выводить теги другим цветом 
+tag_deamon=`echo "$state\
+$artist\
+$separ1\
+$songtitle"`
+
+## раскомментируте если нужно выводить теги другим цветом
 ## цвет шрифта
 ## указывается название цвета - green, red и т.д. или hex-код цвета - #0000FF
 #FONT_COLOR="#FF0000"
 
 ## вывод цветного тега
-#echo "<txt><span foreground=\"$FONT_COLOR\">\
+#tag=`echo "<txt><span foreground=\"$FONT_COLOR\">\
 #"$state\
 #$artist\
 #$separ1\
 #$songtitle\
 #$separ2\
 #$timeleft"\
-#</span></txt>"
+#</span></txt>"`
 }
 
 # make plugin moc info in panel
@@ -102,7 +108,7 @@ done
 let new_id=$max_id+1
 
 #create file-plugin
-echo -e "Command=my_moc_info.sh
+echo -e "Command=$SCRIPT_WAY -t
 UseLabel=0
 Text=(genmon)
 UpdatePeriod=2000
@@ -131,17 +137,43 @@ xfce4-panel -r
 
 case $OPT in
     -p) MakePlugin;;
-    -h|--help) clear
-echo -e "Script `basename $0` designed to display info moc player
-
-Options
-    -p 		make plugin in xfce4-panel 
-    -h, --help 	to help ";;
-    *) # проверяем запущен ли mocp и если запущен выполняем функцию вывода тегов
-       if [[ `pidof mocp` ]]
-          then tagi
+    -d) if ! [[ `which notify-send` ]]
+           then exit 1
+        fi
+        while true ; do
+          if [[ `pgrep -u $USER mocp` ]]; then
+               ReadTag
+               old_tag=`cat /dev/shm/moc_tag.txt`
+               if [[ "$tag_deamon" !=  "$old_tag" ]]
+                 then notify-send $tag_deamon
+                      echo "$tag_deamon" > /dev/shm/moc_tag.txt
+               fi
+          fi
+         sleep 2
+       done;;
+    -k) killall `basename $SCRIPT_WAY` ;;
+    -n) if ! [[ `which notify-send` ]]
+           then exit 1
+        fi
+        if [[ `pgrep -u $USER mocp` ]]; then
+            ReadTag
+            notify-send $tag_deamon
+        fi;;
+    -t) if [[ `pgrep -u $USER mocp` ]]; then
+            ReadTag
+            echo "$tag"
        else echo ""
        fi;;
+    *) #clear
+       echo -e "Script `basename $SCRIPT_WAY` designed to display info moc player
+
+Options
+    -p   make Plugin in xfce4-panel
+    -d   start Daemon to display info moc player in notify-send
+    -k   Kill `basename $SCRIPT_WAY`
+    -n   display info moc player in Notify-send
+    -t   print Tag";;
+
 esac
 
 exit 0
