@@ -171,7 +171,7 @@ Options
     -p   make Plugin in xfce4-panel
     -d   start Daemon to display info moc player in notify-send
     -k   Kill `basename $SCRIPT_WAY`
-    -n   display info moc player in Notify-send
+    -n   display info moc player once in Notify-send 
     -t   print Tag";;
 
 esac
