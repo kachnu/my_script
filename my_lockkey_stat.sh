@@ -5,6 +5,9 @@
 # email:  ya.kachnu@yandex.ua
 
 OPT=$1
+
+SCRIPT_WAY=`readlink -e "$0"`
+
 KEY_INFO=`xset -q | grep -m1 "00:" | sed "s/ //g"`
 
 MakePlugin ()
@@ -32,7 +35,7 @@ done
 let new_id=$max_id+1
 
 #create file-plugin
-echo -e "Command=my_lockkey_stat.sh -S
+echo -e "Command=$SCRIPT_WAY -S
 UseLabel=0
 Text=(genmon)
 UpdatePeriod=1000
@@ -70,7 +73,7 @@ case $OPT in
         SPASE=" ";;
     -p) MakePlugin;;
     -h|--help) clear
-echo -e "Script `basename $0` designed to display key NumLock, CapsLock, ScrollLock
+echo -e "Script `basename $SCRIPT_WAY` designed to display key NumLock, CapsLock, ScrollLock
 
 Options
     -s 		to display short value, like Num, Caps, Scr
