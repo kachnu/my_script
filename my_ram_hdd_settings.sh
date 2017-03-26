@@ -718,7 +718,7 @@ ResultActive=no" | sudo tee /etc/polkit-1/localauthority/90-mandatory.d/disable-
 # Author: Antonio Galea <antonio.galea@gmail.com>
 # Thanks to Przemysław Tomczyk for suggesting swapoff parallelization
 
-FRACTION=50
+FRACTION=25
 
 MEMORY=$((`cat /proc/meminfo | grep ^MemTotal: | sed -e "s/[^0-9]//g"`* 1024))
 CPUS=`grep -c processor /proc/cpuinfo`
@@ -750,13 +750,37 @@ case "$1" in
     ;;
 esac' | sudo tee /etc/init.d/zram
                           sudo chmod +x /etc/init.d/zram
-                          sudo /etc/init.d/zram start
-                          sudo insserv zram
+                          echo '[Unit]
+Description=Manage swap spaces on zram.
+After=local-fs.target
+RequiresMountsFor=/
+RequiresMountsFor=/sys
+RequiresMountsFor=/var
+
+[Service]
+RemainAfterExit=yes
+ExecStart=/etc/init.d/zram start
+ExecStop=/etc/init.d/zram stop
+TimeoutStopSec=600
+Nice=-19
+OOMScoreAdjust=-1000
+CPUAccounting=true
+CPUQuota=5%
+MemoryHigh=16M
+MemoryMax=64M
+ProtectHome=true
+
+[Install]
+WantedBy=local-fs.target' | sudo tee /etc/systemd/system/systemd-zram.service
+                          sudo systemctl enable systemd-zram || sudo insserv zram
+                          sudo systemctl start systemd-zram || sudo /etc/init.d/zram start
                      else
-                          sudo insserv -r zram
-                          sudo /etc/init.d/zram stop
+                          sudo systemctl stop systemd-zram || sudo /etc/init.d/zram stop
+                          sudo systemctl disable systemd-zram || sudo insserv -r zram 
+                          sudo rm -f /etc/systemd/system/systemd-zram.service
                           sudo rm -f /etc/init.d/zram
-                  fi    
+                  fi
+                  sleep 1  
                   ;;
    "$MENU_ZSWAP"* )
                   if [ "$STATE_AUTORUN_ZSWAP" = "OFF" ] 
