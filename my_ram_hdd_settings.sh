@@ -436,10 +436,15 @@ if [ "$STATE_ZRAM" != '' ]
         VALUE_ZRAMP_TEXT=""
 fi
 
-STATE_ZSWAP=`dmesg | grep zswap`
-if [ "$STATE_ZSWAP" != '' ]
+#STATE_ZSWAP=`dmesg | grep zswap`
+#if [ "$STATE_ZSWAP" != '' ]
+   #then STATE_ZSWAP="ON"
+   #else STATE_ZSWAP="OFF"
+#fi
+
+if [ $(cat /sys/module/zswap/parameters/enabled) = 'Y' ]
    then STATE_ZSWAP="ON"
-   else STATE_ZSWAP="OFF"
+   else STATE_ZSWAP="OFF"   
 fi
 
 STATE_AUTORUN_ZSWAP=`cat /etc/default/grub | grep zswap`
@@ -447,7 +452,6 @@ if [ "$STATE_AUTORUN_ZSWAP" != '' ]
    then STATE_AUTORUN_ZSWAP="ON"
    else STATE_AUTORUN_ZSWAP="OFF"
 fi
-
 }
 #########################################################
 CheckStateSysctl ()
@@ -783,6 +787,10 @@ WantedBy=local-fs.target' | sudo tee /etc/systemd/system/systemd-zram.service
                   sleep 1  
                   ;;
    "$MENU_ZSWAP"* )
+                  if [ "$STATE_ZSWAP" = "OFF" ]
+                     then echo 1 | sudo tee /sys/module/zswap/parameters/enabled
+                     else echo 0 | sudo tee /sys/module/zswap/parameters/enabled
+                  fi
                   if [ "$STATE_AUTORUN_ZSWAP" = "OFF" ] 
                      then AddParmToGrub "zswap.enabled=1"
                           sudo update-grub

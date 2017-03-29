@@ -156,17 +156,26 @@ mount -t sysfs none /sys
 mount -t devpts none /dev/pts
 export HOME=/root
 export LC_ALL=C
+export LANG=
+dbus-uuidgen > /var/lib/dbus/machine-id
+dpkg-divert --local --rename --add /sbin/initctl
+ln -s /bin/true /sbin/initctl
+
 ${NORMAL}
 Издеваемся над дистром, ставим программы apt-get update upgrade dist-upgrade purge install -f или aptitude
 ${BLUE} 
 apt-get clean
 rm -rf /tmp/* ~/.bash_history /home/*
+rm /var/lib/dbus/machine-id
+rm /sbin/initctl
+dpkg-divert --rename --remove /sbin/initctl
 umount /proc || umount -lf /proc
 umount /sys
 umount /dev/pts
 exit
 
 umount mydistr_root/dev
+rm -rf mydistr_root/run/synaptic.socket
 rm mydistr_root/etc/hosts
 rm mydistr_root/etc/resolv.conf
 rm mydistr_root/etc/apt/apt.conf.d/proxy
