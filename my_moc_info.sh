@@ -145,7 +145,7 @@ case $OPT in
                ReadTag
                if [[ "$tag_deamon" !=  "$old_tag" ]]
                  then echo "$tag_deamon"
-                      notify-send $tag_deamon
+                      notify-send "$tag_deamon"
                       old_tag="$tag_deamon"
                fi
           fi
@@ -157,7 +157,7 @@ case $OPT in
         fi
         if [[ `pgrep -u $USER mocp` ]]; then
             ReadTag
-            notify-send $tag_deamon
+            notify-send "$tag_deamon"
         fi;;
     -t) if [[ `pgrep -u $USER mocp` ]]; then
             ReadTag
