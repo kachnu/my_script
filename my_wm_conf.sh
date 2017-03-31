@@ -5,7 +5,7 @@
 # email: ya.kachnu@yandex.ua
 
 DIALOG=zenity #Установка типа графического диалогового окна
-
+DIALOG=yad
 if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
  then eсho "Not Install - $DIALOG!"
       exit 1
@@ -222,28 +222,28 @@ ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Back" --title="
 if [ $? == 0 ]
 then
  case $ANSWER in
-    1)  echo "Select Theme"
+    1*)  echo "Select Theme"
         ThemeMetacity
         ;;
-    2)  echo "Button ->"
+    2*)  echo "Button ->"
         dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
         gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close"
         SetMetacity
         ;;
-    3)  echo "Button <-"
+    3*)  echo "Button <-"
         dconf write /org/gnome/desktop/wm/preferences/button-layout "'close,maximize,minimize:menu'"
         gconftool-2 --set --type string /apps/metacity/general/button_layout "close,maximize,minimize:menu"
         SetMetacity
         ;;
-    4)  Check dconf-editor
+    4*)  Check dconf-editor
         echo "Settings dconf"
         dconf-editor
         ;;
-    5)  Check gconf-editor
+    5*)  Check gconf-editor
         echo "Settings gconf"
         gconf-editor
         ;;
-    6)  echo "Set font xfwm4"
+    6*)  echo "Set font xfwm4"
         if [[ -f $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml ]]
          then THEME_FONT=$(grep -i "title_font" $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/<property name="title_font" type="string" value="//g' | sed 's/"\/>//g')
               gconftool-2 --set --type string /apps/metacity/general/titlebar_font "$THEME_FONT"
@@ -353,19 +353,20 @@ ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="
         9 "$MENU9")
 if [ $? == 0 ]
 then
+ echo $ANSWER
  case $ANSWER in
-    1)  StartWm compiz;;
-    2)  StartWm metacity;;
-    3)  StartWm xfwm4;;
-    4)  echo Settings compiz
+    1*)  StartWm compiz;;
+    2*)  StartWm metacity;;
+    3*)  StartWm xfwm4;;
+    4*)  echo Settings compiz
         Check ccsm
         ccsm 1>/dev/null;;
-    5)  echo Settings metacity
+    5*)  echo Settings metacity
         SetMetacity;;
-    6)  AddAutostart compiz;;
-    7)  AddAutostart metacity;;
-    8)  AddAutostart xfwm4;;
-    9)  echo -n "$HELP" | zenity --text-info --cancel-label="Back" --title="Help" \
+    6*)  AddAutostart compiz;;
+    7*)  AddAutostart metacity;;
+    8*)  AddAutostart xfwm4;;
+    9*)  echo -n "$HELP" | $DIALOG --text-info --cancel-label="Back" --title="Help" \
         --width=400 --height=300;;
  esac
  MainForm
