@@ -823,10 +823,10 @@ WantedBy=local-fs.target' | sudo tee /etc/systemd/system/systemd-zram.service
                   if [ "$STATE_AUTORUN_ZSWAP" = "OFF" ]
                      then AddParmToGrub "zswap.enabled=1"
                           sudo update-grub
-                          RestartPC
+                          #RestartPC
                      else RmParmFromGrub "zswap.enabled=1"
                           sudo update-grub
-                          RestartPC
+                          #RestartPC
                   fi
                   ;;
 esac
