@@ -4,10 +4,9 @@
 # author: kachnu
 # email: ya.kachnu@yandex.ua
 
-
-if [ ! -x "`which "zenity"`" ]
- then eсho "Need Install - zenity!"
-      exit 1
+DIALOG=yad
+if ! [[ `which $DIALOG` ]]
+   then DIALOG=zenity
 fi
 
 case $LANG in # language selection
@@ -79,7 +78,7 @@ esac
 #####################################################################
 Help () # help window
 {
-echo -n "$HELP" | zenity --text-info --cancel-label="Back" --title="Help" \
+echo -n "$HELP" | $DIALOG --text-info --cancel-label="Back" --title="Help" \
  --width=400 --height=300
 }
 #####################################################################
@@ -95,7 +94,7 @@ if [ $? = 0 ]
    else echo '#Some Error!'
 fi
 sleep 3"
-) | zenity --progress --pulsate --auto-close \
+) | $DIALOG --progress --pulsate --auto-close \
 --title "Installing vino"
 }
 #####################################################################
@@ -191,7 +190,7 @@ if [ -x "/usr/lib/vino/vino-server" ] # if vino is install then read values else
         else STATE_VNC_ROUTE="OFF"
       fi
  else
-      zenity --question --title="$ATTENTION" --text="$VNC_INSTALL_VINO"
+      $DIALOG --question --title="$ATTENTION" --text="$VNC_INSTALL_VINO"
       if [ $? -eq "0" ]
          then InstallVino
               MainForm
@@ -205,7 +204,7 @@ MainForm () # main window
 # start read vino values
 CheckState
 # open main window
-ANSWER=$(zenity --width=450 --height=300 --list --cancel-label="Exit" --title="$MAIN_LABEL" \
+ANSWER=$($DIALOG --width=450 --height=300 --list --cancel-label="Exit" --title="$MAIN_LABEL" \
       --text="$MAIN_TEXT" \
       --column="" --column="" \
         "$VNC_VIEW_DESKTOP" "$STATE_VNC_VIEW_DESKTOP"\
@@ -262,7 +261,7 @@ then
                      "ON") dconf write /org/gnome/desktop/remote-access/authentication-methods "['none']"
                            ;;
                      "OFF") 
-                              PASSWORD_VNC=`zenity --entry --title="Enter password" --text="$VNC_ENTER_PASSWORD" --entry-text="$PASSWORD_VNC"`
+                              PASSWORD_VNC=`$DIALOG --entry --title="Enter password" --text="$VNC_ENTER_PASSWORD" --entry-text="$PASSWORD_VNC"`
                               if [ $? == 0 ]
                                  then
                                      if [[ `echo "$PASSWORD_VNC"| sed "s/ //g"` == "" ]]
@@ -294,7 +293,7 @@ then
                 MainForm
                 ;;
     "$VNC_PORT"*) # port selection for access
-                STATE_VNC_PORT=`zenity --entry --title="Enter access port" --text="Enter port (valid values 5000-50000)" --entry-text="$STATE_VNC_PORT"`
+                STATE_VNC_PORT=`$DIALOG --entry --title="Enter access port" --text="Enter port (valid values 5000-50000)" --entry-text="$STATE_VNC_PORT"`
                 if [ $? == 0 ]
                    then
                         if [[ $STATE_VNC_PORT == "" ]]
@@ -303,7 +302,7 @@ then
                         # CHEKPORT=$(nmap localhost | grep vnc | grep -w $STATE_VNC_PORT)||\
                         CHEKPORT=$(netstat -anp | grep -w LISTEN | grep "$STATE_VNC_PORT ")
                         if [[ $CHEKPORT != "" ]]
-                           then zenity --error --title="$ATTENTION" --text="$STATE_VNC_PORT $PORT_ALLARM"
+                           then $DIALOG --error --title="$ATTENTION" --text="$STATE_VNC_PORT $PORT_ALLARM"
                            else
                             if [[ $STATE_VNC_PORT == "5900" ]]
                                then dconf write /org/gnome/desktop/remote-access/alternative-port "uint16 $STATE_VNC_PORT"
@@ -317,7 +316,7 @@ then
                 MainForm
                 ;;
     "$VNC_ICON"*) # choice of display icons in the system tray
-                STATE_VNC_ICON=`zenity --list --height=200 --title="Enter icon" --text="$VNC_ENTER_ICON" --radiolist --column "" --column "" \
+                STATE_VNC_ICON=`$DIALOG --list --height=200 --title="Enter icon" --text="$VNC_ENTER_ICON" --radiolist --column "" --column "" \
 $VNC_ICON_CLIENT "client" \
 $VNC_ICON_NEVER "never" \
 $VNC_ICON_ALWAYS "always"`

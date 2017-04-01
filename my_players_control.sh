@@ -3,7 +3,11 @@
 # author: kachnu
 # email: ya.kachnu@yandex.ua
 
-# в системе должен быть установлен zenity
+# в системе должен быть установлен yad или zenity
+DIALOG=yad
+if ! [[ `which $DIALOG` ]]
+   then DIALOG=zenity
+fi
 
 # список плееров
 players_list="audacious mocp deadbeef clementine banshee rhythmbox amarok"
@@ -12,7 +16,7 @@ players_list="audacious mocp deadbeef clementine banshee rhythmbox amarok"
 func_amarok ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
+     -a|--append) folder=`$DIALOG --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then                 
                      amarok -a "$folder"
                   fi;;
@@ -30,7 +34,7 @@ esac
 func_rhythmbox ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
+     -a|--append) folder=`$DIALOG --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then
                       rhythmbox-client --enqueue "$folder"
                   fi;;
@@ -48,7 +52,7 @@ esac
 func_banshee ()
 {
 case $1 in
-     -a|--append) zenity --info --title="Attention" --text="Not supported add files";;
+     -a|--append) $DIALOG --info --title="Attention" --text="Not supported add files";;
      -r|--previous) banshee --previous;;
      -f|--next) banshee --next;;
      -t|--play-pause) banshee --toggle-playing;;
@@ -63,7 +67,7 @@ esac
 func_clementine ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
+     -a|--append) folder=`$DIALOG --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then
                        clementine -a "$folder"
                   fi;;
@@ -86,7 +90,7 @@ if [[ `which deadbeef` ]]; then
 fi
 
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
+     -a|--append) folder=`$DIALOG --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then
                       $deadbeef --queue "$folder"
                   fi;;
@@ -104,7 +108,7 @@ esac
 func_mocp ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
+     -a|--append) folder=`$DIALOG --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then
                       mocp -a "$folder"
                   fi;;
@@ -122,7 +126,7 @@ esac
 func_audacious ()
 {
 case $1 in
-     -a|--append) folder=`zenity --file-selection --directory --title="Add to playlist"`
+     -a|--append) folder=`$DIALOG --file-selection --directory --title="Add to playlist"`
                   if [ $? == 0 ]; then                 
                      audacious -e "$folder"
                   fi;;
@@ -176,7 +180,7 @@ case `echo $run_players | awk '{print NF}'` in
          -q|--quit) ACT="KILL";;
          *) echo "$HELP"; exit;;
      esac
-     run_players=`echo "$run_players" | sed "s/^ //g" | sed "s/ /\\\n/g" | zenity --list --title="select player" \
+     run_players=`echo "$run_players" | sed "s/^ //g" | sed "s/ /\\\n/g" | $DIALOG --list --title="select player" \
                 --text="$ACT" --column="" --separator="\n"`
      func_${run_players// /} $1;;
 esac

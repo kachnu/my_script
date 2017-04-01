@@ -3,9 +3,9 @@
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
-DIALOG=zenity
-if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
- then eсho "Not Install $DIALOG!"; exit 1
+DIALOG=yad
+if ! [[ `which $DIALOG` ]]
+   then DIALOG=zenity
 fi
 
 if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
@@ -31,29 +31,39 @@ case $LANG in
                FORMAT_USB_TEXT="Этап форматирования USB-накопителя (флешки)
 Убедитесь в том, что USB-накопитель вставлен.
 Необходимо на флешке создать 2 раздела:
-раздел №1 - с файловой системой fat32, будет использоваться для iso образа дистрибутива
-раздел №2 - с файловой системой ext2 (ext3, ext4)  и меткой persistence, будет использоваться для сохранения изменений во время live-режима
+раздел №1 - с файловой системой fat32, 
+будет использоваться для iso образа дистрибутива
+раздел №2 - с файловой системой ext2 (ext3, ext4)  и меткой persistence, 
+будет использоваться для сохранения изменений во время live-режима
 Еще раз раздел с меткой - persistence это очень важно!
-Слово persistence - будет скопировано в буфер обмена, просто вставьте во время формирования метки для раздела №2
+Слово persistence - будет скопировано в буфер обмена, 
+просто вставьте во время формирования метки для раздела №2
 
-Если все понятно нажмите ОК (Да), чтобы запустить Gparted и приступить к форматированию флешки"
+Если все понятно нажмите ОК (Да), чтобы запустить Gparted 
+и приступить к форматированию флешки"
                ERROR_MAKE_FILE="Не могу найти раздел с меткой persistence. 
 Попробуйте создать раздел с помощью программы Gparted"
                OK_MAKE_FILE="Файл persistence.conf создан"
-               ERROR_EDIT_MENU="Файл syslinux.cfg не найден, либо найдено несколько файлов syslinux.cfg
+               ERROR_EDIT_MENU="Файл syslinux.cfg не найден, 
+либо найдено несколько файлов syslinux.cfg
+
 Смонтируйте раздел usb-накопителя и повторите попытку. 
 Укажите путь к syslinux.cfg самостоятельно
 
 Нажмите ОК (Да), чтобы самостоятельно указать syslinux.cfg"
                OK_EDIT_MENU="Этап редактирования меню USB-накопителя (флешки) 
-Для включения режима сохранения необходимо запускать ядро linux с параметром persistence,
+Для включения режима сохранения 
+необходимо запускать ядро linux с параметром persistence,
 данный параметр можно передать ядру 2 способами:
-1) В момент загрузки с usb-накопителя, отредактировать пункт меню, нажав Tab и
-добавив в конец строки слово persistence (Enter - для продолжения загрузки)
-2) Отредактировать файл-меню syslinux.cfg добавив слово persistence в конец строки
+1) В момент загрузки с usb-накопителя, 
+отредактировать пункт меню, нажав Tab и
+добавив в конец строки слово persistence 
+(Enter - для продолжения загрузки)
+2) Отредактировать файл-меню syslinux.cfg 
+добавив слово persistence в конец строки
 append initrd=/live/initrd.img .... 
 например,
-append initrd=/live/initrd.img boot=live config quiet splash locales=ru_UA.UTF-8 persistence
+append initrd=/live/initrd.img boot=live config quiet persistence
 
 Слово persistence - будет скопировано в буфер обмена
 Нажмите ОК (Да), чтобы приступить к редактированию файла"
@@ -82,10 +92,13 @@ Install packages for -"
 
 Make sure that the USB-drive is inserted .
 It should be on a flash drive to create 2 sections:
-Section №1 - file system fat32, will be used for the iso image distribution
-Section №2 - an ext2 (ext3, ext4) and tag persistence, it will be used to save the changes during a live-mode
+Section №1 - file system fat32, 
+will be used for the iso image distribution
+Section №2 - an ext2 (ext3, ext4) and tag persistence, 
+it will be used to save the changes during a live-mode
 Once again, the section labeled - persistence is very important!
-Word persistence - will be copied to the clipboard, just insert during the formation of the label for the section №2
+Word persistence - will be copied to the clipboard, 
+just insert during the formation of the label for the section №2
 
 Press OK (Yes) to start Gparted and begin formatting the stick"
                ERROR_MAKE_FILE="I can not find the section labeled persistence. 
@@ -97,14 +110,17 @@ Specify the path to self- syslinux.cfg
 
 Click OK (Yes) to indicate their own syslinux.cfg"
                OK_EDIT_MENU="Step Edit menu USB-drive (flash driv )
-To activate the preservation must be run with the parameter linux kernel persistence,
+To activate the preservation must be run 
+with the parameter linux kernel persistence,
 This parameter can be passed to the kernel in 2 ways:
-1) At the time of loading from the usb- drive , edit the menu item by pressing the Tab and
+1) At the time of loading from the usb- drive , 
+edit the menu item by pressing the Tab and
 adding to the end of the line the word persistence (Enter - to boot) 
-2) Edit syslinux.cfg file menu by adding the word persistence in the end of the line
+2) Edit syslinux.cfg file menu 
+by adding the word persistence in the end of the line
 append initrd=/live/initrd.img .... 
 example
-append initrd=/live/initrd.img boot=live config quiet splash locales=ru_UA.UTF-8 persistence
+append initrd=/live/initrd.img boot=live config quiet persistence
 
 Word persistence - will be copied to the clipboard
 Click OK (Yes) to start editing the file"
@@ -191,7 +207,7 @@ if [ $? == 0 ]
   echo Edit $MENU_FILE
   echo -n persistence | xclip -selection "clipboard"
   ORIG_MENU=$(cat "$MENU_FILE")
-  EDIT_MENU=$(echo -n "$ORIG_MENU" | zenity --text-info --editable --title="Edit $MENU_FILE" \
+  EDIT_MENU=$(echo -n "$ORIG_MENU" | $DIALOG --text-info --editable --title="Edit $MENU_FILE" \
             --width=550 --height=500 ) 
   if [ "$EDIT_MENU" != "" ]
    then echo -n "$EDIT_MENU" > $MENU_FILE
@@ -214,23 +230,23 @@ ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="
 if [ $? == 0 ]
 then
   case $ANSWER in
-    1) Check gparted
+   1*) Check gparted
        Check xclip
        FormatUSB
        MainForm
        ;;
-    2) MakeFile
+   2*) MakeFile
        MainForm
        ;;    
-    3) Check unetbootin
+   3*) Check unetbootin
        unetbootin
        MainForm
        ;;
-    4) EditMenuUSB
+   4*) EditMenuUSB
        Check xclip
        MainForm
        ;;       
-    5) Check gparted
+   5*) Check gparted
        Check unetbootin
        Check xclip
        FormatUSB
@@ -239,7 +255,7 @@ then
        EditMenuUSB
        MainForm
        ;;
-    6) Help | zenity --text-info --cancel-label="Back" --title="Help" --width=400 --height=300
+   6*) Help | $DIALOG --text-info --cancel-label="Back" --title="Help" --width=400 --height=300
        MainForm
        ;;  
   "" ) MainForm 

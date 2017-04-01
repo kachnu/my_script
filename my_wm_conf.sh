@@ -4,11 +4,9 @@
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
-DIALOG=zenity #Установка типа графического диалогового окна
 DIALOG=yad
-if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
- then eсho "Not Install - $DIALOG!"
-      exit 1
+if ! [[ `which $DIALOG` ]]
+   then DIALOG=zenity
 fi
 
 case $LANG in
@@ -195,15 +193,18 @@ THEME_LIST=$(echo "$THEME_LIST" | sed "/^$/d" | sed "s/FALSE ${THEME_NOW}$/TRUE 
 THEME_METACITY=$(echo "$THEME_LIST" | sed "s/FALSE /FALSE\n/g" | sed "s/TRUE /TRUE\n/g" | $DIALOG --width=400 --height=300 --list --cancel-label="Back" --radiolist \
        --title="$THEME_LABEL" \
        --text="$THEME_TEXT" \
-       --column="" --column="Name")
+       --column="" --column="Name" | awk -F"|" '{print $2}')
 if [ $? == 0 ]
  then  #echo Выбрана тема - $THEME_METACITY
-       dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME_METACITY'"
-       #gsettings set org.gnome.desktop.wm.preferences theme $THEME_METACITY
-       dconf write /org/gnome/metacity/theme/name "'$THEME_METACITY'"
-       gconftool-2 --set --type string /apps/metacity/general/theme $THEME_METACITY
-       gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME_METACITY
-       ThemeMetacity
+       if [[ $THEME_METACITY != '' ]]; then
+              dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME_METACITY'"
+              #gsettings set org.gnome.desktop.wm.preferences theme $THEME_METACITY
+              dconf write /org/gnome/metacity/theme/name "'$THEME_METACITY'"
+              gconftool-2 --set --type string /apps/metacity/general/theme $THEME_METACITY
+              gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME_METACITY
+              ThemeMetacity
+         else SetMetacity
+       fi
  else  SetMetacity
 fi
 }
@@ -353,16 +354,15 @@ ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="
         9 "$MENU9")
 if [ $? == 0 ]
 then
- echo $ANSWER
  case $ANSWER in
     1*)  StartWm compiz;;
     2*)  StartWm metacity;;
     3*)  StartWm xfwm4;;
     4*)  echo Settings compiz
-        Check ccsm
-        ccsm 1>/dev/null;;
+         Check ccsm
+         ccsm 1>/dev/null;;
     5*)  echo Settings metacity
-        SetMetacity;;
+         SetMetacity;;
     6*)  AddAutostart compiz;;
     7*)  AddAutostart metacity;;
     8*)  AddAutostart xfwm4;;

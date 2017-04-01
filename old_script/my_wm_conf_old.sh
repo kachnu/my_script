@@ -4,10 +4,9 @@
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
-DIALOG=zenity #Установка типа графического диалогового окна
-
-if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
- then eсho "Not Install - $DIALOG!"
+DIALOG=yad
+if ! [[ `which $DIALOG` ]]
+   then DIALOG=zenity
 fi
 
 case $LANG in

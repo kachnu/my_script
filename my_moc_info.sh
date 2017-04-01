@@ -8,6 +8,32 @@ OPT=$1
 
 SCRIPT_WAY=`readlink -e "$0"`
 
+DIALOG=yad
+if ! [[ `which $DIALOG` ]]
+   then DIALOG=zenity
+fi
+
+AppletMoc ()
+{
+while true; do
+$DIALOG --notification --image="multimedia-player" --menu \
+"♬	start server!mocp -S\
+|☠	stop server!mocp -x\
+|▸	play!mocp -p\
+|╻╻	pause!mocp -G\
+|◾	stop!mocp -s\
+|▸▸	next!mocp -f\
+|◂◂	previous!mocp -p\
+|❐	open window!x-terminal-emulator -e mocp\
+|�	info on panel! $SCRIPT_WAY -p"
+case $? in
+ 0) $DIALOG --question --title="Close moc-applet" --text="Close moc-applet?" 
+    if [ $? == 0 ]; then break; fi;;
+ 252) x-terminal-emulator -e mocp&;;
+ *) echo $?;;
+esac
+done
+}
 # display moc info
 ReadTag ()
 {
@@ -89,7 +115,7 @@ MakePlugin ()
 PANEL=`xfconf-query -c xfce4-panel -p /panels -v | awk '{print $1}' | grep [0-9] | sed 's/^/panel-/g'`
 
 # select panel
-PANEL=`echo "$PANEL" | sed "s/^ //g" | sed "s/ /\\\n/g" | zenity --list --title="Add moc info plugin" \
+PANEL=`echo "$PANEL" | sed "s/^ //g" | sed "s/ /\\\n/g" | $DIALOG --list --title="Add moc info plugin" \
                 --text="select panel" --column="" --separator="\n"`
 
 if [ $? != 0 ]; then
@@ -136,6 +162,7 @@ xfce4-panel -r
 }
 
 case $OPT in
+    -a) AppletMoc;;
     -p) MakePlugin;;
     -d) if ! [[ `which notify-send` ]]
            then exit 1
@@ -168,7 +195,8 @@ case $OPT in
        echo -e "Script `basename $SCRIPT_WAY` designed to display info moc player
 
 Options
-    -p   make Plugin in xfce4-panel
+    -a   start Applet moc
+    -p   make moc-info Plugin in xfce4-panel
     -d   start Daemon to display info moc player in notify-send
     -k   Kill `basename $SCRIPT_WAY`
     -n   display info moc player once in Notify-send 

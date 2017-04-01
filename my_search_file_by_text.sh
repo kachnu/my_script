@@ -3,7 +3,10 @@
 #author: kachnu
 # email: ya.kachnu@yandex.ua
 
-DIALOG=zenity #Установка типа графического диалогового окна
+DIALOG=yad
+if ! [[ `which $DIALOG` ]]
+   then DIALOG=zenity
+fi
 
 case $LANG in
   uk*|ru*|be*) #UA RU BE locales
@@ -79,7 +82,7 @@ echo "$HELP"
 ###############################################
 GuiForm ()
 {
-if [ ! -x "`which "$DIALOG"`" ] #Проверка наличия zenity
+if [ ! -x "`which "$DIALOG"`" ]
  then eсho "Install $DIALOG!"
 fi
 DIRECTORY="$1"
@@ -92,7 +95,7 @@ ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="
 if [ $? == 0 ]
 then
   case $ANSWER in
-    1) SEARCH_WORD=`$DIALOG --entry --cancel-label="Back" --title="Seach" --text="$SEARCH_TEXT" --entry-text="$SEARCH_WORD" `
+    1*) SEARCH_WORD=`$DIALOG --entry --cancel-label="Back" --title="Seach" --text="$SEARCH_TEXT" --entry-text="$SEARCH_WORD" `
        if [ $? != 0 ]
        then GuiForm "$DIRECTORY"
        fi
@@ -104,14 +107,14 @@ then
        then $DIALOG --info --title="$ATTENTION" --text="$ERROR_WORD"
             GuiForm "$DIRECTORY"
        fi
-       grep -EHnr "$SEARCH_WORD" "$DIRECTORY" | zenity --text-info --cancel-label="Back" --title="LIST" \
+       grep -EHnr "$SEARCH_WORD" "$DIRECTORY" | $DIALOG --text-info --cancel-label="Back" --title="LIST" \
  --width=400 --height=300
        GuiForm "$DIRECTORY"
        ;;
-    2) DIRECTORY=`$DIALOG --file-selection --directory --title="$DIRECTORY_TEXT" --filename="$DIRECTORY"`
+    2*) DIRECTORY=`$DIALOG --file-selection --directory --title="$DIRECTORY_TEXT" --filename="$DIRECTORY"`
        GuiForm "$DIRECTORY"
        ;;
-    3) Help | zenity --text-info --cancel-label="Back" --title="Help" --width=400 --height=300
+    3*) Help | $DIALOG --text-info --cancel-label="Back" --title="Help" --width=400 --height=300
        GuiForm "$DIRECTORY"
        ;;              
     *) echo oops!-$ANSWER
