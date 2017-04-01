@@ -1,11 +1,11 @@
 [Desktop Entry]
-GenericName=Display MOC info
-GenericName[ru]=Апплет MOC info
-Name=Display MOC info
-Name[ru]=Апплет MOC info
-Comment=Display MOC info in panel
-Comment[ru]=Создает апплет для отображения тегов и состояние плеера moc на панели
-Exec=/usr/local/bin/my_moc_info.sh -p
+GenericName=Applet MOC
+GenericName[ru]=Апплет MOC
+Name=Applet MOC
+Name[ru]=Апплет MOC 
+Comment=Applet MOC
+Comment[ru]=Апплет на панели для управления плеером moc 
+Exec=/usr/local/bin/my_moc_info.sh -a
 Icon=multimedia-player
 Terminal=false
 X-MultipleArgs=false

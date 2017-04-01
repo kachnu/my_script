@@ -1,8 +1,10 @@
 #!/bin/bash
 # xfce 4.12
-# Display moc info
+# Display moc info && applet moc
 # author: kachnu
 # email:  ya.kachnu@yandex.ua
+
+#need yad !!!
 
 OPT=$1
 
