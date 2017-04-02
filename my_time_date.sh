@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
-#if [ $(id -u) -ne 0 ]; then
-  #echo "Restart $0 with root"
-  #gksudo $0 
-  #exit 1
-#fi
+if [ $(id -u) -ne 0 ]; then
+  echo "Restart $0 with root"
+  gksudo $0 
+  exit 0
+fi
 
 Sync=$(timedatectl status | grep "Network" | awk '{print $4}')
 TZ=$(timedatectl status | grep "Time zone" | awk '{print $3}')
@@ -42,14 +42,18 @@ yad --title="Time and date" --form --separator="," \
     echo $Sync $TZ $Hour $Minute $Second $Date
     echo $Set_time
     
-    #sudo timedatectl set-ntp false 
-    #sudo timedatectl set-timezone "$TZ"
-    #sudo timedatectl set-time "$Set_time"
-    #sudo timedatectl set-ntp "$Sync"
+    sudo timedatectl set-ntp false 
+    sudo timedatectl set-timezone "$TZ"
+    sudo timedatectl set-time "$Set_time"
+    sudo timedatectl set-ntp "$Sync"
+
+#sudo /bin/bash - << usercodeblock
+#timedatectl set-ntp false 
+#timedatectl set-timezone "$TZ"
+#timedatectl set-time "$Set_time"
+#timedatectl set-ntp "$Sync"
+#usercodeblock
     
-    COMMAND=$(echo "#!/bin/sh timedatectl set-ntp false; echo 1111; timedatectl set-timezone "$TZ"; timedatectl set-time "$Set_time"; timedatectl set-ntp "$Sync"")
-    echo "$COMMAND" | sudo sh
-    #gksudo "$COMMAND"
 done
 
 exit 0
