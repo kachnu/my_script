@@ -25,7 +25,7 @@ $DIALOG --notification --image="multimedia-player" --menu \
 |╻╻	pause!mocp -G\
 |◾	stop!mocp -s\
 |▸▸	next!mocp -f\
-|◂◂	previous!mocp -p\
+|◂◂	previous!mocp -r\
 |❐	open window!x-terminal-emulator -e mocp\
 |�	info on panel! $SCRIPT_WAY -p"
 case $? in
