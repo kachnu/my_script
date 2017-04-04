@@ -5,7 +5,7 @@
 
 if ! [ `which yad` ]; then echo "Need yad"; exit 1; fi
 if ! [ `which timedatectl` ]; then echo "Need timedatectl"; exit 1; fi
-#if [ $(id -u) -ne 0 ]; then echo "Start $0 with root"; exit 1; fi
+if [ $(id -u) -ne 0 ]; then echo "Start $0 with root"; exit 1; fi
 
 Sync=$(timedatectl status | grep "Network" | awk '{print $4}')
 TZ=$(timedatectl status | grep "Time zone" | awk '{print $3}')
@@ -40,10 +40,10 @@ yad --window-icon=time-admin --title="Time and date" \
     Date=`echo $Date| awk -F'.' '{print $3"-"$2"-"$1}'`
     Set_time=$Date" "$Hour":"$Minute":"$Second
 
-    sudo timedatectl set-ntp false 
-    sudo timedatectl set-timezone "$TZ"
-    sudo timedatectl set-time "$Set_time"
-    sudo timedatectl set-ntp "$Sync"
+    timedatectl set-ntp false 
+    timedatectl set-timezone "$TZ"
+    timedatectl set-time "$Set_time"
+    timedatectl set-ntp "$Sync"
 done
 
 exit 0
