@@ -3,9 +3,9 @@
 <action>
 	<icon>catfish</icon>
 	<name>Найти файл</name>
-	<unique-id>1426920334780759-1</unique-id>
+	<unique-id>1491407489088048-1</unique-id>
 	<command>catfish --hidden --path=%f</command>
-	<description>Search for files with Catfish</description>
+	<description>Search with Catfish</description>
 	<patterns>*</patterns>
 	<directories/>
 </action>
@@ -244,9 +244,9 @@
 <action>
 	<icon>user-info</icon>
 	<name>Информация о файле</name>
-	<unique-id>1440076178984592-4</unique-id>
+	<unique-id>1491407519497547-2</unique-id>
 	<command>file %F | zenity --text-info --title=&quot;File info&quot; --width=400 --height=200</command>
-	<description>determine file type</description>
+	<description>Determine file type</description>
 	<patterns>*</patterns>
 	<directories/>
 	<audio-files/>
@@ -328,9 +328,9 @@
 <action>
 	<icon>deb</icon>
 	<name>Упаковать в deb</name>
-	<unique-id>1484824498385888-15</unique-id>
+	<unique-id>1491407586153136-4</unique-id>
 	<command>x-terminal-emulator -e /usr/local/bin/my_mk_deb.sh %F</command>
-	<description>dpkg -b</description>
+	<description>Make deb-package</description>
 	<patterns>*</patterns>
 	<directories/>
 </action>
