@@ -1,0 +1,337 @@
+<?xml encoding="UTF-8" version="1.0"?>
+<actions>
+<action>
+	<icon>catfish</icon>
+	<name>Найти файл</name>
+	<unique-id>1426920334780759-1</unique-id>
+	<command>catfish --hidden --path=%f</command>
+	<description>Search for files with Catfish</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>terminator</icon>
+	<name>Открыть терминал</name>
+	<unique-id>1487167230334234-7</unique-id>
+	<command>x-terminal-emulator --working-directory %f</command>
+	<description>Open terminal here</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>terminator</icon>
+	<name>Открыть root-терминал</name>
+	<unique-id>1487167250821951-8</unique-id>
+	<command>gksudo &quot;x-terminal-emulator --working-directory %f&quot;</command>
+	<description>Open root terminal here</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>file-manager</icon>
+	<name>Открыть как root</name>
+	<unique-id>1426920334780834-4</unique-id>
+	<command>gksudo &quot;thunar %f&quot;</command>
+	<description>Open directory as root</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>system-users</icon>
+	<name>Сделать Вас владельцем</name>
+	<unique-id>1487167286205165-9</unique-id>
+	<command>gksudo &quot;chown -hR $USER:$USER %F&quot;</command>
+	<description>Сhange owner to YOU</description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>system-users</icon>
+	<name>Сделать root владельцем</name>
+	<unique-id>1487167305851005-10</unique-id>
+	<command>gksudo &quot;chown -hR root:root %F&quot;</command>
+	<description>Change owner to ROOT</description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>avatar-default</icon>
+	<name>Открыть под root</name>
+	<unique-id>1454143890799404-3</unique-id>
+	<command>gksudo exo-open %f</command>
+	<description>Open as root</description>
+	<patterns>*</patterns>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>geany</icon>
+	<name>Редактировать под root</name>
+	<unique-id>1487167329872495-11</unique-id>
+	<command>gksudo geany %f</command>
+	<description>Edit as root</description>
+	<patterns>*</patterns>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>media-eject</icon>
+	<name>Монтировать iso</name>
+	<unique-id>1487167346010435-12</unique-id>
+	<command>fuseiso -n -p %f %n.mount</command>
+	<description>Mount ISO</description>
+	<patterns>*.iso;*.ISO;*.bin;*.BIN;*.nrg;*.NRG;*.mdf;*.MDF</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>media-eject</icon>
+	<name>Размонтировать iso</name>
+	<unique-id>1487167359149469-13</unique-id>
+	<command>fusermount -uz %f</command>
+	<description>Unmount ISO</description>
+	<patterns>*.mount</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>drive-removable-media</icon>
+	<name>Монтировать архив</name>
+	<unique-id>1487167374506821-14</unique-id>
+	<command>/usr/lib/gvfs/gvfsd-archive file=%f</command>
+	<description>Mount archive</description>
+	<patterns>*</patterns>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>media-optical</icon>
+	<name>Конвертировать в iso</name>
+	<unique-id>1487167469867760-15</unique-id>
+	<command>nrg2iso %f %f.iso | mv %f.iso $(echo %f.iso | sed &apos;s|.nrg||g&apos;)</command>
+	<description>Convert to ISO</description>
+	<patterns>*.nrg;*.NRG</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>media-optical</icon>
+	<name>Конвертировать в iso</name>
+	<unique-id>1487167475016439-16</unique-id>
+	<command>ccd2iso %f %f.iso | mv %f.iso $(echo %f.iso | sed &apos;s|.img||g&apos;)</command>
+	<description>Convert to ISO</description>
+	<patterns>*.img;*.IMG</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>media-optical</icon>
+	<name>Конвертировать в iso</name>
+	<unique-id>1487167480778492-17</unique-id>
+	<command>mdf2iso %f</command>
+	<description>Convert to ISO</description>
+	<patterns>*.mdf;*.MDF</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>gnome-remote-desktop</icon>
+	<name>Запустить в KVM</name>
+	<unique-id>1487167514690295-18</unique-id>
+	<command>kvm --no-acpi -m 1024 %f || gksudo &apos;kvm --no-acpi -m 1024 %f&apos;</command>
+	<description>Start in KVM</description>
+	<patterns>*.iso;*.ISO;sd?;cdrom;*.vdi;*.VDI;*.vhd;*.VHD;*.vmdk;*.VMDK;*.img;*.IMG;*.raw;*.RAW;*.qcow;*.QCOW</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>gtk-media-play-ltr</icon>
+	<name>Воспроизвести в audacious</name>
+	<unique-id>1487167533038699-19</unique-id>
+	<command>audacious %f</command>
+	<description>Play in audacious</description>
+	<patterns>*</patterns>
+	<audio-files/>
+</action>
+<action>
+	<icon>music-library</icon>
+	<name>Добавить в плейлист audacious</name>
+	<unique-id>1487167554845963-20</unique-id>
+	<command>audacious -e %F</command>
+	<description>Add to Playlist audacious</description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+</action>
+<action>
+	<icon>document-print</icon>
+	<name>Печать...</name>
+	<unique-id>1426920334781300-26</unique-id>
+	<command>gtklp %F</command>
+	<description>Print PDF</description>
+	<patterns>*.pdf;*.PDF</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>document-print</icon>
+	<name>Печать...</name>
+	<unique-id>1426920334781321-27</unique-id>
+	<command>gtklp %F</command>
+	<description>Print image and text</description>
+	<patterns>*</patterns>
+	<image-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>folder-publicshare</icon>
+	<name>Открыть доступ по сети</name>
+	<unique-id>1487167576780227-21</unique-id>
+	<command>net usershare add %n %f &quot;&quot; Everyone:F guest_ok=y &amp;&amp; chmod 775 %f &amp;&amp; echo file://$(echo %f | sed &apos;s| |\%%20|g&apos;) %n.share &gt;&gt; $HOME/.config/gtk-3.0/bookmarks</command>
+	<description>Shared</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>folder</icon>
+	<name>Закрыть доступ по сети</name>
+	<unique-id>1487167589289439-22</unique-id>
+	<command>net usershare delete %n &amp;&amp; chmod 740 %f &amp;&amp; cat $HOME/.config/gtk-3.0/bookmarks | grep -v %n.share &gt; $HOME/.config/gtk-3.0/bookmarks.tmp &amp;&amp; mv $HOME/.config/gtk-3.0/bookmarks.tmp $HOME/.config/gtk-3.0/bookmarks</command>
+	<description>Unshared</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>emblem-symbolic-link</icon>
+	<name>Создать ярлык</name>
+	<unique-id>1487167615640813-23</unique-id>
+	<command>ln -s %f %n.link</command>
+	<description>Make link</description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>ghex</icon>
+	<name>Открыть в hex-editor</name>
+	<unique-id>1487167183545292-6</unique-id>
+	<command>ghex %f</command>
+	<description>Open in hex-editor</description>
+	<patterns>*</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>zim</icon>
+	<name>Скопировать путь</name>
+	<unique-id>1487167159949099-5</unique-id>
+	<command>echo -n %f | xclip -selection &quot;clipboard&quot;</command>
+	<description>Copy way</description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>user-info</icon>
+	<name>Информация о файле</name>
+	<unique-id>1440076178984592-4</unique-id>
+	<command>file %F | zenity --text-info --title=&quot;File info&quot; --width=400 --height=200</command>
+	<description>determine file type</description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>application-x-rar</icon>
+	<name>Создать архив RARv4</name>
+	<unique-id>1487167126990126-3</unique-id>
+	<command>x-terminal-emulator -e rar a -hp -ma4 %f.rar %N</command>
+	<description>Make RARv4</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>application-x-rar</icon>
+	<name>Создать архив RARv5</name>
+	<unique-id>1487167134422335-4</unique-id>
+	<command>x-terminal-emulator -e rar a -hp -ma5 %f.rar %N</command>
+	<description>Make RARv5</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Выполнить в терминале</name>
+	<unique-id>1487167662174016-24</unique-id>
+	<command>chmod +x %f; x-terminal-emulator --command=&quot;./%n || exit&quot;</command>
+	<description>Run in terminal</description>
+	<patterns>*.sh;*.py;*.pl</patterns>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>package-remove</icon>
+	<name>Удалить программу</name>
+	<unique-id>1484811841119620-1</unique-id>
+	<command>x-terminal-emulator --command=&quot;/usr/local/bin/my_rm_package_desktop_files.sh %F&quot;</command>
+	<description>Purge package from *.desktop</description>
+	<patterns>*.desktop</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>document-import</icon>
+	<name>Добавить в автозагрузку</name>
+	<unique-id>1487167052230052-1</unique-id>
+	<command>cp %f ~/.config/autostart/</command>
+	<description>Add to autostart</description>
+	<patterns>*.desktop</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>document-export</icon>
+	<name>Убрать из автозагрузки</name>
+	<unique-id>1487167075160736-2</unique-id>
+	<command>rm ~/.config/autostart/%n</command>
+	<description>Remove from autostart</description>
+	<patterns>*.desktop</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>deb</icon>
+	<name>Распаковать deb</name>
+	<unique-id>1484824528521618-16</unique-id>
+	<command>x-terminal-emulator -e /usr/local/bin/my_unpack_deb.sh %F</command>
+	<description>unpack deb-files</description>
+	<patterns>*.deb</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>deb</icon>
+	<name>Упаковать в deb</name>
+	<unique-id>1484824498385888-15</unique-id>
+	<command>x-terminal-emulator -e /usr/local/bin/my_mk_deb.sh %F</command>
+	<description>dpkg -b</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+</actions>
