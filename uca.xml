@@ -319,9 +319,9 @@
 <action>
 	<icon>deb</icon>
 	<name>Распаковать deb</name>
-	<unique-id>1484824528521618-16</unique-id>
+	<unique-id>1491457452698861-1</unique-id>
 	<command>x-terminal-emulator -e /usr/local/bin/my_unpack_deb.sh %F</command>
-	<description>unpack deb-files</description>
+	<description>Unpack deb-files</description>
 	<patterns>*.deb</patterns>
 	<other-files/>
 </action>
