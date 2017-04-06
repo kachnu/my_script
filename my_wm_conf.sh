@@ -207,7 +207,7 @@ MainForm ()
 {
 CheckState
 
-SETTINGS=`$DIALOG --window-icon=preferences-system-windows --title="Manager WM" \
+SETTINGS=`$DIALOG --window-icon=preferences-system-windows --center --title="Manager WM" \
 --form --separator="," \
 --field=" Run WM::CB" "$WM_RUN_LIST" \
 --field=" Autorun WM::CB" "$WM_AUTO_LIST" \
