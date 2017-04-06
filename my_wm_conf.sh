@@ -5,118 +5,28 @@
 # email: ya.kachnu@yandex.ua
 
 DIALOG=yad
-if ! [[ `which $DIALOG` ]]
-   then DIALOG=zenity
-fi
 
-case $LANG in
-  uk*|ru*|be*) #UA RU BE locales
-               MAIN_LABEL="Управление WM"
-               MAIN_TEXT="Выберите действие:"
-               MENU1="Включить эффекты compiz"
-               MENU2="Включить metacity"
-               MENU3="Включить xfwm4"
-               MENU4="Настроить compiz"
-               MENU5="Настроить окна metacity (compiz)"
-               MENU6="Добавить compiz в автозапуск"
-               MENU7="Добавить metacity в автозапуск"
-               MENU8="Добавить xfwm4 в автозапуск"
-               MENU9="Справка"
-               ADDAUTOSTART="- добавлен в автозагрузку!"
-               ATTENTION="ВНИМАНИЕ!"
-               META_LABEL="Настройка окон metacity (compiz)"
-               META_TEXT=$MAIN_TEXT
-               MENU_META1="Выбор темы оформления окон"
-               MENU_META2="Кнопки управления окном справа"
-               MENU_META3="Кнопки управления окном слева"
-               MENU_META4="Тонкая настройка dconf"
-               MENU_META5="Тонкая настройка gconf"
-               MENU_META6="Установить шрифт заголовка как в xfwm4"
-               THEME_LABEL="Список тем"
-               THEME_TEXT="Выберите тему:"
-               CHECK_PO="- не найдено!
-Установите пакеты для работы -"
-               HELP="Данный скрипт позволяет управлять оконными менеджерами (WM)
+CHECK_PO_LIST="$DIALOG dconf gconftool-2 notify-send xfce4-panel xfconf-query"
+for PO in $CHECK_PO_LIST; do
+    if ! [[ `which $PO` ]]; then echo "Not found $PO"; exit 1; fi
+done
 
-В системе 3 оконных менеджера:
-1) xfwm4 - стандартный WM для Xfce
-2) metacity - оконный менеджер среды GNOME
-3) compiz - композитный менеджер окон для X Window System
-
-Одновременно в системе работает только один WM.
-
-xfwm4 настраивается стандартными инструментами Xfce
-Настройки хранятся в домашней папке ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
-
-metacity настраивается с помощью утилиты dconf-editor
-compiz настраивается с помощью утилиты ccsm, а само окно к кнопками развернуть, свернуть и т.д. - с помощью dconf-editor (gconf-editor)
-Настройки metacity и compiz хранятся в ~/.config/dconf/user
-При работе metacity или compiz инструменты настройки xfwm4 НЕДОСТУПНЫ.
-Темы окон metacity (compiz) хранятся в:
-/usr/share/themes/ -глобальные темы
-~/.local/share/themes - локальные темы, доступные только пользователю
-Одним из условий правильного формирования списка тем является отсутствие ПРОБЕЛОВ в названии папки-темы."
-               ;;
-            *) #All locales
-               MAIN_LABEL="Manager WM"
-               MAIN_TEXT="Select an action:"
-               MENU1="Run compiz effects"
-               MENU2="Run metacity"
-               MENU3="Run xfwm4"
-               MENU4="Settings compiz"
-               MENU5="Settings windows metacity (compiz)"
-               MENU6="Add compiz to autostart"
-               MENU7="Add metacity to autostart"
-               MENU8="Add в to autostart"
-               MENU9="Help"
-               ADDAUTOSTART="- add to autostart!"
-               ATTENTION="ATTENTION!"
-               META_LABEL="Configuring windows metacity (compiz)"
-               META_TEXT=$MAIN_TEXT
-               MENU_META1="Choosing themes windows"
-               MENU_META2="Control buttons on the right"
-               MENU_META3="Control buttons on the left "
-               MENU_META4="Start dconf"
-               MENU_META5="Start gconf"
-               MENU_META6="Set font xfwm4"
-               THEME_LABEL="Themes list"
-               THEME_TEXT="Select theme:"
-               CHECK_PO="- not found!
-Install packages for -"
-               HELP="This script allows you to control window managers (WM)
-
-The system 3 window manager :
-1) xfwm4 - WM standard for Xfce
-2) metacity - the GNOME window manager
-3) compiz - composite window manager for the X Window System
-
-At the same time the system is only one WM.
-
-xfwm4 adjusted standard tools Xfce
-The settings are stored in your home folder ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
-
-metacity configured using the utility dconf-editor
-compiz is configured using a utility ccsm
-
-When using metacity or compiz configuration tools xfwm4 unavailable.
-Topics windows metacity (compiz) is stored in:
-/usr/share/themes/ -global themes
-~/.local/share/themes - local themes
-One of the conditions for the proper formation of the list is the lack of spaces in the folder theme."
-               ;;
-esac
-
-#####################################################################
+CHECK_WM_LIST="compiz metacity xfwm4"
+WM_LIST=""
+for WM in $CHECK_WM_LIST; do
+    if [[ `which  $WM` ]]; then WM_LIST=$WM_LIST' '$WM; fi
+done
+########################################################################
 DefaultSettings ()
 {
 #set window decor
 dconf write /org/gnome/metacity/theme/type "'metacity'"
 gconftool-2 --set --type boolen /apps/gwd/use_metacity_theme True
 if [[ -x /usr/bin/gtk-window-decorator ]]
- then gconftool-2 --set --type string /apps/compiz/plugins/decoration/allscreens/options/command "/usr/bin/gtk-window-decorator --replace"
+    then gconftool-2 --set --type string /apps/compiz/plugins/decoration/allscreens/options/command "/usr/bin/gtk-window-decorator --replace"
 fi
 #set Default theme matacity
-DEFAULT_THEME="Default"
+DEFAULT_THEME="Default-4.10"
 if [[ -d /usr/share/themes/$DEFAULT_THEME/metacity-1 ]]; then
     if [[ $(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g" ) == '' ]]
      then dconf write /org/gnome/desktop/wm/preferences/theme "'$DEFAULT_THEME'"
@@ -130,44 +40,43 @@ if [[ -d /usr/share/themes/$DEFAULT_THEME/metacity-1 ]]; then
 fi
 #set button-layout
 if [[ $(gconftool-2 --get /apps/metacity/general/button_layout ) == '' ]]
- then gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close"
+    then gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close"
 fi
 if [[ $(dconf read /org/gnome/desktop/wm/preferences/button-layout) == '' ]]
- then dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
+    then dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
 fi
 #set font
 if [[ $(gconftool-2 --get /apps/metacity/general/titlebar_font ) == '' ]]
- then gconftool-2 --set --type string /apps/metacity/general/titlebar_font "Sans Bold 9"
+    then gconftool-2 --set --type string /apps/metacity/general/titlebar_font "Sans Bold 9"
 fi
 }
-#####################################################################
-Check () #Функция проверки ПО
+########################################################################
+CheckState ()
 {
-if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
- then echo Argument check error; exit 1
-fi
+WM_RUN=''
+WM_NOT_RUN=''
+for WM in $WM_LIST; do
+  if [[ `pgrep -u $USER $WM` ]]; then WM_RUN=$WM
+  else if [ -z $WM_NOT_RUN ]; then WM_NOT_RUN=$WM
+       else WM_NOT_RUN=$WM_NOT_RUN'!'$WM
+       fi
+  fi
+done
+WM_RUN_LIST=$WM_RUN'!'$WM_NOT_RUN
 
-if [ ! -x "`which "$1"`" ] #Проверка наличия ПО
- then echo $1 - not found!
-      $DIALOG --info --title="$ATTENTION" --text="$1 $CHECK_PO $1"
-      MainForm
-fi
-}
-#####################################################################
-AddAutostart () #Функция добавления в автозагрузку
-{
-if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
- then echo Argument autostart error; exit 1
- else WM=$1
-fi
-Check $WM
-echo Add $WM to autostart
-xfconf-query -c xfce4-session -p /sessions/Failsafe/Client0_Command --force-array -t string -s $WM --create
-#$DIALOG --info --title="$ATTENTION" --text="$WM_CELECT $ADDAUTOSTART"
-}
-#####################################################################
-ThemeMetacity () #Выбор оформления окон для metacity и compiz
-{
+WM_AUTO_INFO=`xfconf-query -c xfce4-session -p /sessions/Failsafe/Client0_Command | awk '{print $NF}'`
+WM_NOT_AUTO=''
+for WM in $WM_LIST; do
+  if [[ `echo $WM_AUTO_INFO | grep $WM` ]]; then WM_AUTO=$WM
+  else if [ -z $WM_NOT_AUTO ]; then WM_NOT_AUTO=$WM
+          else WM_NOT_AUTO=$WM_NOT_AUTO'!'$WM
+          fi
+  fi
+done
+WM_AUTO_LIST=$WM_AUTO'!'$WM_NOT_AUTO
+
+THEME_LIST=''
+
 if [[ -d ~/.local/share/themes && ! -d ~/.themes ]]
   then ln -s ~/.local/share/themes ~/.themes
 fi
@@ -176,205 +85,153 @@ if [[ -d ~/.themes && ! -d ~/.local/share/themes ]]
 fi
 
 THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
-#echo Сейчас установлена тема - "$THEME_NOW"
 
-THEME_LIST=$(find /usr/share/themes/ -name metacity-1 | sed "s/\/usr\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g")
+THEME_LIST=$(find /usr/share/themes/ -name metacity-1 | sed "s/\/usr\/share\/themes\//\!/g" | sed "s/\/metacity-1//g")
 if [[ -d ~/.local/share/themes ]]
-  then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//FALSE /g" | sed "s/\/metacity-1//g" )
+  then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\/\!/g" | sed "s/\/metacity-1//g" )
 fi
 if [[ -d ~/.themes ]]
-  then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.themes\//FALSE /g" | sed "s/\/metacity-1//g")
+  then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.themes\/\!/g" | sed "s/\/metacity-1//g")
 fi
+
 THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
-THEME_LIST=$(echo "$THEME_LIST" | sort)
-THEME_LIST=$(echo "$THEME_LIST" | sed "/^$/d" | sed "s/FALSE ${THEME_NOW}$/TRUE ${THEME_NOW}/g")
-#echo -e "Общий список тем - $THEME_LIST"
+THEME_LIST=$(echo "$THEME_LIST" | sort | sed "/^$/d")
+THEME_LIST=$THEME_NOW"!"$(echo $THEME_LIST | sed 's/ \!/\!/g' | sed 's/^\!//g')
 
-THEME_METACITY=$(echo "$THEME_LIST" | sed "s/FALSE /FALSE\n/g" | sed "s/TRUE /TRUE\n/g" | $DIALOG --width=400 --height=300 --list --cancel-label="Back" --radiolist \
-       --title="$THEME_LABEL" \
-       --text="$THEME_TEXT" \
-       --column="" --column="Name" | awk -F"|" '{print $2}')
-if [ $? == 0 ]
- then  #echo Выбрана тема - $THEME_METACITY
-       if [[ $THEME_METACITY != '' ]]; then
-              dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME_METACITY'"
-              #gsettings set org.gnome.desktop.wm.preferences theme $THEME_METACITY
-              dconf write /org/gnome/metacity/theme/name "'$THEME_METACITY'"
-              gconftool-2 --set --type string /apps/metacity/general/theme $THEME_METACITY
-              gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME_METACITY
-              ThemeMetacity
-         else SetMetacity
-       fi
- else  SetMetacity
+BUTTON_R="Right"
+BUTTON_L="Left"
+if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
+     BUTTON=$BUTTON_L
+     BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
+else BUTTON=$BUTTON_R
+     BUTTON_LIST=$BUTTON_R'!'$BUTTON_L
 fi
 }
-#####################################################################
-SetMetacity () #Окно настройки metacity
+########################################################################
+AddAutostart ()
 {
-ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Back" --title="$META_LABEL" \
-      --text="$META_TEXT" \
-      --column="" --column="" \
-        1 "$MENU_META1"\
-        2 "$MENU_META2"\
-        3 "$MENU_META3"\
-        4 "$MENU_META4"\
-        5 "$MENU_META5"\
-        6 "$MENU_META6")
-if [ $? == 0 ]
-then
- case $ANSWER in
-    1*)  echo "Select Theme"
-        ThemeMetacity
-        ;;
-    2*)  echo "Button ->"
-        dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
-        gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close"
-        SetMetacity
-        ;;
-    3*)  echo "Button <-"
-        dconf write /org/gnome/desktop/wm/preferences/button-layout "'close,maximize,minimize:menu'"
-        gconftool-2 --set --type string /apps/metacity/general/button_layout "close,maximize,minimize:menu"
-        SetMetacity
-        ;;
-    4*)  Check dconf-editor
-        echo "Settings dconf"
-        dconf-editor
-        ;;
-    5*)  Check gconf-editor
-        echo "Settings gconf"
-        gconf-editor
-        ;;
-    6*)  echo "Set font xfwm4"
-        if [[ -f $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml ]]
-         then THEME_FONT=$(grep -i "title_font" $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/<property name="title_font" type="string" value="//g' | sed 's/"\/>//g')
-              gconftool-2 --set --type string /apps/metacity/general/titlebar_font "$THEME_FONT"
-              dconf write /org/gnome/desktop/wm/preferences/titlebar-uses-system-font "false"
-              dconf write /org/gnome/desktop/wm/preferences/titlebar-font "'$THEME_FONT'"
-        fi
-        SetMetacity
-        ;;
- esac
-else MainForm
+if [ -z "$1" ]
+   then echo Argument autostart error; exit 1
+   else WM=$1
 fi
+xfconf-query -c xfce4-session -p /sessions/Failsafe/Client0_Command --force-array -t string -s $WM --create
+notify-send -i dialog-information "$WM" "add to autostart"
 }
-#####################################################################
-CheckState () #Проверяет какой WM запущен и какой добавлен в автозагрузку
+########################################################################
+StartWm ()
 {
-STATE_COMPIZ=''
-STATE_METACITY=''
-STATE_XFWM4=''
-AUTO_COMPIZ=''
-AUTO_METACITY=''
-AUTO_XFWM4=''
-NUMBER_WORKSPACE=''
-
-if [[ `pgrep -u $USER compiz` ]]
- then STATE_COMPIZ="- ON"
-      if [ -f "$HOME/.config/compiz/compizconfig/config" ]; then
-         profile=$(cat $HOME/.config/compiz/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
-         if [[ $profile = '' ]]; then profile='Default'; fi
-         s0_hsize=$(cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_hsize | awk -F= '{print $2}'| sed "s/ //g")
-         s0_vsize=$(cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_vsize | awk -F= '{print $2}'| sed "s/ //g")
-      fi
-      if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
-         profile=$(cat $HOME/.config/compiz-1/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
-         if [[ $profile = '' ]]; then profile='Default'; fi
-         s0_hsize=$(cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_hsize | awk -F= '{print $2}'| sed "s/ //g")
-         s0_vsize=$(cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_vsize | awk -F= '{print $2}'| sed "s/ //g")
-      fi
-      if [[ $s0_hsize = '' ]]; then s0_hsize=2; fi
-      if [[ $s0_vsize = '' ]]; then s0_vsize=1; fi
-
-      let NUMBER_WORKSPACE=$s0_hsize*$s0_vsize
+if [ -z "$1" ]
+   then echo Argument autostart error; exit 1
+   else WM=$1
 fi
 
-if [[ `pgrep -u $USER metacity` ]]
- then STATE_METACITY="- ON"
-      NUMBER_WORKSPACE=`dconf read /org/gnome/desktop/wm/preferences/num-workspaces`
+if ! [ -z "$2" ]; then WM_RUN=$2
+   NUMBER_WORKSPACE=''
+   case $WM_RUN in
+     compiz)   if [ -f "$HOME/.config/compiz/compizconfig/config" ]; then
+                  profile=$(cat $HOME/.config/compiz/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
+                  if [[ $profile = '' ]]; then profile='Default'; fi
+                  s0_hsize=$(cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_hsize | awk -F= '{print $2}'| sed "s/ //g")
+                  s0_vsize=$(cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_vsize | awk -F= '{print $2}'| sed "s/ //g")
+               fi
+               if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
+                  profile=$(cat $HOME/.config/compiz-1/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
+                  if [[ $profile = '' ]]; then profile='Default'; fi
+                  s0_hsize=$(cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_hsize | awk -F= '{print $2}'| sed "s/ //g")
+                  s0_vsize=$(cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_vsize | awk -F= '{print $2}'| sed "s/ //g")
+               fi
+               if [[ $s0_hsize = '' ]]; then s0_hsize=2; fi
+               if [[ $s0_vsize = '' ]]; then s0_vsize=1; fi
+               let NUMBER_WORKSPACE=$s0_hsize*$s0_vsize;;
+     metacity) NUMBER_WORKSPACE=`dconf read /org/gnome/desktop/wm/preferences/num-workspaces`;;
+     xfwm4)    NUMBER_WORKSPACE=`xfconf-query -c xfwm4 -p /general/workspace_count`;;
+   esac
+
+   case $WM in
+     compiz)   if [ -f "$HOME/.config/compiz/compizconfig/config" ]; then
+                  profile=$(cat $HOME/.config/compiz/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
+                  if [[ $profile = '' ]]; then profile='Default'; fi
+                  sed -i "/^s0_hsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
+                  sed -i "/^s0_vsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
+                  sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz/compizconfig/$profile.ini
+               fi
+               if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
+                  profile=$(cat $HOME/.config/compiz-1/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
+                  if [[ $profile = '' ]]; then profile='Default'; fi
+                  sed -i "/^s0_hsize/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
+                  sed -i "/^s0_vsize/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
+                  sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz-1/compizconfig/$profile.ini
+               fi;;
+     metacity) dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE;;
+     xfwm4)    xfconf-query -c xfwm4 -p /general/workspace_count -s $NUMBER_WORKSPACE;;
+   esac
 fi
-
-if [[ `pgrep -u $USER xfwm4` ]]
- then STATE_XFWM4="- ON"
-      NUMBER_WORKSPACE=`xfconf-query -c xfwm4 -p /general/workspace_count`
-fi
-
-WM_CHOSE=`xfconf-query -c xfce4-session -p /sessions/Failsafe/Client0_Command`
-case $WM_CHOSE in
- *compiz*) AUTO_COMPIZ="- ON";;
- *metacity*) AUTO_METACITY="- ON";;
- *xfwm4*) AUTO_XFWM4="- ON";;
-esac
-}
-#####################################################################
-StartWm () #Запуск WM
-{
-if [ -z "$1" ] #Проверка указан ли аргумент ф-ции
- then echo Argument autostart error; exit 1
- else WM=$1
-fi
-Check $WM
-CheckState
-echo Run $WM
-case $WM in
- compiz)   sed -i "/^s0_hsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
-           sed -i "/^s0_vsize/d" $HOME/.config/compiz/compizconfig/$profile.ini
-           sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz/compizconfig/$profile.ini
-
-           sed -i "/^s0_hsize/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
-           sed -i "/^s0_vsize/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
-           sed -i "s|\[core\]|\[core\]\ns0_hsize=${NUMBER_WORKSPACE}\ns0_vsize=1|g" $HOME/.config/compiz-1/compizconfig/$profile.ini
-           ;;
- metacity) dconf write /org/gnome/desktop/wm/preferences/num-workspaces $NUMBER_WORKSPACE
-           ;;
- xfwm4)    xfconf-query -c xfwm4 -p /general/workspace_count -s $NUMBER_WORKSPACE
-           ;;
-esac
-
 
 $WM --replace &
 xfce4-panel -r
 sleep 1
-#notify-send -i dialog-information $WM
+notify-send -i dialog-information "$WM" "started"
 }
-#####################################################################
-MainForm () #Функция главного окна
+########################################################################
+SetTheme ()
+{
+if [ -z "$1" ]
+   then echo Argument autostart error; exit 1
+   else THEME=$1
+fi
+dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME'"
+dconf write /org/gnome/metacity/theme/name "'$THEME'"
+gconftool-2 --set --type string /apps/metacity/general/theme $THEME
+gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME
+notify-send -i dialog-information "$THEME" "theme activated"
+}
+########################################################################
+SetButton ()
+{
+if [ -z "$1" ]
+   then echo Argument autostart error; exit 1
+   else BUTTON=$1
+fi
+
+case $BUTTON in
+     $BUTTON_R) dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
+                  gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close" ;;
+     $BUTTON_L) dconf write /org/gnome/desktop/wm/preferences/button-layout "'close,maximize,minimize:menu'"
+                  gconftool-2 --set --type string /apps/metacity/general/button_layout "close,maximize,minimize:menu";;
+      *) echo ---"$BUTTON"----;;
+esac
+notify-send -i dialog-information "$BUTTON" "button activated"
+}
+########################################################################
+MainForm ()
 {
 CheckState
-ANSWER=$($DIALOG --width=400 --height=300 --list --cancel-label="Exit" --title="$MAIN_LABEL" \
-      --text="$MAIN_TEXT" \
-      --column="" --column="" \
-        1 "$MENU1 $STATE_COMPIZ"\
-        2 "$MENU2 $STATE_METACITY"\
-        3 "$MENU3 $STATE_XFWM4"\
-        4 "$MENU4"\
-        5 "$MENU5"\
-        6 "$MENU6 $AUTO_COMPIZ"\
-        7 "$MENU7 $AUTO_METACITY"\
-        8 "$MENU8 $AUTO_XFWM4"\
-        9 "$MENU9")
-if [ $? == 0 ]
-then
- case $ANSWER in
-    1*)  StartWm compiz;;
-    2*)  StartWm metacity;;
-    3*)  StartWm xfwm4;;
-    4*)  echo Settings compiz
-         Check ccsm
-         ccsm 1>/dev/null;;
-    5*)  echo Settings metacity
-         SetMetacity;;
-    6*)  AddAutostart compiz;;
-    7*)  AddAutostart metacity;;
-    8*)  AddAutostart xfwm4;;
-    9*)  echo -n "$HELP" | $DIALOG --text-info --cancel-label="Back" --title="Help" \
-        --width=400 --height=300;;
- esac
- MainForm
-else echo Exit; exit 0
-fi
+
+SETTINGS=`$DIALOG --window-icon=preferences-system-windows --title="Manager WM" \
+--form --separator="," \
+--field=" Run WM::CB" "$WM_RUN_LIST" \
+--field=" Autorun WM::CB" "$WM_AUTO_LIST" \
+--field=" Theme window::CB" "$THEME_LIST" \
+--field=" Button window::CB" "$BUTTON_LIST" \
+--field=" Settings compiz:BTN" ccsm`
+
+if [ $? != 0 ]; then exit; fi
+
+NEW_WM_RUN=`echo $SETTINGS | awk -F',' '{print $1}'`
+NEW_WM_AUTO=`echo $SETTINGS | awk -F',' '{print $2}'`
+NEW_THEME=`echo $SETTINGS | awk -F',' '{print $3}'`
+NEW_BUTTON=`echo $SETTINGS | awk -F',' '{print $4}'`
+
+if [ "$NEW_WM_RUN" != "$WM_RUN" ]; then StartWm $NEW_WM_RUN "$WM_RUN"; fi
+if [ "$NEW_WM_AUTO" != "$WM_AUTO" ]; then AddAutostart "$NEW_WM_AUTO"; fi
+if [ "$NEW_THEME" != "$THEME_NOW" ]; then SetTheme "$NEW_THEME"; fi
+if [ "$NEW_BUTTON" != "$BUTTON" ]; then SetButton "$NEW_BUTTON"; fi
+
+MainForm
 }
-#####################################################################
+########################################################################
 DefaultSettings
+
 MainForm
 
 exit 0
