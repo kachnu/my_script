@@ -121,7 +121,7 @@ notify-send -i dialog-information "$WM" "add to autostart"
 StartWm ()
 {
 if [ -z "$1" ]
-   then echo Argument autostart error; exit 1
+   then echo Argument start wm error; exit 1
    else WM=$1
 fi
 
@@ -176,7 +176,7 @@ notify-send -i dialog-information "$WM" "started"
 SetTheme ()
 {
 if [ -z "$1" ]
-   then echo Argument autostart error; exit 1
+   then echo Argument theme error; exit 1
    else THEME=$1
 fi
 dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME'"
@@ -189,7 +189,7 @@ notify-send -i dialog-information "$THEME" "theme activated"
 SetButton ()
 {
 if [ -z "$1" ]
-   then echo Argument autostart error; exit 1
+   then echo Argument button error; exit 1
    else BUTTON=$1
 fi
 
@@ -207,15 +207,18 @@ MainForm ()
 {
 CheckState
 
-SETTINGS=`$DIALOG --window-icon=preferences-system-windows --center --title="Manager WM" \
+SETTINGS=`$DIALOG --window-icon=preferences-system-windows \
+--center --title="Manager WM" \
 --form --separator="," \
 --field=" Run WM::CB" "$WM_RUN_LIST" \
 --field=" Autorun WM::CB" "$WM_AUTO_LIST" \
 --field=" Theme window::CB" "$THEME_LIST" \
 --field=" Button window::CB" "$BUTTON_LIST" \
---field=" Settings compiz:BTN" ccsm`
+--field=" Settings compiz:FBTN" ccsm`
 
 if [ $? != 0 ]; then exit; fi
+
+#echo $SETTINGS
 
 NEW_WM_RUN=`echo $SETTINGS | awk -F',' '{print $1}'`
 NEW_WM_AUTO=`echo $SETTINGS | awk -F',' '{print $2}'`
