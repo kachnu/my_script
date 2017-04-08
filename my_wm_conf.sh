@@ -16,6 +16,13 @@ WM_LIST=""
 for WM in $CHECK_WM_LIST; do
     if [[ `which  $WM` ]]; then WM_LIST=$WM_LIST' '$WM; fi
 done
+
+TEXT_WM="WM"
+TEXT_AUTO="Autostart WM"
+TEXT_THEME="Theme"
+TEXT_BUTTON="Button window"
+TEXT_SETTINGS="Settings"
+
 ########################################################################
 DefaultSettings ()
 {
@@ -76,27 +83,12 @@ done
 WM_AUTO_LIST=$WM_AUTO'!'$WM_NOT_AUTO
 
 THEME_LIST=''
-
 if [[ -d ~/.local/share/themes && ! -d ~/.themes ]]
-  then ln -s ~/.local/share/themes ~/.themes
+    then ln -s ~/.local/share/themes ~/.themes
 fi
 if [[ -d ~/.themes && ! -d ~/.local/share/themes ]]
-  then ln -s ~/.themes ~/.local/share/themes
+    then ln -s ~/.themes ~/.local/share/themes
 fi
-
-THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
-
-THEME_LIST=$(find /usr/share/themes/ -name metacity-1 | sed "s/\/usr\/share\/themes\//\!/g" | sed "s/\/metacity-1//g")
-if [[ -d ~/.local/share/themes ]]
-  then THEME_LIST_HOME1=$(find ~/.local/share/themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.local\/share\/themes\/\!/g" | sed "s/\/metacity-1//g" )
-fi
-if [[ -d ~/.themes ]]
-  then THEME_LIST_HOME2=$(find ~/.themes -name metacity-1 | sed "s/\/home\/\(.*\)\/.themes\/\!/g" | sed "s/\/metacity-1//g")
-fi
-
-THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
-THEME_LIST=$(echo "$THEME_LIST" | sort | sed "/^$/d")
-THEME_LIST=$THEME_NOW"!"$(echo $THEME_LIST | sed 's/ \!/\!/g' | sed 's/^\!//g')
 
 BUTTON_R="Right"
 BUTTON_L="Left"
@@ -106,6 +98,41 @@ if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close
 else BUTTON=$BUTTON_R
      BUTTON_LIST=$BUTTON_R'!'$BUTTON_L
 fi
+
+case $WM_RUN in
+    compiz)
+    TYPE_THEME="metacity"
+    THEME_FOLDER="metacity-1"
+    THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
+    TEXT_PROG="compiz"
+    PROG="ccsm"
+    ;;
+    metacity)
+    TYPE_THEME="metacity"
+    THEME_FOLDER="metacity-1"
+    THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
+    TEXT_PROG="dconf"
+    PROG="dconf-editor"
+    ;;
+    xfwm4)
+    TYPE_THEME="xfwm4"
+    THEME_FOLDER="xfwm4"
+    THEME_NOW=$(xfconf-query -c xfwm4 -p /general/theme)
+    BUTTON_LIST=""
+    TEXT_PROG="xfwm4"
+    PROG="xfwm4-settings"
+    ;;
+esac
+THEME_LIST=$(find /usr/share/themes/ -name $THEME_FOLDER | sed "s/\/usr\/share\/themes\//\!/g" | sed "s/\/${THEME_FOLDER}//g")
+if [[ -d ~/.local/share/themes ]]
+  then THEME_LIST_HOME1=$(find ~/.local/share/themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.local\/share\/themes\/\!/g" | sed "s/\/${THEME_FOLDER}//g" )
+fi
+if [[ -d ~/.themes ]]
+  then THEME_LIST_HOME2=$(find ~/.themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.themes\/\!/g" | sed "s/\/${THEME_FOLDER}//g")
+fi
+THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
+THEME_LIST=$(echo "$THEME_LIST" | sort | sed "/^$/d")
+THEME_LIST=$THEME_NOW"!"$(echo $THEME_LIST | sed 's/ \!/\!/g' | sed 's/^\!//g')
 }
 ########################################################################
 AddAutostart ()
@@ -175,14 +202,19 @@ notify-send -i dialog-information "$WM" "started"
 ########################################################################
 SetTheme ()
 {
-if [ -z "$1" ]
+if [ -z "$1" ] || [ -z "$2" ]
    then echo Argument theme error; exit 1
-   else THEME=$1
+   else THEME=$1; WM=$2
 fi
-dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME'"
-dconf write /org/gnome/metacity/theme/name "'$THEME'"
-gconftool-2 --set --type string /apps/metacity/general/theme $THEME
-gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME
+case $WM in
+    compiz|metacity)
+    dconf write /org/gnome/desktop/wm/preferences/theme "'$THEME'"
+    dconf write /org/gnome/metacity/theme/name "'$THEME'"
+    gconftool-2 --set --type string /apps/metacity/general/theme $THEME
+    gconftool-2 --set --type string /desktop/gnome/interface/gtk_theme $THEME
+    ;;
+    xfwm4) xfconf-query -c xfwm4 -p /general/theme -s "$THEME";;
+esac
 notify-send -i dialog-information "$THEME" "theme activated"
 }
 ########################################################################
@@ -210,25 +242,27 @@ CheckState
 SETTINGS=`$DIALOG --window-icon=preferences-system-windows \
 --center --title="Manager WM" \
 --form --separator="," \
---field=" Run WM::CB" "$WM_RUN_LIST" \
---field=" Autorun WM::CB" "$WM_AUTO_LIST" \
---field=" Theme window::CB" "$THEME_LIST" \
---field=" Button window::CB" "$BUTTON_LIST" \
---field=" Settings compiz:FBTN" ccsm`
+--field="$TEXT_WM:CB" "$WM_RUN_LIST" \
+--field=":LBL" "" \
+--field="$TEXT_AUTO:CB" "$WM_AUTO_LIST" \
+--field="$TEXT_THEME $TYPE_THEME:CB" "$THEME_LIST" \
+--field="$TEXT_BUTTON:CB" "$BUTTON_LIST" \
+--field="$TEXT_SETTINGS $TEXT_PROG:FBTN" $PROG`
 
 if [ $? != 0 ]; then exit; fi
 
 #echo $SETTINGS
 
 NEW_WM_RUN=`echo $SETTINGS | awk -F',' '{print $1}'`
-NEW_WM_AUTO=`echo $SETTINGS | awk -F',' '{print $2}'`
-NEW_THEME=`echo $SETTINGS | awk -F',' '{print $3}'`
-NEW_BUTTON=`echo $SETTINGS | awk -F',' '{print $4}'`
+NEW_WM_AUTO=`echo $SETTINGS | awk -F',' '{print $3}'`
+NEW_THEME=`echo $SETTINGS | awk -F',' '{print $4}'`
+NEW_BUTTON=`echo $SETTINGS | awk -F',' '{print $5}'`
 
-if [ "$NEW_WM_RUN" != "$WM_RUN" ]; then StartWm $NEW_WM_RUN "$WM_RUN"; fi
+
+if [ "$NEW_WM_RUN" != "$WM_RUN" ] && ! [[ `echo $SETTINGS | grep " "` ]]; then StartWm "$NEW_WM_RUN" "$WM_RUN"; fi
 if [ "$NEW_WM_AUTO" != "$WM_AUTO" ]; then AddAutostart "$NEW_WM_AUTO"; fi
-if [ "$NEW_THEME" != "$THEME_NOW" ]; then SetTheme "$NEW_THEME"; fi
-if [ "$NEW_BUTTON" != "$BUTTON" ]; then SetButton "$NEW_BUTTON"; fi
+if [ "$NEW_THEME" != "$THEME_NOW" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ]; then SetTheme "$NEW_THEME" "$WM_RUN"; fi
+if [ "$NEW_BUTTON" != "$BUTTON" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ] && [ "$NEW_BUTTON" != "(null)" ]; then SetButton "$NEW_BUTTON"; fi
 
 MainForm
 }
