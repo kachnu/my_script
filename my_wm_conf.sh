@@ -92,18 +92,18 @@ fi
 
 BUTTON_R="Right"
 BUTTON_L="Left"
-if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
-     BUTTON=$BUTTON_L
-     BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
-else BUTTON=$BUTTON_R
-     BUTTON_LIST=$BUTTON_R'!'$BUTTON_L
-fi
 
 case $WM_RUN in
     compiz)
     TYPE_THEME="metacity"
     THEME_FOLDER="metacity-1"
     THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
+    if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
+         BUTTON=$BUTTON_L
+         BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
+    else BUTTON=$BUTTON_R
+         BUTTON_LIST=$BUTTON_R'!'$BUTTON_L
+    fi
     TEXT_PROG="compiz"
     PROG="ccsm"
     ;;
@@ -111,6 +111,12 @@ case $WM_RUN in
     TYPE_THEME="metacity"
     THEME_FOLDER="metacity-1"
     THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
+        if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
+         BUTTON=$BUTTON_L
+         BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
+    else BUTTON=$BUTTON_R
+         BUTTON_LIST=$BUTTON_R'!'$BUTTON_L
+    fi
     TEXT_PROG="dconf"
     PROG="dconf-editor"
     ;;
@@ -118,7 +124,12 @@ case $WM_RUN in
     TYPE_THEME="xfwm4"
     THEME_FOLDER="xfwm4"
     THEME_NOW=$(xfconf-query -c xfwm4 -p /general/theme)
-    BUTTON_LIST=""
+    if [[ `xfconf-query -c xfwm4 -p /general/button_layout | grep ^C` ]]; then
+         BUTTON=$BUTTON_L
+         BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
+    else BUTTON=$BUTTON_R
+         BUTTON_LIST=$BUTTON_R'!'$BUTTON_L
+    fi
     TEXT_PROG="xfwm4"
     PROG="xfwm4-settings"
     ;;
@@ -226,10 +237,14 @@ if [ -z "$1" ]
 fi
 
 case $BUTTON in
-     $BUTTON_R) dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
-                  gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close" ;;
-     $BUTTON_L) dconf write /org/gnome/desktop/wm/preferences/button-layout "'close,maximize,minimize:menu'"
-                  gconftool-2 --set --type string /apps/metacity/general/button_layout "close,maximize,minimize:menu";;
+     $BUTTON_R) xfconf-query -c xfwm4 -p /general/button_layout -s "O|SHMC"
+                xfconf-query -c xsettings -p /Gtk/DecorationLayout -s "menu:minimize,maximize,close"
+                dconf write /org/gnome/desktop/wm/preferences/button-layout "'menu:minimize,maximize,close'"
+                gconftool-2 --set --type string /apps/metacity/general/button_layout "menu:minimize,maximize,close" ;;
+     $BUTTON_L) xfconf-query -c xfwm4 -p /general/button_layout -s "CMH|SO"
+                xfconf-query -c xsettings -p /Gtk/DecorationLayout -s "close,maximize,minimize:menu"
+                dconf write /org/gnome/desktop/wm/preferences/button-layout "'close,maximize,minimize:menu'"
+                gconftool-2 --set --type string /apps/metacity/general/button_layout "close,maximize,minimize:menu";;
       *) echo ---"$BUTTON"----;;
 esac
 notify-send -i dialog-information "$BUTTON" "button activated"
@@ -262,7 +277,7 @@ NEW_BUTTON=`echo $SETTINGS | awk -F',' '{print $5}'`
 if [ "$NEW_WM_RUN" != "$WM_RUN" ] && ! [[ `echo $SETTINGS | grep " "` ]]; then StartWm "$NEW_WM_RUN" "$WM_RUN"; fi
 if [ "$NEW_WM_AUTO" != "$WM_AUTO" ]; then AddAutostart "$NEW_WM_AUTO"; fi
 if [ "$NEW_THEME" != "$THEME_NOW" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ]; then SetTheme "$NEW_THEME" "$WM_RUN"; fi
-if [ "$NEW_BUTTON" != "$BUTTON" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ] && [ "$NEW_BUTTON" != "(null)" ]; then SetButton "$NEW_BUTTON"; fi
+if [ "$NEW_BUTTON" != "$BUTTON" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ] && [ "$NEW_BUTTON" != "(null)" ]; then SetButton "$NEW_BUTTON" "$WM_RUN"; fi
 
 MainForm
 }
