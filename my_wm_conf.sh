@@ -22,6 +22,8 @@ TEXT_AUTO="Autostart WM"
 TEXT_THEME="Theme"
 TEXT_BUTTON="Button window"
 TEXT_SETTINGS="Settings"
+BUTTON_R="Right"
+BUTTON_L="Left"
 
 ########################################################################
 DefaultSettings ()
@@ -56,6 +58,13 @@ fi
 if [[ $(gconftool-2 --get /apps/metacity/general/titlebar_font ) == '' ]]
     then gconftool-2 --set --type string /apps/metacity/general/titlebar_font "Sans Bold 9"
 fi
+#set link for themes
+if [[ -d ~/.local/share/themes && ! -d ~/.themes ]]
+    then ln -s ~/.local/share/themes ~/.themes
+fi
+if [[ -d ~/.themes && ! -d ~/.local/share/themes ]]
+    then ln -s ~/.themes ~/.local/share/themes
+fi
 }
 ########################################################################
 CheckState ()
@@ -83,16 +92,6 @@ done
 WM_AUTO_LIST=$WM_AUTO'!'$WM_NOT_AUTO
 
 THEME_LIST=''
-if [[ -d ~/.local/share/themes && ! -d ~/.themes ]]
-    then ln -s ~/.local/share/themes ~/.themes
-fi
-if [[ -d ~/.themes && ! -d ~/.local/share/themes ]]
-    then ln -s ~/.themes ~/.local/share/themes
-fi
-
-BUTTON_R="Right"
-BUTTON_L="Left"
-
 case $WM_RUN in
     compiz)
     TYPE_THEME="metacity"
@@ -111,7 +110,7 @@ case $WM_RUN in
     TYPE_THEME="metacity"
     THEME_FOLDER="metacity-1"
     THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
-        if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
+    if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
          BUTTON=$BUTTON_L
          BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
     else BUTTON=$BUTTON_R
@@ -272,7 +271,6 @@ NEW_WM_RUN=`echo $SETTINGS | awk -F',' '{print $1}'`
 NEW_WM_AUTO=`echo $SETTINGS | awk -F',' '{print $3}'`
 NEW_THEME=`echo $SETTINGS | awk -F',' '{print $4}'`
 NEW_BUTTON=`echo $SETTINGS | awk -F',' '{print $5}'`
-
 
 if [ "$NEW_WM_RUN" != "$WM_RUN" ] && ! [[ `echo $SETTINGS | grep " "` ]]; then StartWm "$NEW_WM_RUN" "$WM_RUN"; fi
 if [ "$NEW_WM_AUTO" != "$WM_AUTO" ]; then AddAutostart "$NEW_WM_AUTO"; fi
