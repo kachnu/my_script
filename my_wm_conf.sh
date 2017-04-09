@@ -38,13 +38,13 @@ fi
 DEFAULT_THEME="Default-4.10"
 if [[ -d /usr/share/themes/$DEFAULT_THEME/metacity-1 ]]; then
     if [[ $(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g" ) == '' ]]
-     then dconf write /org/gnome/desktop/wm/preferences/theme "'$DEFAULT_THEME'"
+        then dconf write /org/gnome/desktop/wm/preferences/theme "'$DEFAULT_THEME'"
     fi
     if [[ $(dconf read /org/gnome/metacity/theme/name | sed "s/'//g" | sed "s|/|\\\/|g" ) == '' ]]
-     then dconf write /org/gnome/metacity/theme/name "'$DEFAULT_THEME'"
+        then dconf write /org/gnome/metacity/theme/name "'$DEFAULT_THEME'"
     fi
     if [[ $(gconftool-2 --get /apps/metacity/general/theme ) == '' ]]
-     then gconftool-2 --set --type string /apps/metacity/general/theme  "$DEFAULT_THEME"
+        then gconftool-2 --set --type string /apps/metacity/general/theme  "$DEFAULT_THEME"
     fi
 fi
 #set button-layout
@@ -86,7 +86,7 @@ for WM in $WM_LIST; do
   if [[ `echo $WM_AUTO_INFO | grep $WM` ]]; then WM_AUTO=$WM
   else if [ -z $WM_NOT_AUTO ]; then WM_NOT_AUTO=$WM
           else WM_NOT_AUTO=$WM_NOT_AUTO'!'$WM
-          fi
+       fi
   fi
 done
 WM_AUTO_LIST=$WM_AUTO'!'$WM_NOT_AUTO
@@ -135,10 +135,10 @@ case $WM_RUN in
 esac
 THEME_LIST=$(find /usr/share/themes/ -name $THEME_FOLDER | sed "s/\/usr\/share\/themes\//\!/g" | sed "s/\/${THEME_FOLDER}//g")
 if [[ -d ~/.local/share/themes ]]
-  then THEME_LIST_HOME1=$(find ~/.local/share/themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.local\/share\/themes\/\!/g" | sed "s/\/${THEME_FOLDER}//g" )
+    then THEME_LIST_HOME1=$(find ~/.local/share/themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.local\/share\/themes\/\!/g" | sed "s/\/${THEME_FOLDER}//g" )
 fi
 if [[ -d ~/.themes ]]
-  then THEME_LIST_HOME2=$(find ~/.themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.themes\/\!/g" | sed "s/\/${THEME_FOLDER}//g")
+    then THEME_LIST_HOME2=$(find ~/.themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.themes\/\!/g" | sed "s/\/${THEME_FOLDER}//g")
 fi
 THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
 THEME_LIST=$(echo "$THEME_LIST" | sort | sed "/^$/d")
@@ -274,8 +274,8 @@ NEW_BUTTON=`echo $SETTINGS | awk -F',' '{print $5}'`
 
 if [ "$NEW_WM_RUN" != "$WM_RUN" ] && ! [[ `echo $SETTINGS | grep " "` ]]; then StartWm "$NEW_WM_RUN" "$WM_RUN"; fi
 if [ "$NEW_WM_AUTO" != "$WM_AUTO" ]; then AddAutostart "$NEW_WM_AUTO"; fi
-if [ "$NEW_THEME" != "$THEME_NOW" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ]; then SetTheme "$NEW_THEME" "$WM_RUN"; fi
-if [ "$NEW_BUTTON" != "$BUTTON" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ] && [ "$NEW_BUTTON" != "(null)" ]; then SetButton "$NEW_BUTTON" "$WM_RUN"; fi
+if [ "$NEW_THEME" != "$THEME_NOW" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ] && [ "$NEW_BUTTON" != "(null)" ]; then SetTheme "$NEW_THEME" "$WM_RUN"; fi
+if [ "$NEW_BUTTON" != "$BUTTON" ] && [ "$NEW_BUTTON" != "(null)" ]; then SetButton "$NEW_BUTTON" "$WM_RUN"; fi
 
 MainForm
 }
