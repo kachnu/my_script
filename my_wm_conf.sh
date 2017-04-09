@@ -92,9 +92,10 @@ done
 WM_AUTO_LIST=$WM_AUTO'!'$WM_NOT_AUTO
 
 THEME_LIST=''
+THEME_NOW=''
 case $WM_RUN in
     compiz)
-    TYPE_THEME="metacity"
+    WM_THEME="metacity"
     THEME_FOLDER="metacity-1"
     THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
     if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
@@ -107,9 +108,16 @@ case $WM_RUN in
     PROG="ccsm"
     ;;
     metacity)
-    TYPE_THEME="metacity"
-    THEME_FOLDER="metacity-1"
-    THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
+    THEME_TYPE=$(dconf read /org/gnome/metacity/theme/type | sed "s/'//g" | sed "s|/|\\\/|g")
+    if [ "$THEME_TYPE" = "gtk" ]; then
+         echo "eba!shodelat?"
+         WM_THEME=$THEME_TYPE
+         THEME_FOLDER="gtk-3.0"
+         THEME_NOW=$(dconf read /org/gnome/metacity/theme/name | sed "s/'//g" | sed "s|/|\\\/|g")
+    else WM_THEME=$THEME_TYPE
+         THEME_FOLDER="metacity-1"
+         THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
+    fi
     if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
          BUTTON=$BUTTON_L
          BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
@@ -120,7 +128,7 @@ case $WM_RUN in
     PROG="dconf-editor"
     ;;
     xfwm4)
-    TYPE_THEME="xfwm4"
+    WM_THEME="xfwm4"
     THEME_FOLDER="xfwm4"
     THEME_NOW=$(xfconf-query -c xfwm4 -p /general/theme)
     if [[ `xfconf-query -c xfwm4 -p /general/button_layout | grep ^C` ]]; then
@@ -259,7 +267,7 @@ SETTINGS=`$DIALOG --window-icon=preferences-system-windows \
 --field="$TEXT_WM:CB" "$WM_RUN_LIST" \
 --field=":LBL" "" \
 --field="$TEXT_AUTO:CB" "$WM_AUTO_LIST" \
---field="$TEXT_THEME $TYPE_THEME:CB" "$THEME_LIST" \
+--field="$TEXT_THEME $WM_THEME:CB" "$THEME_LIST" \
 --field="$TEXT_BUTTON:CB" "$BUTTON_LIST" \
 --field="$TEXT_SETTINGS $TEXT_PROG:FBTN" $PROG`
 
