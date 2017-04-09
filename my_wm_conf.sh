@@ -135,10 +135,10 @@ case $WM_RUN in
 esac
 THEME_LIST=$(find /usr/share/themes/ -name $THEME_FOLDER | sed "s/\/usr\/share\/themes\//\!/g" | sed "s/\/${THEME_FOLDER}//g")
 if [[ -d ~/.local/share/themes ]]
-    then THEME_LIST_HOME1=$(find ~/.local/share/themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.local\/share\/themes\/\!/g" | sed "s/\/${THEME_FOLDER}//g" )
+    then THEME_LIST_HOME1=$(find ~/.local/share/themes -name ${THEME_FOLDER} | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//\!/g" | sed "s/\/${THEME_FOLDER}//g")
 fi
 if [[ -d ~/.themes ]]
-    then THEME_LIST_HOME2=$(find ~/.themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.themes\/\!/g" | sed "s/\/${THEME_FOLDER}//g")
+    then THEME_LIST_HOME2=$(find ~/.themes -name $THEME_FOLDER | sed "s/\/home\/\(.*\)\/.themes\//\!/g" | sed "s/\/${THEME_FOLDER}//g")
 fi
 THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
 THEME_LIST=$(echo "$THEME_LIST" | sort | sed "/^$/d")
