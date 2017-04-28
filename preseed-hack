@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Network manager fix - allow all users to modify settings.
+# This is suboptimal, but will continue to track this bug/feature.
+
+mv -f /usr/share/preseed/adduser.conf /etc/adduser.conf
+dpkg-divert --quiet --add "/etc/adduser.conf"
+mv -f /usr/share/preseed/org.freedesktop.NetworkManager.pkla /etc/polkit-1/localauthority/50-local.d/org.freedesktop.NetworkManager.pkla
+dpkg-divert --quiet --add "/etc/polkit-1/localauthority/50-local.d/org.freedesktop.NetworkManager.pkla"
+mv -f /usr/share/preseed/laptop-mode-tools.desktop /usr/share/applications/laptop-mode-tools.desktop
+dpkg-divert --quiet --add "/usr/share/applications/laptop-mode-tools.desktop"
+
+groupadd -g 900 network
+NOOB=`awk -F: '{print $1}' /etc/passwd | tail -1`
+usermod -a -G network ${NOOB}
+usermod -a -G vboxsf ${NOOB}
+usermod -a -G vboxusers ${NOOB}
+usermod -a -G sambashare ${NOOB}
+#usermod -a -G adm ${NOOB}
+#usermod -a -G fuse ${NOOB}
+
+#rules for home dir
+chmod 700 -R /home/${NOOB}
+
+# udisks - allow all users to mount internal drives within Thunar
+mv -f /usr/share/preseed/10-udisks.pkla /etc/polkit-1/localauthority/50-local.d/10-udisks.pkla
+dpkg-divert --quiet --add "/etc/polkit-1/localauthority/50-local.d/10-udisks.pkla"
+
+
+# Move final apt source file into place.
+#mv -f /etc/apt/sources-list-post-preseed /etc/apt/sources.list
+
+#sudo-mode in gksu
+#gconftool-2 --set --type boolean /apps/gksu/sudo-mode true
+
+#hddtemp
+chmod u+s /usr/sbin/hddtemp
+
+#grub efi
+if [[ `grub-probe -t drive / | grep gpt` ]]; then
+    mkdir -p /boot/efi/EFI/debian
+    dpkg -i /debs/*
+    rm -rf /debs
+    apt-get -yqq autoremove
+fi
+
+# Remove live-* packages as no longer needed.
+#dpkg --purge live-boot live-config-sysvinit live-boot-initramfs-tools live-build live-config live-helper live-initramfs debootstrap gnu-fdisk gawk imvirt imvirt-helper libemail-date-format-perl libfile-slurp-perl libfile-which-perl libimvirt-perl libmime-lite-perl libmime-types-perl libmodule-find-perl libsigsegv2 nullmailer python-parted python-webkit inxi
+#apt-get -yqq --force-yes purge live-boot live-config live-tools live-manual pointlinux-installer
+#apt-get -yqq autoremove
+
+# Add SWAP UUID information into initramfs for current work hibernate
+echo "RESUME=$(grep swap /etc/fstab| awk '{ print $1 }')" > /etc/initramfs-tools/conf.d/resume 
+update-initramfs -u
+
+# This is a fugly hack for fixing fstab after installing
+# CrunchBang using unetbootin. Basically, if using unetbootin,
+# the USB device is identified as a cdrom drive and added to
+# /etc/fstab as that. This script will find any such entries
+# in fstab and disable them. It is looking for cdrom entries
+# which reference devices under "/dev/sdX".
+FSTAB=/etc/fstab
+if grep "^/dev/sd" ${FSTAB} | grep "/media/" | grep "auto"
+then
+    NEEDLE=`grep "^/dev/sd" ${FSTAB} | grep "/media/" | grep "auto"`
+    if ! echo "${NEEDLE}" | grep "#/dev/sd"
+    then
+        CORK="#${NEEDLE}"
+        rpl -q "${NEEDLE}" "${CORK}" ${FSTAB}
+    fi
+fi
+exit 0
