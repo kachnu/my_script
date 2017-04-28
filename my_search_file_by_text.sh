@@ -18,6 +18,8 @@ case $LANG in
                ATTENTION="ВНИМАНИЕ!"
                SEARCH_TEXT="Введите фразу для поиска"
                DIRECTORY_TEXT="Место поиска"
+               SAY_TEXT="Текст"
+               SAY_FOLDER="Папка"
                ERROR_DIR="Укажите МЕСТО поиска"
                ERROR_WORD="Укажите ФРАЗУ для поиска"
                HELP="НАИМЕНОВАНИЕ
@@ -49,6 +51,8 @@ case $LANG in
                ATTENTION="ATTENTION!"
                SEARCH_TEXT="Enter search phrase"
                DIRECTORY_TEXT="Location search"
+               SAY_TEXT="Text"
+               SAY_FOLDER="Folder"
                ERROR_DIR="Specify where find"
                ERROR_WORD="Enter search phrase"
                HELP="NAME
@@ -124,8 +128,8 @@ else
     DIRECTORY=`echo $* | awk -F',' '{print $2}'`
     INFO=`yad --width=300 --window-icon=gtk-find --title="$MAIN_LABEL" \
     --form --separator="," \
-    --field="Text:" "$SEARCH_WORD" \
-    --field="Folder::DIR" "$DIRECTORY"`
+    --field="$SAY_TEXT" "$SEARCH_WORD" \
+    --field="$SAY_FOLDER:DIR" "$DIRECTORY"`
     if [ $? != 0 ]; then exit; fi
     SEARCH_WORD=`echo $INFO | awk -F',' '{print $1}'`
     DIRECTORY=`echo $INFO | awk -F',' '{print $2}'`
