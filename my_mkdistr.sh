@@ -25,7 +25,7 @@ INVERSE='\033[7m'      #  ${INVERSE}     # реверсия (знаки прио
 NINVERSE='\033[7m'     #  ${NINVERSE}    # отменить реверсию
 BREAK='\033[m'         #  ${BREAK}       # все атрибуты по умолчанию
 NORMAL='\033[0m'       #  ${NORMAL}      # все атрибуты по умолчанию
-# Цвет текста: 
+# Цвет текста:
 BLACK='\033[0;30m'     #  ${BLACK}       # чёрный цвет знаков
 RED='\033[0;31m'       #  ${RED}         # красный цвет знаков
 GREEN='\033[0;32m'     #  ${GREEN}       # зелёный цвет знаков
@@ -52,16 +52,16 @@ fi
 ##################################
 Help ()
 {
- echo -en "${CYAN} 
+ echo -en "${CYAN}
 Скрипт $0 позволяет разбирать и собирать Live ISO дистрибутивов Debian и Ubuntu.
-Скрипт автоматически распознает с каким дистрибутивом ведется работа. 
+Скрипт автоматически распознает с каким дистрибутивом ведется работа.
 Пояснения по пунктам меню:
-  1 Распаковать iso и создать временные файлы - создаются временная/рабочая папка mydistr, монтируется iso, производится копирование содержимого iso в папку mydistr_iso и распаковка filesystem.squashfs в папку mydistr_root. 
+  1 Распаковать iso и создать временные файлы - создаются временная/рабочая папка mydistr, монтируется iso, производится копирование содержимого iso в папку mydistr_iso и распаковка filesystem.squashfs в папку mydistr_root.
   2 Инструкции по изменению дистрибутива - описаны действия по изменению дистрибутива, установка программ и т.д.
   3 Подготовить iso (filesystem.squashfs и т.д.) - создается filesystem.squashfs из содержимого папки mydistr_root, копируются актуальное ядро и инит, обновляются списки установленных пакетов, производится подсчет контрольной суммы по MD5.
   4 Собрать  iso - генерируется iso-образ
   5 Удалить временные файлы и папки - удаление временных файлов и папок
-  6 Выполнить всё: распаковка-инструкция-упаковка-очистка - выполняются поочередно пп 1-4 
+  6 Выполнить всё: распаковка-инструкция-упаковка-очистка - выполняются поочередно пп 1-4
   7 Справка - то что вы сейчас читаете
 ${NORMAL}
 "
@@ -87,11 +87,11 @@ while true; do
  then
   {
   case $WAY in
-   *.iso ) echo "- Монтирование iso-образа $WAY в папку mnt/" ; sudo mount -o loop $WAY mnt;  break;; 
+   *.iso ) echo "- Монтирование iso-образа $WAY в папку mnt/" ; sudo mount -o loop $WAY mnt;  break;;
    * ) $DIALOG --title "ВНИМАНИЕ!" --msgbox "Файл $WAY не является iso-образом. Повторите ввод!" 10 60 ;;
   esac
   }
-  else $DIALOG --title "ВНИМАНИЕ!" --msgbox "Файл $WAY не найден. Повторите ввод!" 10 60 
+  else $DIALOG --title "ВНИМАНИЕ!" --msgbox "Файл $WAY не найден. Повторите ввод!" 10 60
  fi
 done
 
@@ -108,11 +108,11 @@ fi
 if [[ $DISTRIBUTIV == '' ]]
  then echo "В образе нет папок casper/ или live/ я не могу определиться какой это дистрибутив - Чао, Пупсики!"
       sudo umount mnt
-      sudo rm -r mnt 
+      sudo rm -r mnt
       sudo rm -r mydistr_iso
       exit 1
 fi
-echo "- Работаем с дистрибутивом - $DISTRIBUTIV "  
+echo "- Работаем с дистрибутивом - $DISTRIBUTIV "
 
 echo "- Копирование содержимого mnt/ в mydistr_iso (кроме filesystem.squashfs)"
 case $DISTRIBUTIV in
@@ -141,7 +141,7 @@ ManEditDirtrib ()
 {
 echo -en "${UNDERLINE}
 Следующая последовательность команд написана в качестве мануала и нужна для установки ПО в новой сборке.
-${NORMAL} ${BLUE} 
+${NORMAL} ${BLUE}
 cd $WORK_DIR/mydistr
 sudo -s
 
@@ -163,7 +163,7 @@ ln -s /bin/true /sbin/initctl
 
 ${NORMAL}
 Издеваемся над дистром, ставим программы apt-get update upgrade dist-upgrade purge install -f или aptitude
-${BLUE} 
+${BLUE}
 apt-get clean
 rm -rf /tmp/* ~/.bash_history /home/*
 rm /var/lib/dbus/machine-id
@@ -180,7 +180,7 @@ rm mydistr_root/etc/hosts
 rm mydistr_root/etc/resolv.conf
 rm mydistr_root/etc/apt/apt.conf.d/proxy
 ${NORMAL}____________
-Удачного изменения дистрибутива! " 
+Удачного изменения дистрибутива! "
 beep
 }
 ##################################
@@ -205,7 +205,7 @@ if [[ $DISTRIBUTIV == '' ]]
  then echo "В рабочей папке mydistr_iso нет casper/ или live/ я не могу определиться какой это дистрибутив - Чао, Пупсики!"; exit 1
 fi
 #DISTRIBUTIV=$(cat mydistr_root/etc/*release* | grep -w "ID" | sed "s/ID=//g")
-echo "- Работаем с дистрибутивом - $DISTRIBUTIV " 
+echo "- Работаем с дистрибутивом - $DISTRIBUTIV "
 
 echo "- Копирование ядра и инит "
 SPISOK_YADER=$(find mydistr_root/boot/vmlinuz* | sed "s/mydistr_root\/boot\///g" | sed "s/$/ ядро NO/" )
@@ -217,8 +217,8 @@ ANSWER_YADRO=$($DIALOG --title "Выбор ядра" --checklist \
 "Выберите ядро которое будет использоваться в LIVE" 15 60 4 \
 $SPISOK_YADER 3>&1 1>&2 2>&3 )
 if [ $? != 0 ]
-  then echo Нажали отмену - переход в главное меню 
-       MainForm 
+  then echo Нажали отмену - переход в главное меню
+       MainForm
 fi
 if [[ $ANSWER_YADRO == '' ]]
   then echo не выбрано ядро
@@ -290,40 +290,54 @@ while true; do
  then
  {
   case $WAY in
-   *.iso ) echo "- Создание iso-образа CD/DVD $WAY" 
+   *.iso ) echo "- Создание iso-образа CD/DVD $WAY"
            if [[ -x "`which xorriso`" ]]
-            then 
+            then
                  if [[ -f /usr/lib/syslinux/mbr/isohdpfx.bin ]] ; then
-                    isohybrid_opt="-isohybrid-mbr /usr/lib/syslinux/mbr/isohdpfx.bin"
+                    isohybrid_opt="/usr/lib/syslinux/mbr/isohdpfx.bin"
                  elif [[ -f /usr/lib/syslinux/isohdpfx.bin ]] ; then
-                    isohybrid_opt="-isohybrid-mbr /usr/lib/syslinux/isohdpfx.bin"
+                    isohybrid_opt="/usr/lib/syslinux/isohdpfx.bin"
                  elif [[ -f /usr/lib/ISOLINUX/isohdpfx.bin ]] ; then
-                    isohybrid_opt="-isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin"
+                    isohybrid_opt="/usr/lib/ISOLINUX/isohdpfx.bin"
                  else
-			        echo "Can't create isohybrid.  File: isohdpfx.bin not found. The resulting image will be a standard iso file."
+                    echo "Can't create isohybrid.  File: isohdpfx.bin not found. The resulting image will be a standard iso file."
                  fi
-                sudo xorriso -as mkisofs -r -J -joliet-long -l ${isohybrid_opt} -partition_offset 16 -V "$DISTRIBUTIV-custom"  -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
-    -boot-load-size 4 -boot-info-table -o "$WAY" $WORK_DIR/mydistr/mydistr_iso | tee >($DIALOG --title="Creating CD/DVD image file..." --progress --pulsate --auto-close --width 300) 
+                #sudo xorriso -as mkisofs -r -J -joliet-long -l -isohybrid-mbr ${isohybrid_opt} -partition_offset 16 -V "$DISTRIBUTIV-custom"  -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
+                #-boot-load-size 4 -boot-info-table -o "$WAY" $WORK_DIR/mydistr/mydistr_iso | tee >($DIALOG --title="Creating CD/DVD image file..." --progress --pulsate --auto-close --width 300)
+
+                sudo xorriso -as mkisofs \
+                  -isohybrid-mbr "$isohybrid_opt" \
+                  -c isolinux/boot.cat \
+                  -b isolinux/isolinux.bin \
+                  -no-emul-boot \
+                  -boot-load-size 4 \
+                  -boot-info-table \
+                  -eltorito-alt-boot \
+                  -e boot/grub/efi.img \
+                  -no-emul-boot \
+                  -isohybrid-gpt-basdat \
+                  -V "$DISTRIBUTIV-custom" \
+                  -o "$WAY" $WORK_DIR/mydistr/mydistr_iso | tee >($DIALOG --title="Creating CD/DVD image file..." --progress --pulsate --auto-close --width 300)
                 break
-           fi 
+           fi
            if [[ -x "`which genisoimage`" ]]
-            then sudo genisoimage -D -r -V "$DISTRIBUTIV-custom" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $WAY $WORK_DIR/mydistr/mydistr_iso 
+            then sudo genisoimage -D -r -V "$DISTRIBUTIV-custom" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $WAY $WORK_DIR/mydistr/mydistr_iso
                  break
            fi
            if [[ -x "`which mkisofs`" ]]
-            then sudo mkisofs -D -r -V "$DISTRIBUTIV-custom" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $WAY $WORK_DIR/mydistr/mydistr_iso 
+            then sudo mkisofs -D -r -V "$DISTRIBUTIV-custom" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $WAY $WORK_DIR/mydistr/mydistr_iso
                  break
            fi
-           ;; 
-           
+           ;;
+
      * ) $DIALOG --title "ВНИМАНИЕ!" --msgbox "Файл $WAY не является iso-образом. Повторите ввод!" 10 60 ;;
   esac
  }
- else $DIALOG --title "ВНИМАНИЕ!" --msgbox "Указанная папка $DIRWAY не существует. Повторите ввод!" 10 60 
+ else $DIALOG --title "ВНИМАНИЕ!" --msgbox "Указанная папка $DIRWAY не существует. Повторите ввод!" 10 60
  fi
 done
 echo "Все действия выполнены. Файл iso находится по адресу $WAY"
-beep 
+beep
 }
 ##################################
 RmWorkFiles ()
@@ -337,12 +351,12 @@ ANSWER=$($DIALOG  --title "Удаление временных файлов" --m
         4 "Удалить только $WORK_DIR/mydistr/mydistr_root" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
  then echo Нажали отмену; MainForm
-fi	
+fi
 case $ANSWER in
  1 ) MainForm ;;
- 2 ) sudo rm -r $WORK_DIR/mydistr ;; 
- 3 ) sudo rm -r $WORK_DIR/mydistr/mydistr_iso ;; 
- 4 ) sudo rm -r $WORK_DIR/mydistr/mydistr_root ;; 
+ 2 ) sudo rm -r $WORK_DIR/mydistr ;;
+ 3 ) sudo rm -r $WORK_DIR/mydistr/mydistr_iso ;;
+ 4 ) sudo rm -r $WORK_DIR/mydistr/mydistr_root ;;
  * ) Неожиданный ответ: $ANSWER ; exit 1 ;;
 esac
 echo "Все действия выполнены"
@@ -364,34 +378,34 @@ if [ $? != 0 ]
  then echo Нажали Выход - выходим с нулем ; exit 0
 fi
 case $ANSWER in
-    1) UnpackIsoSquashfs 
-       echo "Нажмите Enter для перехода в главное меню" 
+    1) UnpackIsoSquashfs
+       echo "Нажмите Enter для перехода в главное меню"
        read x
        MainForm
        ;;
-    2) ManEditDirtrib 
-       echo "Нажмите Enter для перехода в главное меню" 
+    2) ManEditDirtrib
+       echo "Нажмите Enter для перехода в главное меню"
        read x
        MainForm
        ;;
     3) MakeSquashfs
-       echo "Нажмите Enter для перехода в главное меню" 
+       echo "Нажмите Enter для перехода в главное меню"
        read x
        MainForm ;;
     4) MakeIso
-       echo "Нажмите Enter для перехода в главное меню" 
+       echo "Нажмите Enter для перехода в главное меню"
        read x
        MainForm;;
-    5) RmWorkFiles 
-       echo "Нажмите Enter для перехода в главное меню" 
+    5) RmWorkFiles
+       echo "Нажмите Enter для перехода в главное меню"
        read x
-       MainForm;;   
+       MainForm;;
     6) UnpackIsoSquashfs
-       echo "- После проведения изменений, наберите next и нажмите Enter, для перехода к этапу формирования iso-образа" 
+       echo "- После проведения изменений, наберите next и нажмите Enter, для перехода к этапу формирования iso-образа"
        while true; do
         read NEXT
         case $NEXT in
-         next ) echo "- Выполнен переход к этапу формирования iso-образа CD/DVD";  break;; 
+         next ) echo "- Выполнен переход к этапу формирования iso-образа CD/DVD";  break;;
          * ) echo "Наберите next и нажмите Enter, для продолжения";;
         esac
        done
@@ -399,12 +413,12 @@ case $ANSWER in
        MakeSquashfs
        MakeIso
        RmWorkFiles
-       echo "Нажмите Enter для перехода в главное меню" 
+       echo "Нажмите Enter для перехода в главное меню"
        read x
        MainForm
-       ;;       
-    7) Help  
-       echo "Нажмите Enter для перехода в главное меню" 
+       ;;
+    7) Help
+       echo "Нажмите Enter для перехода в главное меню"
        read x
        MainForm
        ;;
