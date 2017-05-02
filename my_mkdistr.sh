@@ -316,7 +316,6 @@ while true; do
                   -e boot/grub/efi.img \
                   -no-emul-boot \
                   -isohybrid-gpt-basdat \
-                  -V "$DISTRIBUTIV-custom" \
                   -o "$WAY" $WORK_DIR/mydistr/mydistr_iso | tee >($DIALOG --title="Creating CD/DVD image file..." --progress --pulsate --auto-close --width 300)
                 break
            fi
