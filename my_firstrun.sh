@@ -31,21 +31,36 @@ if [ -f "/usr/share/applications/debian-installer-launcher.desktop" ]; then
    chmod +x "$HOME/$DESK_FOLDER/debian-installer-launcher.desktop"
 fi
 
-#Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы.
-#После установки данные строки не будут использоваться.
-if [ -f "/etc/pointlinux-installer/install.conf" ]
-then
-    OLD_WAY=$(cat /etc/pointlinux-installer/install.conf | grep LIVE_MEDIA_SOURCE | sed "s/LIVE_MEDIA_SOURCE = //g")
-    if [ ! -f "$OLD_WAY" ]
-     then
-      echo "Путь к файлу filesystem.squashfs - $OLD_WAY не верен! Будем искать другой путь к файлу"
-      NEW_WAY=$(find /lib/ -name filesystem.squashfs -type f 2>/dev/null)
-      echo "Найден путь $NEW_WAY, редактируем /etc/pointlinux-installer/install.conf"
-      sudo sed -i "s|${OLD_WAY}|${NEW_WAY}|g" /etc/pointlinux-installer/install.conf
-     else
-      echo "Путь к файлу filesystem.squashfs - $OLD_WAY верен. Никаких изменений не требуется"
-    fi
-fi
+##Уточняем данные о нахождении filesystem.squashfs, необходимо при установке системы.
+##После установки данные строки не будут использоваться.
+#if [ -f "/etc/pointlinux-installer/install.conf" ]
+#then
+    #OLD_WAY=$(cat /etc/pointlinux-installer/install.conf | grep LIVE_MEDIA_SOURCE | sed "s/LIVE_MEDIA_SOURCE = //g")
+    #if [ ! -f "$OLD_WAY" ]
+     #then
+      #echo "Путь к файлу filesystem.squashfs - $OLD_WAY не верен! Будем искать другой путь к файлу"
+      #NEW_WAY=$(find /lib/ -name filesystem.squashfs -type f 2>/dev/null)
+      #echo "Найден путь $NEW_WAY, редактируем /etc/pointlinux-installer/install.conf"
+      #sudo sed -i "s|${OLD_WAY}|${NEW_WAY}|g" /etc/pointlinux-installer/install.conf
+     #else
+      #echo "Путь к файлу filesystem.squashfs - $OLD_WAY верен. Никаких изменений не требуется"
+    #fi
+#fi
+
+#if [ -f "/etc/live-installer/live-installer.conf" ]
+#then
+    #OLD_WAY=$(cat /etc/live-installer/live-installer.conf | grep live_media_source | sed "s/live_media_source = //g")
+    #if [ ! -f "$OLD_WAY" ]
+     #then
+      #echo "Путь к файлу filesystem.squashfs - $OLD_WAY не верен! Будем искать другой путь к файлу"
+      #NEW_WAY=$(find /lib/ -name filesystem.squashfs -type f 2>/dev/null)
+      #echo "Найден путь $NEW_WAY, редактируем /etc/live-installer/live-installer.conf"
+      #sudo sed -i "s|${OLD_WAY}|${NEW_WAY}|g" /etc/live-installer/live-installer.conf
+     #else
+      #echo "Путь к файлу filesystem.squashfs - $OLD_WAY верен. Никаких изменений не требуется"
+    #fi
+#fi
+
 
 #Убираем блокировку экрана при работе скрин-сейвера
 dconf write /apps/light-locker/lock-after-screensaver 'uint32 0'
