@@ -2,7 +2,7 @@
 # xfce 4.12
 # Display moc info && applet moc
 # author: kachnu
-# email:  ya.kachnu@yandex.ua
+# email:  ya.kachnu@gmail.com
 
 #need yad !!!
 

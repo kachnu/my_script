@@ -1,7 +1,7 @@
 #!/bin/bash
 # Скрипт настройки RDP-сервера (xrdp)
 # author: kachnu
-# email:  ya.kachnu@yandex.ua
+# email:  ya.kachnu@gmail.com
 
 DIALOG=whiptail
 

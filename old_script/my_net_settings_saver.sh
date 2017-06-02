@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт позволяет сохранять конфигурационные файлы NetworkManager
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 if [ $(id -u) -ne 0 ] #Проверка на запуск с правами root
   then
   echo "Start $0 with root"

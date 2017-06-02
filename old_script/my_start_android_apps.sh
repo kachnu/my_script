@@ -2,7 +2,7 @@
 #Сделано на основании статьи http://vasilisc.com/android-app-in-linux
 #Скрипт для запуска android-приложений *.apk, а также подготовленных для запуска файлов ARCHON
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 WORK_FOLDER="$HOME/.start_android_apps"
 

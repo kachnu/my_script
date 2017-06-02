@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт по поиску ФАЙЛОВ содержащих ФРАЗУ, т.е. мы задает фразу и скрипт выводит список файлов которые содержат заданную фразу.
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=yad
 if ! [[ `which $DIALOG` ]]

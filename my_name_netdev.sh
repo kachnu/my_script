@@ -1,6 +1,6 @@
 #!/bin/bash
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 
 case $LANG in

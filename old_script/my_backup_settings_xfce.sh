@@ -2,7 +2,7 @@
 #Скрипт по сохранению/открытию (ранее сохраненных) настроек xfce
 #Xfce 4.10
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=zenity #Установка типа графического диалогового окна
 

@@ -2,7 +2,7 @@
 # Скрипт настройки VNC-сервера
 # Xfce 4.10
 # author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=yad
 if ! [[ `which $DIALOG` ]]

@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт позволяет ввести ПК в домен
 #author: kachnu
-#email:  ya.kachnu@yandex.ua
+#email:  ya.kachnu@gmail.com
 #Основой для скрипта послужил ресурс http://zubarev.me/domainjoin
 
 DIALOG=whiptail

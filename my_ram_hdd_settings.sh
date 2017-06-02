@@ -8,7 +8,7 @@
 # https://habrahabr.ru/post/129551/
 #
 # author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]

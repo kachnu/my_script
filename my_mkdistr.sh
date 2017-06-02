@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт по созданию собственной сборки, позволяет распаковать образ ISO и упаковать его обратно.
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]

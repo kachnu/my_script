@@ -2,7 +2,7 @@
 #Скрипт для применения/отмены prelink
 #Prelink - программа для предварительного динамического связывания библиотек, позволяет уменьшить время запуска программ. 
 #author: kachnu
-#email:  ya.kachnu@yandex.ua
+#email:  ya.kachnu@gmail.com
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]

@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт предназначен для поворота изображения в скайпе
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]

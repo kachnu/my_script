@@ -1,7 +1,7 @@
 #!/bin/bash
 # управление плеерами следующая/предидущая песня, пауза, дабавить в плейлист и т.д.
 # author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 # в системе должен быть установлен yad или zenity
 DIALOG=yad

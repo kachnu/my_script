@@ -1,7 +1,7 @@
 #!/bin/bash
 # изменение громкости
 # author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 HELP="$0 - script to change the volume. 
 Usage:

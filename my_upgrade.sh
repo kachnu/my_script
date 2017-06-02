@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт обновления системы c помощью $APT
 #author: kachnu
-#email:  ya.kachnu@yandex.ua
+#email:  ya.kachnu@gmail.com
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]

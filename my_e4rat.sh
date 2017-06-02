@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт позволяет упростить пользование утилитой e4rat
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]

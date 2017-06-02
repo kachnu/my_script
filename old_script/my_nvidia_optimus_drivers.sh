@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт установки драйверов на видео-устройства NVIDIA Optimus
 #author: kachnu
-#email:  ya.kachnu@yandex.ua
+#email:  ya.kachnu@gmail.com
 
 DIALOG=whiptail
 if [ ! -x "`which "$DIALOG"`" ]

@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт по созданию Live-USB с сохранением
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=yad
 if ! [[ `which $DIALOG` ]]

@@ -1,7 +1,7 @@
 #!/bin/bash
 #Скрипт является псевдо-графической оболочкой для Profile-sync-daemon
 #author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 DIALOG=whiptail #Установка типа графического диалогового окна
 TEXT_EDITOR="nano"

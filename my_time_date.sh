@@ -1,7 +1,7 @@
 #!/bin/bash
 # Set time and date
 # author: kachnu
-# email: ya.kachnu@yandex.ua
+# email: ya.kachnu@gmail.com
 
 if ! [ `which yad` ]; then echo "Need yad"; exit 1; fi
 if ! [ `which timedatectl` ]; then echo "Need timedatectl"; exit 1; fi

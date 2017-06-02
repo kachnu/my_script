@@ -1,7 +1,7 @@
 #!/bin/bash
 # Скрипт предназначен для удаления пакетов на основании ярлыка *.desktop
 # author: kachnu
-# email:  ya.kachnu@yandex.ua
+# email:  ya.kachnu@gmail.com
 
 APT=apt-get
 

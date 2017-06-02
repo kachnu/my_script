@@ -2,7 +2,7 @@
 # Простой скрипт для настройки сглаживания шрифтов в Wine.
 #
 # Связь с автором: Тарасов Игорь <tarasov.igor@gmail.com>
-# немного добелывал: kachnu <ya.kachnu@yandex.ua>
+# немного добелывал: kachnu <ya.kachnu@gmail.com>
 
 WINE=${WINE:-wine}
 WINEPREFIX=${WINEPREFIX:-$HOME/.wine}
