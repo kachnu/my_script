@@ -306,7 +306,9 @@ while true; do
                 #-boot-load-size 4 -boot-info-table -o "$WAY" $WORK_DIR/mydistr/mydistr_iso | tee >($DIALOG --title="Creating CD/DVD image file..." --progress --pulsate --auto-close --width 300)
 
                 sudo xorriso -as mkisofs \
+                  -r -J -joliet-long -l \
                   -isohybrid-mbr "$isohybrid_opt" \
+                  -partition_offset 16 -V "$DISTRIBUTIV-custom" \
                   -c isolinux/boot.cat \
                   -b isolinux/isolinux.bin \
                   -no-emul-boot \
