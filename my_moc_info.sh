@@ -19,15 +19,15 @@ AppletMoc ()
 {
 while true; do
 $DIALOG --notification --image="multimedia-player" --menu \
-"♬	start server!mocp -S\
-|☠	stop server!mocp -x\
+"❐	open window moc!x-terminal-emulator -e mocp\
 |▸	play!mocp -p\
 |╻╻	pause!mocp -G\
 |◾	stop!mocp -s\
 |▸▸	next!mocp -f\
 |◂◂	previous!mocp -r\
-|❐	open window!x-terminal-emulator -e mocp\
-|�	info on panel! $SCRIPT_WAY -p"
+|�	info on panel! $SCRIPT_WAY -p\
+|♬	start server!mocp -S\
+|☠	stop server!mocp -x"
 case $? in
  0) $DIALOG --question --title="Close moc-applet" --text="Close moc-applet?" 
     if [ $? == 0 ]; then break; fi;;
