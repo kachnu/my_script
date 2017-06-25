@@ -270,10 +270,6 @@ case $DISTRIBUTIV in
           *) echo "debian или ubuntu?" ; exit 1 ;;
 esac
 
-echo "- Подсчет контрольной суммы MD5"
-cd mydistr_iso
-sudo rm md5sum.txt
-find -type f -print0 | sudo xargs -0 md5sum | grep -v isolinux/boot.cat | sudo tee md5sum.txt
 beep
 }
 ##################################
@@ -290,7 +286,12 @@ while true; do
  then
  {
   case $WAY in
-   *.iso ) echo "- Создание iso-образа CD/DVD $WAY"
+   *.iso ) cd $WORK_DIR/mydistr/ 
+           echo "- Подсчет контрольной суммы MD5"
+           cd mydistr_iso
+           sudo rm md5sum.txt
+           find -type f -print0 | sudo xargs -0 md5sum | grep -v isolinux/boot.cat | sudo tee md5sum.txt
+           echo "- Создание iso-образа CD/DVD $WAY"
            if [[ -x "`which xorriso`" ]]
             then
                  if [[ -f /usr/lib/syslinux/mbr/isohdpfx.bin ]] ; then
@@ -304,7 +305,6 @@ while true; do
                  fi
                 #sudo xorriso -as mkisofs -r -J -joliet-long -l -isohybrid-mbr ${isohybrid_opt} -partition_offset 16 -V "$DISTRIBUTIV-custom"  -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
                 #-boot-load-size 4 -boot-info-table -o "$WAY" $WORK_DIR/mydistr/mydistr_iso | tee >($DIALOG --title="Creating CD/DVD image file..." --progress --pulsate --auto-close --width 300)
-
                 sudo xorriso -as mkisofs \
                   -r -J -joliet-long -l \
                   -isohybrid-mbr "$isohybrid_opt" \
