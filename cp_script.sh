@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SOURSE_DIR="."
-REMOTE_DIR="/usr/local/bin"
+REMOTE_DIR="$HOME/mydistr/mydistr_root/usr/local/bin"
 for SOUR in `ls $SOURSE_DIR`; do
     for REM in `ls $REMOTE_DIR`; do
         if [ "$REM" = "$SOUR" ]; then
