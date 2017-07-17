@@ -99,15 +99,19 @@ THEME_NOW=''
 case $WM_RUN in
     compiz)
     CHECK_DECOR_LIST="gtk-window-decorator emerald"
+    DECOR_RUN=""
+    DECOR_NOT_RUN=""
     sleep 1
     for DECOR in $CHECK_DECOR_LIST; do
         if [[ `which  $DECOR` ]]; then
            if [[ `pgrep -u $USER -f $DECOR` ]]; then DECOR_RUN=$DECOR
-              else DECOR_NOT_RUN=$DECOR
+              else if [ -z $DECOR_NOT_RUN ]; then DECOR_NOT_RUN=$DECOR
+                   else DECOR_NOT_RUN=$DECOR_NOT_RUN'!'$DECOR
+                   fi
            fi
         fi
     done
-    DECOR_LIST=$DECOR_RUN'!'$DECOR_NOT_RUN    
+    DECOR_LIST=$DECOR_RUN'!'$DECOR_NOT_RUN
     if [[ `echo $DECOR_RUN | grep gtk-window-decorator` ]]; then
         WM_THEME="metacity"
         THEME_FOLDER="metacity-1"
@@ -126,7 +130,7 @@ case $WM_RUN in
         TEXT_PROG2="Emerald theme manager"
         PROG2="emerald-theme-manager"
     fi
-    
+
     TEXT_PROG="compiz"
     PROG="ccsm"
     ;;
@@ -175,7 +179,7 @@ esac
 
 
 if [[ `echo $DECOR_RUN | grep emerald` ]]; then THEME_LIST=""
-else 
+else
     THEME_LIST=$(find /usr/share/themes/ -name $THEME_FOLDER | sed "s/\/usr\/share\/themes\//\!/g" | sed "s/\/${THEME_FOLDER}//g")
     if [[ -d ~/.local/share/themes ]]
         then THEME_LIST_HOME1=$(find ~/.local/share/themes -name ${THEME_FOLDER} | sed "s/\/home\/\(.*\)\/.local\/share\/themes\//\!/g" | sed "s/\/${THEME_FOLDER}//g")
