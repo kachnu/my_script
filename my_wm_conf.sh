@@ -17,7 +17,9 @@ for WM in $CHECK_WM_LIST; do
     if [[ `which  $WM` ]]; then WM_LIST=$WM_LIST' '$WM; fi
 done
 
+
 TEXT_WM="WM"
+TEXT_DECOR="Window decorator"
 TEXT_AUTO="Autostart WM"
 TEXT_THEME="Theme"
 TEXT_BUTTON="Button window"
@@ -91,23 +93,46 @@ for WM in $WM_LIST; do
 done
 WM_AUTO_LIST=$WM_AUTO'!'$WM_NOT_AUTO
 
+DECOR_LIST=''
 THEME_LIST=''
 THEME_NOW=''
 case $WM_RUN in
     compiz)
-    WM_THEME="metacity"
-    THEME_FOLDER="metacity-1"
-    THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
-    if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
-         BUTTON=$BUTTON_L
-         BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
-    else BUTTON=$BUTTON_R
-         BUTTON_LIST=$BUTTON_R'!'$BUTTON_L
+    CHECK_DECOR_LIST="gtk-window-decorator emerald"
+    sleep 1
+    for DECOR in $CHECK_DECOR_LIST; do
+        if [[ `which  $DECOR` ]]; then
+           if [[ `pgrep -u $USER -f $DECOR` ]]; then DECOR_RUN=$DECOR
+              else DECOR_NOT_RUN=$DECOR
+           fi
+        fi
+    done
+    DECOR_LIST=$DECOR_RUN'!'$DECOR_NOT_RUN    
+    if [[ `echo $DECOR_RUN | grep gtk-window-decorator` ]]; then
+        WM_THEME="metacity"
+        THEME_FOLDER="metacity-1"
+        THEME_NOW=$(dconf read /org/gnome/desktop/wm/preferences/theme | sed "s/'//g" | sed "s|/|\\\/|g")
+        if [[ `dconf read /org/gnome/desktop/wm/preferences/button-layout | grep \'close` ]]; then
+             BUTTON=$BUTTON_L
+             BUTTON_LIST=$BUTTON_L'!'$BUTTON_R
+        else BUTTON=$BUTTON_R
+             BUTTON_LIST=$BUTTON_R'!'$BUTTON_L
+        fi
+        TEXT_PROG2="Metacity theme viewer"
+        PROG2="metacity-theme-viewer"
+    else
+        WM_THEME=""
+        BUTTON_LIST=""
+        TEXT_PROG2="Emerald theme manager"
+        PROG2="emerald-theme-manager"
     fi
+    
     TEXT_PROG="compiz"
     PROG="ccsm"
     ;;
     metacity)
+    DECOR_LIST="gtk-window-decorator"
+    DECOR_RUN=$DECOR_LIST
     THEME_TYPE=$(dconf read /org/gnome/metacity/theme/type | sed "s/'//g" | sed "s|/|\\\/|g")
     if [ "$THEME_TYPE" = "gtk" ]; then
          echo "eba!shodelat?"
@@ -126,8 +151,12 @@ case $WM_RUN in
     fi
     TEXT_PROG="dconf"
     PROG="dconf-editor"
+    TEXT_PROG2="Metacity theme viewer"
+    PROG2="metacity-theme-viewer"
     ;;
     xfwm4)
+    DECOR_LIST="xfwm4"
+    DECOR_RUN=$DECOR_LIST
     WM_THEME="xfwm4"
     THEME_FOLDER="xfwm4"
     THEME_NOW=$(xfconf-query -c xfwm4 -p /general/theme)
@@ -139,6 +168,8 @@ case $WM_RUN in
     fi
     TEXT_PROG="xfwm4"
     PROG="xfwm4-settings"
+    TEXT_PROG2="xfce4-settings-editor"
+    PROG2="xfce4-settings-editor"
     ;;
 esac
 THEME_LIST=$(find /usr/share/themes/ -name $THEME_FOLDER | sed "s/\/usr\/share\/themes\//\!/g" | sed "s/\/${THEME_FOLDER}//g")
@@ -151,6 +182,9 @@ fi
 THEME_LIST=$(echo "$THEME_LIST"; echo "$THEME_LIST_HOME1"; echo "$THEME_LIST_HOME2")
 THEME_LIST=$(echo "$THEME_LIST" | sort | sed "/^$/d")
 THEME_LIST=$THEME_NOW"!"$(echo $THEME_LIST | sed 's/ \!/\!/g' | sed 's/^\!//g')
+
+if [[ `echo $DECOR_RUN | grep emerald` ]]; then THEME_LIST=""; fi
+
 }
 ########################################################################
 AddAutostart ()
@@ -218,6 +252,26 @@ sleep 1
 notify-send -i dialog-information "$WM" "started"
 }
 ########################################################################
+SetDecor ()
+{
+NEW_DECOR=$1
+if [ -f "$HOME/.config/compiz/compizconfig/config" ]; then
+  profile=$(cat $HOME/.config/compiz/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
+  if [[ $profile = '' ]]; then profile='Default'; fi
+  sed -i "/^s0_command/d" $HOME/.config/compiz/compizconfig/$profile.ini
+  sed -i "s|\[decor\]|\[decor\]\ns0_command=${NEW_DECOR}\n|g" $HOME/.config/compiz/compizconfig/$profile.ini
+fi
+if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
+  profile=$(cat $HOME/.config/compiz-1/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
+  if [[ $profile = '' ]]; then profile='Default'; fi
+  sed -i "/^s0_command/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
+  sed -i "s|\[decor\]|\[decor\]\ns0_command=${NEW_DECOR}\n|g" $HOME/.config/compiz-1/compizconfig/$profile.ini
+fi
+$NEW_DECOR --replace &
+sleep 1
+$NEW_DECOR --replace &
+}
+########################################################################
 SetTheme ()
 {
 if [ -z "$1" ] || [ -z "$2" ]
@@ -266,24 +320,29 @@ SETTINGS=`$DIALOG --window-icon=preferences-system-windows \
 --form --separator="," \
 --field="$TEXT_WM:CB" "$WM_RUN_LIST" \
 --field=":LBL" "" \
---field="$TEXT_AUTO:CB" "$WM_AUTO_LIST" \
+--field="$TEXT_DECOR:CB" "$DECOR_LIST" \
 --field="$TEXT_THEME $WM_THEME:CB" "$THEME_LIST" \
 --field="$TEXT_BUTTON:CB" "$BUTTON_LIST" \
---field="$TEXT_SETTINGS $TEXT_PROG:FBTN" $PROG`
+--field="$TEXT_SETTINGS $TEXT_PROG:FBTN" $PROG \
+--field="$TEXT_PROG2:FBTN" $PROG2 \
+--field=":LBL" "" \
+--field="$TEXT_AUTO:CB" "$WM_AUTO_LIST"`
 
 if [ $? != 0 ]; then exit; fi
 
 #echo $SETTINGS
 
 NEW_WM_RUN=`echo $SETTINGS | awk -F',' '{print $1}'`
-NEW_WM_AUTO=`echo $SETTINGS | awk -F',' '{print $3}'`
+NEW_DECOR=`echo $SETTINGS | awk -F',' '{print $3}'`
 NEW_THEME=`echo $SETTINGS | awk -F',' '{print $4}'`
 NEW_BUTTON=`echo $SETTINGS | awk -F',' '{print $5}'`
+NEW_WM_AUTO=`echo $SETTINGS | awk -F',' '{print $9}'`
 
 if [ "$NEW_WM_RUN" != "$WM_RUN" ] && ! [[ `echo $SETTINGS | grep " "` ]]; then StartWm "$NEW_WM_RUN" "$WM_RUN"; fi
-if [ "$NEW_WM_AUTO" != "$WM_AUTO" ]; then AddAutostart "$NEW_WM_AUTO"; fi
+if [ "$NEW_DECOR" != "$DECOR_RUN" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ] && [ "$NEW_DECOR" != "(null)" ]; then SetDecor "$NEW_DECOR"; fi
 if [ "$NEW_THEME" != "$THEME_NOW" ] && [ "$NEW_WM_RUN" = "$WM_RUN" ] && [ "$NEW_BUTTON" != "(null)" ]; then SetTheme "$NEW_THEME" "$WM_RUN"; fi
 if [ "$NEW_BUTTON" != "$BUTTON" ] && [ "$NEW_BUTTON" != "(null)" ]; then SetButton "$NEW_BUTTON" "$WM_RUN"; fi
+if [ "$NEW_WM_AUTO" != "$WM_AUTO" ]; then AddAutostart "$NEW_WM_AUTO"; fi
 
 MainForm
 }
