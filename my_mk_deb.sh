@@ -4,6 +4,7 @@ for FOLDER in "$@"
     do
        if [ -d "$FOLDER/DEBIAN" ]
           then cd "$FOLDER"
+               IFS=$'\n'
                md5sum `find . -type f | grep -v '^[.]/DEBIAN/'` > DEBIAN/md5sums 
                cd ..         
                if [ `which fakeroot` ]

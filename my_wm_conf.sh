@@ -96,6 +96,7 @@ WM_AUTO_LIST=$WM_AUTO'!'$WM_NOT_AUTO
 DECOR_LIST=''
 THEME_LIST=''
 THEME_NOW=''
+
 case $WM_RUN in
     compiz)
     CHECK_DECOR_LIST="gtk-window-decorator emerald"
@@ -135,7 +136,7 @@ case $WM_RUN in
     PROG="ccsm"
     ;;
     metacity)
-    DECOR_LIST="gtk-window-decorator"
+    DECOR_LIST=""
     DECOR_RUN=$DECOR_LIST
     THEME_TYPE=$(dconf read /org/gnome/metacity/theme/type | sed "s/'//g" | sed "s|/|\\\/|g")
     if [ "$THEME_TYPE" = "gtk" ]; then
@@ -159,7 +160,7 @@ case $WM_RUN in
     PROG2="metacity-theme-viewer"
     ;;
     xfwm4)
-    DECOR_LIST="xfwm4"
+    DECOR_LIST=""
     DECOR_RUN=$DECOR_LIST
     WM_THEME="xfwm4"
     THEME_FOLDER="xfwm4"
