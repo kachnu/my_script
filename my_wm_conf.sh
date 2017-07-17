@@ -269,7 +269,8 @@ if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
 fi
 $NEW_DECOR --replace &
 sleep 1
-$NEW_DECOR --replace &
+compiz --replace &
+notify-send -i dialog-information "$NEW_DECOR" "started"
 }
 ########################################################################
 SetTheme ()
