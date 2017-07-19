@@ -243,7 +243,6 @@ case $ANSWER in
       4 ) sudo $APT autoremove
           sudo rm -r /var/cache/apt/archives && echo "remove /var/cache/apt/archive"
           sudo rm -r /var/cache/apt-xapian-index && echo "remove /var/cache/apt-xapian-index";;
-      #5 ) Autoupgrade ;;
       5 ) if [ -x "`sudo which update-flashplugin-nonfree`" ]
              then
              sudo cp /etc/wgetrc /etc/wgetrc.bak
@@ -253,11 +252,12 @@ http_proxy = $http_proxy
 https_proxy = $https_proxy
 use_proxy = on" | sudo tee --append /etc/wgetrc > /dev/null
              fi
+             echo start update-flashplugin-nonfree
              sudo update-flashplugin-nonfree --install
              sudo update-flashplugin-nonfree --status
              sudo mv /etc/wgetrc.bak /etc/wgetrc
           fi
-          if [ -x "`sudo which update-pepperflashplugin-nonfree-direct`" ]
+          if [ -x "`sudo which update-pepperflashplugin-nonfree`" ]
              then
              sudo cp /etc/wgetrc /etc/wgetrc.bak
              if [ "$ftp_proxy" != '' ] || [ "$http_proxy" != '' ] || [ "$https_proxy" != '' ]
@@ -266,7 +266,9 @@ http_proxy = $http_proxy
 https_proxy = $https_proxy
 use_proxy = on" | sudo tee --append /etc/wgetrc > /dev/null
              fi
-             sudo update-pepperflashplugin-nonfree-direct
+             echo start update-pepperflashplugin-nonfree
+             sudo update-pepperflashplugin-nonfree --install
+             sudo update-pepperflashplugin-nonfree --status
              sudo mv /etc/wgetrc.bak /etc/wgetrc
           fi
           ;;
