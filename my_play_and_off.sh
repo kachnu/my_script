@@ -4,6 +4,7 @@ if [ -z ${1// /} ]
    then echo "no play"; exit 1
    else echo "Play $1"; FILE_PLAY=$1
 fi
+
 TIMER=20
 vlc --play-and-exit "$FILE_PLAY"
 (
