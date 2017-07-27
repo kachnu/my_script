@@ -266,14 +266,20 @@ NEW_DECOR=$1
 if [ -f "$HOME/.config/compiz/compizconfig/config" ]; then
   profile=$(cat $HOME/.config/compiz/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
   if [[ $profile = '' ]]; then profile='Default'; fi
-  sed -i "/^s0_command/d" $HOME/.config/compiz/compizconfig/$profile.ini
-  sed -i "s|\[decor\]|\[decor\]\ns0_command=${NEW_DECOR}\n|g" $HOME/.config/compiz/compizconfig/$profile.ini
+  if [ `cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_command` ]
+     then sed -i "/^s0_command/d" $HOME/.config/compiz/compizconfig/$profile.ini 
+          sed -i "s|\[decor\]|\[decor\]\ns0_command=${NEW_DECOR}\n|g" $HOME/.config/compiz/compizconfig/$profile.ini
+     else echo -e "[decor]\ns0_command=${NEW_DECOR}" >> ~/.config/compiz/compizconfig/Default.ini
+  fi
 fi
 if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
   profile=$(cat $HOME/.config/compiz-1/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
   if [[ $profile = '' ]]; then profile='Default'; fi
-  sed -i "/^s0_command/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
-  sed -i "s|\[decor\]|\[decor\]\ns0_command=${NEW_DECOR}\n|g" $HOME/.config/compiz-1/compizconfig/$profile.ini
+  if [ `cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_command` ]
+     then sed -i "/^s0_command/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
+          sed -i "s|\[decor\]|\[decor\]\ns0_command=${NEW_DECOR}\n|g" $HOME/.config/compiz-1/compizconfig/$profile.ini
+     else echo -e "[decor]\ns0_command=${NEW_DECOR}" >> ~/.config/compiz-1/compizconfig/Default.ini
+  fi
 fi
 $NEW_DECOR --replace &
 sleep 1
