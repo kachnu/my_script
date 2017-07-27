@@ -21,7 +21,7 @@ zenity --auto-close --progress --title "Play is complete" \
 --text "Power off"
 
 if [ $? = 0 ];
-   then xfce4-session-logout --halt
+   then xfce4-session-logout --halt --fast
    #dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop
 fi
 
