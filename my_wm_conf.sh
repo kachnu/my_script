@@ -18,11 +18,11 @@ for WM in $CHECK_WM_LIST; do
 done
 
 
-TEXT_WM="WM"
-TEXT_DECOR="Window decorator"
-TEXT_AUTO="Autostart WM"
-TEXT_THEME="Theme"
-TEXT_BUTTON="Button window"
+TEXT_WM=" WM"
+TEXT_DECOR=" Window decorator"
+TEXT_AUTO=" Autostart WM"
+TEXT_THEME=" Theme"
+TEXT_BUTTON=" Button window"
 TEXT_SETTINGS="Settings"
 BUTTON_R="Right"
 BUTTON_L="Left"
@@ -102,7 +102,7 @@ case $WM_RUN in
     CHECK_DECOR_LIST="gtk-window-decorator emerald"
     DECOR_RUN=""
     DECOR_NOT_RUN=""
-    sleep 1
+    sleep 2
     for DECOR in $CHECK_DECOR_LIST; do
         if [[ `which  $DECOR` ]]; then
            if [[ `pgrep -u $USER -f $DECOR` ]]; then DECOR_RUN=$DECOR
@@ -266,16 +266,16 @@ NEW_DECOR=$1
 if [ -f "$HOME/.config/compiz/compizconfig/config" ]; then
   profile=$(cat $HOME/.config/compiz/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
   if [[ $profile = '' ]]; then profile='Default'; fi
-  if [ `cat $HOME/.config/compiz/compizconfig/$profile.ini | grep s0_command` ]
-     then sed -i "/^s0_command/d" $HOME/.config/compiz/compizconfig/$profile.ini 
-          sed -i "s|\[decor\]|\[decor\]\ns0_command=${NEW_DECOR}\n|g" $HOME/.config/compiz/compizconfig/$profile.ini
-     else echo -e "[decor]\ns0_command=${NEW_DECOR}" >> ~/.config/compiz/compizconfig/Default.ini
+  if [[ `cat "$HOME/.config/compiz/compizconfig/$profile.ini" | grep as_command` ]]
+     then sed -i "/^as_command/d" $HOME/.config/compiz/compizconfig/$profile.ini 
+          sed -i "s|\[decoration\]|\[decoration\]\nas_command=${NEW_DECOR}\n|g" $HOME/.config/compiz/compizconfig/$profile.ini
+     else echo -e "[decoration]\nas_command=${NEW_DECOR}" >> ~/.config/compiz/compizconfig/Default.ini
   fi
 fi
 if [ -f "$HOME/.config/compiz-1/compizconfig/config" ]; then
   profile=$(cat $HOME/.config/compiz-1/compizconfig/config | grep profile | awk -F= '{print $2}'| sed "s/ //g")
   if [[ $profile = '' ]]; then profile='Default'; fi
-  if [ `cat $HOME/.config/compiz-1/compizconfig/$profile.ini | grep s0_command` ]
+  if [[ `cat "$HOME/.config/compiz-1/compizconfig/$profile.ini" | grep s0_command` ]]
      then sed -i "/^s0_command/d" $HOME/.config/compiz-1/compizconfig/$profile.ini
           sed -i "s|\[decor\]|\[decor\]\ns0_command=${NEW_DECOR}\n|g" $HOME/.config/compiz-1/compizconfig/$profile.ini
      else echo -e "[decor]\ns0_command=${NEW_DECOR}" >> ~/.config/compiz-1/compizconfig/Default.ini
