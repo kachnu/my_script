@@ -175,7 +175,8 @@ MainForm
 fi
 mkdir /media/persistence/
 mount /dev/$PARTITION /media/persistence/
-echo "/ union,source=." > /media/persistence/persistence.conf
+#echo "/ union,source=." > /media/persistence/persistence.conf
+echo "/ union" > /media/persistence/persistence.conf
 if [ -f /media/persistence/persistence.conf ]
  then $DIALOG --info --title="$ATTENTION" --text="$OK_MAKE_FILE"
 fi
