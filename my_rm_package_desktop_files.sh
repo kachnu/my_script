@@ -13,7 +13,7 @@ fi
 DEL_PACKAGES=""
 
 # в качестве аргументов к скрипту прилагается список *.desktop, поочередно перебираем этот список
-for DESKTOP_FILE in $@
+for DESKTOP_FILE in "$@"
     do
        # из *.desktop получаем исполняемую команду
        EXEC_FILE=$(cat "$DESKTOP_FILE" | grep Exec | sed "s/Exec=//g")
