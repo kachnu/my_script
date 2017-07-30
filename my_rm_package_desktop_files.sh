@@ -56,10 +56,10 @@ if [[ $(echo $DEL_PACKAGES | sed "s/ //g") != "" ]]
                  if [[ $DIR_DESKTOP == "" ]]
                     then DIR_DESKTOP="Desktop"
                  fi
-                 for DESKTOP_FILE in $@
+                 for DESKTOP_FILE in "$@"
                  do
                     # удаляем ярлык программы с Рабочего стола
-                    sudo rm -rf "/home/$DIR_USER/$DIR_DESKTOP/$DESKTOP_FILE"
+                    sudo rm -rf "/$DIR_DESKTOP/$DESKTOP_FILE"
                  done
           done
           sudo $APT autoremove)
