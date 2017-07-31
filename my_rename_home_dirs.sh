@@ -15,6 +15,7 @@ Usage:
 
 Keys:
   -en 	English name folder
+  -enl 	English name folder lower case letters
   -loc 	Local name folder
 "
 
@@ -28,6 +29,27 @@ case $1 in
                 XDG_TEXT=`echo $LINE | awk -F= '{print $1}'`
                 LOC_FOLDER=`echo $LINE | awk -F/ '{print $2}' | sed 's/\"//g'`
                 EN_FOLDER=`echo $XDG_TEXT | awk -F_ '{print $2}' | sed 's@[^ ]*@\L&@g' | sed 's@[^ ]*@\u&@1'`
+                sed -i "/${LOC_FOLDER}/d" $HOME/.config/gtk-3.0/bookmarks
+                sed -i "/${EN_FOLDER}/d" $HOME/.config/gtk-3.0/bookmarks
+                echo rename "$HOME/$LOC_FOLDER" to "$HOME/$EN_FOLDER"
+                mv -f "$HOME/$LOC_FOLDER/" "$HOME/$EN_FOLDER/"
+                echo $XDG_TEXT\=\"\$HOME\/$EN_FOLDER\" >> "$HOME/.config/user-dirs.dirs.tmp"
+            else echo $LINE >> "$HOME/.config/user-dirs.dirs.tmp"
+            fi
+        done < $FILE
+
+        echo mv tmp user-dir to real user-dir
+        mv "$HOME/.config/user-dirs.dirs.tmp" "$FILE"
+        ;;
+    -enl)
+        echo make tmp user-dir
+        #sed -e 's/XDG_DESKTOP_DIR=.*/XDG_DESKTOP_DIR=\"$HOME\/Desktop\"/g' $FILE
+        echo > "$HOME/.config/user-dirs.dirs.tmp"
+        while read LINE; do
+            if [[ $LINE =~ ^XDG ]]; then
+                XDG_TEXT=`echo $LINE | awk -F= '{print $1}'`
+                LOC_FOLDER=`echo $LINE | awk -F/ '{print $2}' | sed 's/\"//g'`
+                EN_FOLDER=`echo $XDG_TEXT | awk -F_ '{print $2}' | sed 's@[^ ]*@\L&@g'`
                 sed -i "/${LOC_FOLDER}/d" $HOME/.config/gtk-3.0/bookmarks
                 sed -i "/${EN_FOLDER}/d" $HOME/.config/gtk-3.0/bookmarks
                 echo rename "$HOME/$LOC_FOLDER" to "$HOME/$EN_FOLDER"
