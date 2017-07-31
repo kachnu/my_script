@@ -52,14 +52,16 @@ if [[ $(echo $DEL_PACKAGES | sed "s/ //g") != "" ]]
           for DIR_USER in $(ls /home)
               do 
                  # определяем папку Рабочего стола
-                 DIR_DESKTOP=$(sudo cat "/home/$DIR_USER/.config/user-dirs.dirs"| grep DESKTOP|sed "s/\"//g"| awk -F "/" '{print $NF}')
+                 DIR_DESKTOP=$(sudo cat "/home/$DIR_USER/.config/user-dirs.dirs"| grep DESKTOP |sed "s/\"//g"| awk -F "/" '{print $NF}')
                  if [[ $DIR_DESKTOP == "" ]]
                     then DIR_DESKTOP="Desktop"
                  fi
                  for DESKTOP_FILE in "$@"
                  do
                     # удаляем ярлык программы с Рабочего стола
-                    sudo rm -rf "/$DIR_DESKTOP/$DESKTOP_FILE"
+                    DESKTOP_FILE=`basename "$DESKTOP_FILE"`
+                    echo "Try remote /home/$DIR_USER/$DIR_DESKTOP/$DESKTOP_FILE"
+                    sudo rm -rf "/home/$DIR_USER/$DIR_DESKTOP/$DESKTOP_FILE"
                  done
           done
           sudo $APT autoremove)
