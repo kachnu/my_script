@@ -28,8 +28,10 @@ case $1 in
                 XDG_TEXT=`echo $LINE | awk -F= '{print $1}'`
                 LOC_FOLDER=`echo $LINE | awk -F/ '{print $2}' | sed 's/\"//g'`
                 EN_FOLDER=`echo $XDG_TEXT | awk -F_ '{print $2}' | sed 's@[^ ]*@\L&@g' | sed 's@[^ ]*@\u&@1'`
+                sed -i "/${LOC_FOLDER}/d" $HOME/.config/gtk-3.0/bookmarks
+                sed -i "/${EN_FOLDER}/d" $HOME/.config/gtk-3.0/bookmarks
                 echo rename "$HOME/$LOC_FOLDER" to "$HOME/$EN_FOLDER"
-                mv -f "$HOME/$LOC_FOLDER" "$HOME/$EN_FOLDER"
+                mv -f "$HOME/$LOC_FOLDER/" "$HOME/$EN_FOLDER/"
                 echo $XDG_TEXT\=\"\$HOME\/$EN_FOLDER\" >> "$HOME/.config/user-dirs.dirs.tmp"
             else echo $LINE >> "$HOME/.config/user-dirs.dirs.tmp"
             fi
@@ -46,8 +48,10 @@ case $1 in
                 XDG_TEXT=`echo "$LINE" | awk -F= '{print $1}'`
                 LOC_FOLDER=`echo "$LINE" | awk -F/ '{print $2}' | sed 's/\"//g'`
                 EN_FOLDER=`echo "$XDG_TEXT" | awk -F_ '{print $2}' | sed 's@[^ ]*@\L&@g' | sed 's@[^ ]*@\u&@1'`
+                sed -i "/${LOC_FOLDER}/d" $HOME/.config/gtk-3.0/bookmarks
+                sed -i "/${EN_FOLDER}/d" $HOME/.config/gtk-3.0/bookmarks
                 echo rename "$HOME/$EN_FOLDER" to "$HOME/$LOC_FOLDER"
-                mv -f "$HOME/$EN_FOLDER" "$HOME/$LOC_FOLDER" 
+                mv -f "$HOME/$EN_FOLDER/" "$HOME/$LOC_FOLDER/" 
             fi
         done < $FILE
          ;;
@@ -58,9 +62,8 @@ case $1 in
 esac
 
 echo make new bookmarks
-#sleep 2
-rm $HOME/.config/gtk-3.0/bookmarks
-echo "file:///usr/share/applications" >> $HOME/.config/gtk-3.0/bookmarks
+sleep 3
+
 MARKS_LIST=`cat "$HOME/.config/user-dirs.dirs" | grep -v \# | grep -v "^XDG_DESKTOP_DIR" | awk -F"=" '{ print $2 }' | sed "s/\"//g"`
 IFS=$'\n'
 for MARK in "$MARKS_LIST"; do 
@@ -70,5 +73,16 @@ done
 #echo clear empty folder
 #DESKTOP_FOLDER=`cat "$HOME/.config/user-dirs.dirs" | grep "^XDG_DESKTOP_DIR" | awk -F/ '{ print $2 }' | sed "s/\"//g"`
 #find "$HOME/$DESKTOP_FOLDER/" -type d -empty -exec rmdir {} \;
+
+echo "######################"
+
+echo -n "Need logout!
+Enter Y or y - to logout: "
+
+read ENTER
+
+case $ENTER in
+  Y|y) xfce4-session-logout -l --fast || systemctl reboot -i;;
+esac
 
 exit 0
