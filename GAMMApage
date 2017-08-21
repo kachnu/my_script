@@ -867,6 +867,7 @@ class ShowGamma:
 					f_in.close()
 					f_out.close()
 					os.chmod(self.start_file, 0755)
+					os.system('echo "[Desktop Entry]\nName=GAMMApage\nType=Application\nExec=$HOME/.xinitrc\nHidden=false" > ~/.config/autostart/gammapage.desktop')
 					self.info("\nSettings have been saved")
 					return True
 				except:
@@ -900,6 +901,7 @@ class ShowGamma:
 				os.system('mv -f %s %s' % (tmp, self.start_file))
 				if self.start_file == os.path.join(self.home_dir,".xinitrc"):
 					os.chmod(self.start_file, 0755)
+				os.system('echo "[Desktop Entry]\nName=GAMMApage\nType=Application\nExec=$HOME/.xinitrc\nHidden=false" > ~/.config/autostart/gammapage.desktop')
 				self.info("\nSettings have been saved")
 				return True
 			except:
@@ -924,6 +926,7 @@ class ShowGamma:
 		# or simply delete the calling lines if file was already there
 		if os.path.exists(rc):
 			os.system('rm -f %s' % rc)
+			os.system('rm -f ~/.config/autostart/gammapage.desktop')
 			
 		self.start_file = self.get_start_file()	
 		if not os.path.exists(self.start_file):
