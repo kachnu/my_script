@@ -241,6 +241,7 @@ case $ANSWER in
       2 ) sudo $APT update; sudo $APT dist-upgrade && echo "$MENU2 - $ALLOK"; PrelinkSystem ;;
       3 ) Check nano; sudo nano /etc/apt/sources.list ;;
       4 ) sudo $APT autoremove
+          dpkg -l | awk '/^rc/ {print $2}' | xargs sudo dpkg --purge
           sudo rm -r /var/cache/apt/archives && echo "remove /var/cache/apt/archive"
           sudo rm -r /var/cache/apt-xapian-index && echo "remove /var/cache/apt-xapian-index";;
       5 ) if [ -x "`sudo which update-flashplugin-nonfree`" ]
