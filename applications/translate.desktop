@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Applet translate
+GenericName[ru]=Апплет переводчик
+Name=Applet translate 
+Name[ru]=Апплет переводчик
+Comment=translate
+Comment[ru]=Апплет на панели для управления ондайн переводчиком 
+Exec=/usr/local/bin/my_translate.sh -a
+Icon=accessories-dictionary
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+StartupNotify=true
+Categories=Office;

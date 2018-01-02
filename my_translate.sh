@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# онлайн перевод выделенного фрагмента текста
+# author: kachnu
+# email: ya.kachnu@gmail.com
 
 # загружаем файл настроек, если его нет - создаем
 CONF_FILE="$HOME/.config/translate.conf"
@@ -16,6 +19,7 @@ fi
 OPT=$1
 LNG2=$2
 SCRIPT_WAY=`readlink -e "$0"`
+SEPAR="\n ######################### \n"
 
 settings ()
 {
@@ -71,7 +75,7 @@ yad --notification --image="accessories-dictionary" --menu \
 case $? in
  0) yad --question --title="Close  applet" --text="Close translate applet?" 
     if [ $? == 0 ]; then break; fi;;
- 252) $SCRIPT_WAY -s;;
+ 252) $SCRIPT_WAY;;
  *) echo $?;;
 esac
 done
@@ -95,6 +99,7 @@ Options
 	# отображение исходного текста
 	if [ "$SOURCE" = "false" ]
 	  then text=' '
+	       SEPAR=' '
 	fi
 	
 	# сохранить перевод в буфер обмена
@@ -109,7 +114,7 @@ Options
 	
 	# вывести в окне
 	if [ "$WINDOW" = "true" ]
-	   then echo -e "$text\n ################### \n$translate" | zenity --text-info --title="Translation" --width=600 --height=400
+	   then echo -e "$text$SEPAR$translate" | zenity --text-info --title="Translation" --width=600 --height=400
 	fi;;
 
 esac
