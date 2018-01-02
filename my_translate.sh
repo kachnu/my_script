@@ -27,7 +27,7 @@ settings ()
 if ! [ `which yad` ]; then echo "Need yad"; exit 1; fi
 
 # список языков uk-українська, ru-русский, be-беларуска, en-english
-LNG_LIST="en!uk!ru!be"
+LNG_LIST="en!uk!ru!be!de!fr"
 
 yad --window-icon=accessories-dictionary --title="Settings translate" \
 --form --separator="," \
@@ -71,6 +71,8 @@ yad --notification --image="accessories-dictionary" --menu \
 |Українська!$SCRIPT_WAY -l uk\
 |Беларуска!$SCRIPT_WAY -l be\
 |English!$SCRIPT_WAY -l en\
+|Deutsch!$SCRIPT_WAY -l de\
+|Française!$SCRIPT_WAY -l fr\
 |Settings!$SCRIPT_WAY -s"
 case $? in
  0) yad --question --title="Close  applet" --text="Close translate applet?" 
