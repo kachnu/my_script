@@ -21,6 +21,8 @@ case $LANG in
                CRYPT_LEVEL_RDP="* Уровень шифрования"
                COLOR_RDP="* Глубина цвета"
                FORK_RDP="* Новая сесcия для других ПК"
+               EDIT_XRDP="* Редактировать xrdp.ini"
+               RULE_START_X="Права на запуск Х сервера"
                HELP_RDP="Справка"
                FORK_TEXT="Выберите хотите ли открывать новую сессию:
   yes - при доступе с другого ПК будет начата новая сессия
@@ -40,7 +42,12 @@ ____________________________________
 * - отмечены настройки, применение которых требует перезагрузки RDP-сервера.
 Обратите внимание, что при перезагрузке RDP - все запущенные сеансы будут закрыты.
 
-Если по какой-то причине сервер не стартует попробуйте создать новый ключ RSA.
+Если по какой-то причине сервер не стартует попробуйте создать новый ключ RSA, воспользуйтесь пунктом:
+ - $NEW_KEY_RDP
+
+Если не возможно подключиться через Xorg, воспользуйтесь пунктом: 
+ - $RULE_START_X
+в появившемся окне выберете 'Кто угодно' или отредактируейте файл /etc/X11/Xwrapper.config с параметром allowed_users=anybody
 ___________________________________"
                ;;
               *) # All locales
@@ -54,6 +61,8 @@ ___________________________________"
                  CRYPT_LEVEL_RDP="* Crypt level"
                  COLOR_RDP="* Color depth"
                  FORK_RDP="* New Session to other PCs"
+                 EDIT_XRDP="* Edit xrdp.ini"
+                 RULE_START_X="X server startup rights"
                  HELP_RDP="Help"
                  FORK_TEXT="Select whether you want to open a new session:
   yes - the new session will be started when you access from another PC
@@ -72,6 +81,15 @@ ____________________________________
 This script is intended for RDP-server, flexible settings (based on xrdp).
 * - Marked settings, the use of which requires a restart of the RDP-server.
 Note that when you restart the RDP - all open sessions will be closed.
+
+If for some reason the server does not start, try to create a new RSA key, use the following:
+ - $NEW_KEY_RDP
+ 
+If it is not possible to connect via Xorg, use:
+ - $RULE_START_X
+in the window that appears, select Anyone or edit the file /etc/X11/Xwrapper.config with the parameter allowed_users=anybody
+
+
 ___________________________________"
 esac    
 
@@ -139,7 +157,7 @@ MainForm () # Main form
 CheckState
 ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
     "$MAIN_TEXT" 18 50\
-    10\
+    11\
         "$START_STOP_RDP" "$STATE_XRDP"\
         "$AUTOSTART_RDP" "$STATE_AUTORUN_XRDP"\
         "$PORT_RDP" "$STATE_PORT_RDP"\
@@ -147,7 +165,9 @@ ANSWER=$($DIALOG  --cancel-button "Exit" --title "$MAIN_LABEL" --menu \
         "$COLOR_RDP" "$STATE_COLOR_RDP"\
         "$FORK_RDP" "$STATE_FORK_RDP"\
         "$NEW_KEY_RDP" ""\
+        "$EDIT_XRDP" ""\
         "$RESTART_RDP" ""\
+        "$RULE_START_X" ""\
         "$HELP_RDP" "" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]
    then echo Exit ; exit 0
@@ -255,6 +275,10 @@ case $ANSWER in
                         MainForm
                      fi
                      sudo sed -i "s/^fork.*/fork=${STATE_FORK_RDP}/" /etc/xrdp/xrdp.ini
+        ;;
+        "$RULE_START_X" ) sudo dpkg-reconfigure xserver-xorg-legacy
+        ;;
+        "$EDIT_XRDP") sudo nano /etc/xrdp/xrdp.ini
         ;;
         "$HELP_RDP") echo "$HELP"
                      echo "$EXIT_TEXT"
