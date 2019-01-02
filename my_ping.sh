@@ -2,7 +2,10 @@
 # script for ping http://xxxx.yyy.zz/abcd (https, ftp)
 
 DEST=$1
-CLEAR_DEST=$(echo $DEST | awk -F\/ '{print $3}')
-/bin/ping $CLEAR_DEST
+if [[ $(echo $DEST | grep /) ]]; then
+      CLEAR_DEST=$(echo $DEST | awk -F\/ '{print $3}')
+     /bin/ping $CLEAR_DEST
+else /bin/ping $DEST
+fi
 
 exit 0
