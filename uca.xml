@@ -2,7 +2,7 @@
 <actions>
 <action>
 	<icon>catfish</icon>
-	<name>Найти файл</name>
+	<name>Найти файл</name>cc
 	<unique-id>1491407489088048-1</unique-id>
 	<command>catfish --hidden --path=%f</command>
 	<description>Search with Catfish</description>
